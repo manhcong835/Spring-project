@@ -2,12 +2,21 @@ package com.spring.project;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
 
 @SpringBootApplication
 public class ProjectApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ProjectApplication.class, args);
+		// SpringApplication.run(ProjectApplication.class, args);
+		ApplicationContext context = SpringApplication.run(ProjectApplication.class, args);
+
+		String port = context.getEnvironment().getProperty("local.server.port");
+
+		System.out.println("\n---------------------------------------------------------");
+		System.out.println("\tApplication is running! Access URL:");
+		System.out.println("\tLocal: \t\thttp://localhost:" + port);
+		System.out.println("---------------------------------------------------------\n");
 	}
 
 }
