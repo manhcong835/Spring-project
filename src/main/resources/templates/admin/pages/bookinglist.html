@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head th:replace="~{admin/fragments/head :: head('Quản lý Đơn đặt', null)}"></head>
+<body>
+<div th:replace="~{admin/fragments/sidebar :: sidebar}"></div>
+<div class="admin-main">
+    <div th:replace="~{admin/fragments/header :: header}"></div>
+    <main class="flex-grow-1 p-4">
+        <div th:replace="~{admin/fragments/breadcrumb :: breadcrumb('Đơn đặt tour')}"></div>
+        <h4 class="fw-bold mb-4">📋 Quản Lý Đơn Đặt Tour</h4>
+
+        <div class="card admin-card mb-4">
+            <div class="card-body">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-3"><input type="text" class="form-control form-control-sm" placeholder="Mã đơn / tên khách..."></div>
+                    <div class="col-md-2">
+                        <select class="form-select form-select-sm">
+                            <option>Trạng thái</option><option>Chờ xác nhận</option><option>Đã xác nhận</option><option>Đã thanh toán</option><option>Đã hoàn thành</option><option>Đã hủy</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2"><input type="date" class="form-control form-control-sm"></div>
+                    <div class="col-md-2"><input type="date" class="form-control form-control-sm"></div>
+                    <div class="col-md-3"><button class="btn btn-primary btn-sm w-100">Tìm kiếm</button></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card admin-card">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-admin table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Mã đơn</th>
+                                <th>Khách hàng</th>
+                                <th>Tour</th>
+                                <th>Ngày đặt</th>
+                                <th>Ngày khởi hành</th>
+                                <th>Số khách</th>
+                                <th>Tổng tiền</th>
+                                <th>Trạng thái</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>#BK1257</strong></td>
+                                <td>Nguyễn Thị Lan</td>
+                                <td>Phú Quốc 4N3Đ</td>
+                                <td>02/04/2026</td>
+                                <td>15/04/2026</td>
+                                <td>3</td>
+                                <td class="fw-bold">12.970.000đ</td>
+                                <td><span class="badge bg-warning text-dark rounded-pill">Chờ xác nhận</span></td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a th:href="@{/admin/bookings/status}" class="btn btn-outline-primary">Cập nhật</a>
+                                        <a th:href="@{/admin/bookings/delete}" class="btn btn-outline-danger">Xóa</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>#BK1256</strong></td>
+                                <td>Trần Văn Minh</td>
+                                <td>Đà Nẵng 3N2Đ</td>
+                                <td>01/04/2026</td>
+                                <td>20/04/2026</td>
+                                <td>2</td>
+                                <td class="fw-bold">6.580.000đ</td>
+                                <td><span class="badge bg-success rounded-pill">Đã thanh toán</span></td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a th:href="@{/admin/bookings/status}" class="btn btn-outline-primary">Cập nhật</a>
+                                        <a th:href="@{/admin/bookings/delete}" class="btn btn-outline-danger">Xóa</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>#BK1255</strong></td>
+                                <td>Lê Hoàng Anh</td>
+                                <td>Sapa 3N2Đ</td>
+                                <td>01/04/2026</td>
+                                <td>10/04/2026</td>
+                                <td>4</td>
+                                <td class="fw-bold">14.760.000đ</td>
+                                <td><span class="badge bg-info text-dark rounded-pill">Đã xác nhận</span></td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a th:href="@{/admin/bookings/status}" class="btn btn-outline-primary">Cập nhật</a>
+                                        <a th:href="@{/admin/bookings/delete}" class="btn btn-outline-danger">Xóa</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>#BK1254</strong></td>
+                                <td>Phạm Thị Hoa</td>
+                                <td>Hạ Long 2N1Đ</td>
+                                <td>31/03/2026</td>
+                                <td>05/04/2026</td>
+                                <td>2</td>
+                                <td class="fw-bold">5.180.000đ</td>
+                                <td><span class="badge bg-danger rounded-pill">Đã hủy</span></td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a th:href="@{/admin/bookings/status}" class="btn btn-outline-secondary">Xem</a>
+                                        <a th:href="@{/admin/bookings/delete}" class="btn btn-outline-danger">Xóa</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div th:replace="~{admin/fragments/pagination :: pagination}"></div>
+    </main>
+    <div th:replace="~{admin/fragments/footer :: footer}"></div>
+</div>
+</body>
+</html>

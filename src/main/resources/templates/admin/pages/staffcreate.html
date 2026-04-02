@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head th:replace="~{admin/fragments/head :: head('Thêm nhân viên', null)}"></head>
+<body>
+<div th:replace="~{admin/fragments/sidebar :: sidebar}"></div>
+<div class="admin-main">
+    <div th:replace="~{admin/fragments/header :: header}"></div>
+    <main class="flex-grow-1 p-4">
+        <div th:replace="~{admin/fragments/breadcrumb :: breadcrumb('Thêm nhân viên')}"></div>
+        <h4 class="fw-bold mb-4">👔 Thêm Nhân Viên Mới</h4>
+        <div class="card admin-card">
+            <div class="card-body p-4">
+                <form>
+                    <div class="row g-3">
+                        <div class="col-md-6"><label class="form-label fw-semibold">Họ và tên <span class="text-danger">*</span></label><input type="text" class="form-control" placeholder="Nguyễn Văn A" required></div>
+                        <div class="col-md-6"><label class="form-label fw-semibold">Email <span class="text-danger">*</span></label><input type="email" class="form-control" placeholder="nva@traveler.vn" required></div>
+                        <div class="col-md-6"><label class="form-label fw-semibold">Số điện thoại</label><input type="tel" class="form-control" placeholder="0912 345 678"></div>
+                        <div class="col-md-6"><label class="form-label fw-semibold">Phòng ban <span class="text-danger">*</span></label>
+                            <select class="form-select" required><option value="">Chọn phòng ban</option><option>Hướng dẫn viên</option><option>Kinh doanh</option><option>Hỗ trợ khách hàng</option><option>Quản trị</option></select>
+                        </div>
+                        <div class="col-md-6"><label class="form-label fw-semibold">Chức vụ</label><input type="text" class="form-control" placeholder="Nhân viên"></div>
+                        <div class="col-md-6"><label class="form-label fw-semibold">Ngày bắt đầu</label><input type="date" class="form-control"></div>
+                        <div class="col-12"><label class="form-label fw-semibold">Địa chỉ</label><input type="text" class="form-control" placeholder="Quận 1, TP.HCM"></div>
+                        <div class="col-12"><label class="form-label fw-semibold">Ghi chú</label><textarea class="form-control" rows="3" placeholder="Ghi chú thêm..."></textarea></div>
+                    </div>
+                    <div class="mt-4 d-flex gap-2"><button type="submit" class="btn btn-primary">Thêm nhân viên</button><a th:href="@{/admin/staff}" class="btn btn-outline-secondary">Hủy</a></div>
+                </form>
+            </div>
+        </div>
+    </main>
+    <div th:replace="~{admin/fragments/footer :: footer}"></div>
+</div>
+</body>
+</html>

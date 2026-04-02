@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head th:replace="~{client/fragments/head :: head('Lịch sử đặt tour', null)}"></head>
+<body>
+<div th:replace="~{client/fragments/header :: header}"></div>
+<div th:replace="~{client/fragments/navbar :: navbar}"></div>
+
+<section class="py-5">
+    <div class="container">
+        <h3 class="fw-bold mb-4">📋 Lịch Sử Đặt Tour</h3>
+
+        <!-- Filter -->
+        <div class="card border-0 shadow-sm rounded-4 p-3 mb-4">
+            <div class="row g-2 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold">Trạng thái</label>
+                    <select class="form-select form-select-sm">
+                        <option>Tất cả</option>
+                        <option>Chờ xác nhận</option>
+                        <option>Đã xác nhận</option>
+                        <option>Đã thanh toán</option>
+                        <option>Đã hoàn thành</option>
+                        <option>Đã hủy</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold">Từ ngày</label>
+                    <input type="date" class="form-control form-control-sm">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold">Đến ngày</label>
+                    <input type="date" class="form-control form-control-sm">
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-primary btn-sm w-100">Lọc</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking List -->
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Mã đơn</th>
+                        <th>Tour</th>
+                        <th>Ngày khởi hành</th>
+                        <th>Số khách</th>
+                        <th>Tổng tiền</th>
+                        <th>Trạng thái</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>#BK001</strong></td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="https://placehold.co/50x35/0d6efd/ffffff?text=PQ" class="rounded" alt="tour">
+                                <span class="fw-semibold small">Phú Quốc — Grand World</span>
+                            </div>
+                        </td>
+                        <td>15/04/2026</td>
+                        <td>3 khách</td>
+                        <td class="fw-bold text-primary">12.970.000đ</td>
+                        <td><span class="badge bg-success rounded-pill">Đã thanh toán</span></td>
+                        <td>
+                            <a th:href="@{/booking/detail}" class="btn btn-sm btn-outline-primary">Chi tiết</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>#BK002</strong></td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="https://placehold.co/50x35/198754/ffffff?text=DN" class="rounded" alt="tour">
+                                <span class="fw-semibold small">Đà Nẵng — Bà Nà — Hội An</span>
+                            </div>
+                        </td>
+                        <td>20/04/2026</td>
+                        <td>2 khách</td>
+                        <td class="fw-bold text-primary">6.580.000đ</td>
+                        <td><span class="badge bg-warning text-dark rounded-pill">Chờ xác nhận</span></td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a th:href="@{/booking/detail}" class="btn btn-outline-primary">Chi tiết</a>
+                                <a th:href="@{/booking/edit}" class="btn btn-outline-secondary">Sửa</a>
+                                <a th:href="@{/booking/cancel}" class="btn btn-outline-danger">Hủy</a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>#BK003</strong></td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="https://placehold.co/50x35/6f42c1/ffffff?text=SP" class="rounded" alt="tour">
+                                <span class="fw-semibold small">Sapa — Fansipan</span>
+                            </div>
+                        </td>
+                        <td>10/03/2026</td>
+                        <td>4 khách</td>
+                        <td class="fw-bold text-primary">14.760.000đ</td>
+                        <td><span class="badge bg-info text-dark rounded-pill">Đã hoàn thành</span></td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a th:href="@{/booking/detail}" class="btn btn-outline-primary">Chi tiết</a>
+                                <a th:href="@{/review/create}" class="btn btn-outline-warning">Đánh giá</a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>#BK004</strong></td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="https://placehold.co/50x35/dc3545/ffffff?text=HL" class="rounded" alt="tour">
+                                <span class="fw-semibold small">Hạ Long — Du thuyền 5 sao</span>
+                            </div>
+                        </td>
+                        <td>05/02/2026</td>
+                        <td>2 khách</td>
+                        <td class="fw-bold text-muted"><del>5.180.000đ</del></td>
+                        <td><span class="badge bg-danger rounded-pill">Đã hủy</span></td>
+                        <td>
+                            <a th:href="@{/booking/detail}" class="btn btn-sm btn-outline-secondary">Chi tiết</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:replace="~{client/fragments/pagination :: pagination}"></div>
+    </div>
+</section>
+
+<div th:replace="~{client/fragments/footer :: footer}"></div>
+</body>
+</html>

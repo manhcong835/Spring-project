@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head th:replace="~{client/fragments/head :: head('Đặt tour', null)}"></head>
+<body>
+<div th:replace="~{client/fragments/header :: header}"></div>
+<div th:replace="~{client/fragments/navbar :: navbar}"></div>
+
+<section class="py-5">
+    <div class="container">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/}" class="text-decoration-none">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/tours}" class="text-decoration-none">Tour</a></li>
+                <li class="breadcrumb-item active">Đặt tour</li>
+            </ol>
+        </nav>
+
+        <h3 class="fw-bold mb-4">🛒 Đặt Tour Du Lịch</h3>
+
+        <div class="row g-4">
+            <!-- Form đặt tour -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                    <h5 class="fw-bold mb-3">👤 Thông tin liên hệ</h5>
+                    <form>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Họ và tên <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" value="Nguyễn Văn A" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Số điện thoại <span class="text-danger">*</span></label>
+                                <input type="tel" class="form-control" value="0912 345 678" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Email <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" value="nguyenvana@email.com" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Địa chỉ</label>
+                                <input type="text" class="form-control" value="Quận 1, TP.HCM">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                    <h5 class="fw-bold mb-3">📅 Thông tin chuyến đi</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Ngày khởi hành <span class="text-danger">*</span></label>
+                            <select class="form-select">
+                                <option>15/04/2026 (còn 12 chỗ)</option>
+                                <option>22/04/2026 (còn 20 chỗ)</option>
+                                <option>29/04/2026 (còn 8 chỗ)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Người lớn <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" value="2" min="1" max="20">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Trẻ em</label>
+                            <input type="number" class="form-control" value="1" min="0" max="10">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Ghi chú</label>
+                            <textarea class="form-control" rows="3" placeholder="Yêu cầu đặc biệt: chế độ ăn, phòng, v.v.">Chúng tôi có em bé 3 tuổi, vui lòng bố trí phòng gia đình.</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-4 p-4">
+                    <h5 class="fw-bold mb-3">🎫 Mã khuyến mãi</h5>
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Nhập mã khuyến mãi (nếu có)">
+                        <button class="btn btn-outline-primary">Áp dụng</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tóm tắt đơn đặt -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow rounded-4 p-4 sticky-top" style="top:90px;">
+                    <h5 class="fw-bold mb-3">📋 Tóm tắt đơn đặt</h5>
+                    <div class="d-flex gap-3 mb-3">
+                        <img src="https://placehold.co/100x70/0d6efd/ffffff?text=PQ" alt="Tour" class="rounded-3" style="width:80px;height:60px;object-fit:cover;">
+                        <div>
+                            <h6 class="fw-bold mb-1 small">Phú Quốc — Grand World — Vinpearl Safari</h6>
+                            <small class="text-muted">4N3Đ • Khởi hành: 15/04/2026</small>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between small mb-2">
+                        <span>2 người lớn × 4.990.000đ</span><strong>9.980.000đ</strong>
+                    </div>
+                    <div class="d-flex justify-content-between small mb-2">
+                        <span>1 trẻ em × 3.490.000đ</span><strong>3.490.000đ</strong>
+                    </div>
+                    <div class="d-flex justify-content-between small mb-2 text-success">
+                        <span>Giảm giá</span><strong>-500.000đ</strong>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between fw-bold fs-5 mb-3">
+                        <span>Tổng cộng</span><span class="text-primary">12.970.000đ</span>
+                    </div>
+                    <a th:href="@{/payment}" class="btn btn-primary btn-lg w-100 fw-semibold mb-2">Tiếp tục thanh toán →</a>
+                    <a th:href="@{/tours/detail}" class="btn btn-outline-secondary w-100">← Quay lại tour</a>
+                    <div class="mt-3 small text-muted text-center">
+                        🔒 Thông tin được bảo mật an toàn
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div th:replace="~{client/fragments/footer :: footer}"></div>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head th:replace="~{client/fragments/head :: head('Sửa đơn đặt tour', null)}"></head>
+<body>
+<div th:replace="~{client/fragments/header :: header}"></div>
+<div th:replace="~{client/fragments/navbar :: navbar}"></div>
+<section class="py-5">
+    <div class="container">
+        <h3 class="fw-bold mb-4">✏️ Sửa Đơn Đặt Tour</h3>
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                    <div class="alert alert-info small mb-3">ℹ️ Bạn chỉ có thể sửa đơn khi đơn đang ở trạng thái <strong>"Chờ xác nhận"</strong>.</div>
+                    <h5 class="fw-bold mb-3">Thông tin chuyến đi</h5>
+                    <form>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Ngày khởi hành</label>
+                                <select class="form-select"><option selected>20/04/2026 (còn 20 chỗ)</option><option>27/04/2026 (còn 15 chỗ)</option></select>
+                            </div>
+                            <div class="col-md-3"><label class="form-label fw-semibold">Người lớn</label><input type="number" class="form-control" value="2" min="1"></div>
+                            <div class="col-md-3"><label class="form-label fw-semibold">Trẻ em</label><input type="number" class="form-control" value="0" min="0"></div>
+                            <div class="col-12"><label class="form-label fw-semibold">Ghi chú</label><textarea class="form-control" rows="3">Không có yêu cầu đặc biệt</textarea></div>
+                        </div>
+                        <div class="mt-4 d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                            <a th:href="@{/booking/history}" class="btn btn-outline-secondary">Hủy</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card border-0 shadow rounded-4 p-4">
+                    <h6 class="fw-bold mb-3">📋 Thông tin đơn</h6>
+                    <div class="small"><div class="mb-2"><strong>Mã đơn:</strong> #BK002</div><div class="mb-2"><strong>Tour:</strong> Đà Nẵng — Bà Nà — Hội An</div><div class="mb-2"><strong>Trạng thái:</strong> <span class="badge bg-warning text-dark">Chờ xác nhận</span></div><div class="mb-2"><strong>Tổng tiền:</strong> <span class="text-primary fw-bold">6.580.000đ</span></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<div th:replace="~{client/fragments/footer :: footer}"></div>
+</body>
+</html>

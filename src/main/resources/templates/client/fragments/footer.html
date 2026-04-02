@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<footer th:fragment="footer" class="client-footer bg-dark text-white pt-5 pb-3 mt-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <h5 class="fw-bold mb-3"><span class="text-primary">✈️ Travel</span><span class="text-warning">er</span></h5>
+                <p class="text-white-50 small">Traveler — Nền tảng đặt tour du lịch, vé máy bay, khách sạn trực tuyến hàng đầu Việt Nam. Đồng hành cùng hàng triệu du khách mỗi năm.</p>
+                <div class="d-flex gap-2 mt-3">
+                    <a href="#" class="btn btn-outline-light btn-sm rounded-circle">📘</a>
+                    <a href="#" class="btn btn-outline-light btn-sm rounded-circle">📷</a>
+                    <a href="#" class="btn btn-outline-light btn-sm rounded-circle">▶️</a>
+                    <a href="#" class="btn btn-outline-light btn-sm rounded-circle">💬</a>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-6">
+                <h6 class="fw-bold mb-3">Sản phẩm</h6>
+                <ul class="list-unstyled small">
+                    <li class="mb-2"><a th:href="@{/tours}" class="text-white-50 text-decoration-none">Tour trong nước</a></li>
+                    <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Tour nước ngoài</a></li>
+                    <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Vé máy bay</a></li>
+                    <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Khách sạn</a></li>
+                    <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Combo du lịch</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-2 col-md-6">
+                <h6 class="fw-bold mb-3">Về Traveler</h6>
+                <ul class="list-unstyled small">
+                    <li class="mb-2"><a th:href="@{/about}" class="text-white-50 text-decoration-none">Giới thiệu</a></li>
+                    <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Tuyển dụng</a></li>
+                    <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Điều khoản</a></li>
+                    <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Chính sách bảo mật</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <h6 class="fw-bold mb-3">Liên hệ</h6>
+                <ul class="list-unstyled small">
+                    <li class="mb-2 text-white-50">📞 Hotline: 1900 1234</li>
+                    <li class="mb-2 text-white-50">✉️ info@traveler.vn</li>
+                    <li class="mb-2 text-white-50">📍 Hà Nội, Việt Nam</li>
+                    <li class="mb-2 text-white-50">🕐 Hằng ngày: 8:00 – 22:00</li>
+                </ul>
+            </div>
+        </div>
+        <hr class="border-secondary my-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center small text-white-50">
+            <span>© 2026 Traveler. Bảo lưu mọi quyền.</span>
+            <div class="d-flex gap-3 mt-2 mt-md-0">
+                <a href="#" class="text-white-50 text-decoration-none">Điều khoản</a>
+                <a href="#" class="text-white-50 text-decoration-none">Bảo mật</a>
+                <a href="#" class="text-white-50 text-decoration-none">Sitemap</a>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</footer>
+</html>

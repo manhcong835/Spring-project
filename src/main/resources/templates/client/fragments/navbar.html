@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold fs-4" th:href="@{/}">
+            <span class="text-primary">✈️ Travel</span><span class="text-warning">er</span>
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#clientNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="clientNavbar">
+            <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/}">Trang chủ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/tours}">Tour du lịch</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/about}">Giới thiệu</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/contact}">Liên hệ</a>
+                </li>
+            </ul>
+            <div class="d-flex align-items-center gap-2">
+                <a th:href="@{/booking/history}" class="btn btn-outline-secondary btn-sm">📋 Đơn của tôi</a>
+                <a th:href="@{/login}" class="btn btn-primary btn-sm">Đăng nhập</a>
+                <a th:href="@{/register}" class="btn btn-outline-primary btn-sm">Đăng ký</a>
+            </div>
+        </div>
+    </div>
+</nav>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head th:replace="~{client/fragments/head :: head('Chi tiết tour', '/css/client/tourdetail.css')}"></head>
+<body>
+<div th:replace="~{client/fragments/header :: header}"></div>
+<div th:replace="~{client/fragments/navbar :: navbar}"></div>
+
+<section class="py-5">
+    <div class="container">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/}" class="text-decoration-none">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/tours}" class="text-decoration-none">Tour du lịch</a></li>
+                <li class="breadcrumb-item active">Phú Quốc — Grand World — Vinpearl Safari</li>
+            </ol>
+        </nav>
+
+        <div class="row g-4">
+            <!-- Left: Tour info -->
+            <div class="col-lg-8">
+                <!-- Gallery -->
+                <div class="tour-gallery mb-4">
+                    <img src="https://placehold.co/900x450/0d6efd/ffffff?text=Phú+Quốc+Paradise" alt="Phú Quốc">
+                </div>
+                <div class="row g-2 tour-gallery-thumb mb-4">
+                    <div class="col-3"><img src="https://placehold.co/250x100/198754/ffffff?text=Ảnh+1" alt="thumb" class="active"></div>
+                    <div class="col-3"><img src="https://placehold.co/250x100/6f42c1/ffffff?text=Ảnh+2" alt="thumb"></div>
+                    <div class="col-3"><img src="https://placehold.co/250x100/dc3545/ffffff?text=Ảnh+3" alt="thumb"></div>
+                    <div class="col-3"><img src="https://placehold.co/250x100/fd7e14/ffffff?text=Ảnh+4" alt="thumb"></div>
+                </div>
+
+                <!-- Title & Quick Info -->
+                <h2 class="fw-bold mb-2">Phú Quốc — Grand World — Vinpearl Safari</h2>
+                <div class="d-flex flex-wrap gap-3 mb-4 text-muted">
+                    <span>📍 Kiên Giang, Việt Nam</span>
+                    <span>⏱️ 4 ngày 3 đêm</span>
+                    <span>✈️ Bay VietJet Air</span>
+                    <span class="text-warning fw-bold">★ 4.9 (320 đánh giá)</span>
+                </div>
+
+                <!-- Highlights -->
+                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                    <h5 class="fw-bold mb-3">✨ Điểm nổi bật</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6"><span class="badge bg-primary-subtle text-primary me-2">✈️</span>Bay thẳng VietJet Air</div>
+                        <div class="col-md-6"><span class="badge bg-primary-subtle text-primary me-2">🏨</span>Resort 5 sao Vinpearl</div>
+                        <div class="col-md-6"><span class="badge bg-primary-subtle text-primary me-2">🍜</span>3 bữa ăn mỗi ngày</div>
+                        <div class="col-md-6"><span class="badge bg-primary-subtle text-primary me-2">🚌</span>Xe đưa đón VIP</div>
+                        <div class="col-md-6"><span class="badge bg-primary-subtle text-primary me-2">🎢</span>VinWonders miễn phí</div>
+                        <div class="col-md-6"><span class="badge bg-primary-subtle text-primary me-2">📸</span>Chụp ảnh kỷ niệm</div>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                    <h5 class="fw-bold mb-3">📋 Mô tả tour</h5>
+                    <p>Tour Phú Quốc 4 ngày 3 đêm đưa bạn trải nghiệm thiên đường biển đảo hàng đầu Việt Nam. Tham quan Grand World — thị trấn Địa Trung Hải, Vinpearl Safari — vườn thú bán hoang dã lớn nhất Đông Nam Á, tắm biển Bãi Sao, lặn ngắm san hô, và thưởng thức hải sản tươi sống.</p>
+                    <p>Tour bao gồm vé máy bay khứ hồi, ăn uống, khách sạn, xe đưa đón, và hướng dẫn viên chuyên nghiệp.</p>
+                </div>
+
+                <!-- Itinerary -->
+                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                    <h5 class="fw-bold mb-4">📅 Lịch trình tour</h5>
+                    <div class="itinerary-day">
+                        <h6 class="fw-bold text-primary">Ngày 1: TP.HCM — Phú Quốc</h6>
+                        <p class="text-muted small mb-0">Đón khách tại sân bay Tân Sơn Nhất, bay đến Phú Quốc. Check-in resort, tham quan Grand World — show nhạc nước, ăn tối hải sản.</p>
+                    </div>
+                    <div class="itinerary-day">
+                        <h6 class="fw-bold text-primary">Ngày 2: Vinpearl Safari — VinWonders</h6>
+                        <p class="text-muted small mb-0">Sáng: tham quan Safari, ngắm thú hoang dã. Chiều: VinWonders với trò chơi cảm giác mạnh. Tối: show nghệ thuật tại Grand World.</p>
+                    </div>
+                    <div class="itinerary-day">
+                        <h6 class="fw-bold text-primary">Ngày 3: Bãi Sao — Lặn san hô</h6>
+                        <p class="text-muted small mb-0">Sáng: tắm biển Bãi Sao. Chiều: lặn ngắm san hô tại Hòn Thơm. Tối: tự do mua sắm chợ đêm.</p>
+                    </div>
+                    <div class="itinerary-day">
+                        <h6 class="fw-bold text-primary">Ngày 4: Phú Quốc — TP.HCM</h6>
+                        <p class="text-muted small mb-0">Sáng: mua đặc sản. Trưa: bay về TP.HCM. Kết thúc tour, hẹn gặp lại!</p>
+                    </div>
+                </div>
+
+                <!-- Reviews Section -->
+                <div class="card border-0 shadow-sm rounded-4 p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold mb-0">💬 Đánh giá từ khách hàng</h5>
+                        <a th:href="@{/review/create}" class="btn btn-outline-primary btn-sm">Viết đánh giá</a>
+                    </div>
+                    <div class="border-bottom pb-3 mb-3">
+                        <div class="d-flex gap-3 align-items-start">
+                            <div class="review-avatar">NT</div>
+                            <div>
+                                <div class="fw-bold">Nguyễn Thị Lan <span class="text-warning">★★★★★</span></div>
+                                <small class="text-muted">15/03/2026</small>
+                                <p class="mb-0 mt-1 small">"Tour tuyệt vời! Resort đẹp, đồ ăn ngon, guide nhiệt tình."</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pb-3">
+                        <div class="d-flex gap-3 align-items-start">
+                            <div class="review-avatar">TV</div>
+                            <div>
+                                <div class="fw-bold">Trần Văn Minh <span class="text-warning">★★★★★</span></div>
+                                <small class="text-muted">12/03/2026</small>
+                                <p class="mb-0 mt-1 small">"Lần đầu đi tour hài lòng 100%. Sẽ giới thiệu cho bạn bè."</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Booking card -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow rounded-4 p-4 tour-info-card">
+                    <div class="text-center mb-3">
+                        <del class="text-muted">6.990.000đ</del>
+                        <div class="text-primary fw-bold display-6">4.990.000đ</div>
+                        <small class="text-muted">/ khách</small>
+                    </div>
+                    <hr>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between small mb-2">
+                            <span class="text-muted">Mã tour:</span><strong>PQ2026-04</strong>
+                        </div>
+                        <div class="d-flex justify-content-between small mb-2">
+                            <span class="text-muted">Thời gian:</span><strong>4 ngày 3 đêm</strong>
+                        </div>
+                        <div class="d-flex justify-content-between small mb-2">
+                            <span class="text-muted">Khởi hành:</span><strong>15/04/2026</strong>
+                        </div>
+                        <div class="d-flex justify-content-between small mb-2">
+                            <span class="text-muted">Nơi khởi hành:</span><strong>TP. Hồ Chí Minh</strong>
+                        </div>
+                        <div class="d-flex justify-content-between small mb-2">
+                            <span class="text-muted">Số chỗ còn lại:</span><strong class="text-danger">12 chỗ</strong>
+                        </div>
+                    </div>
+                    <a th:href="@{/booking/create}" class="btn btn-primary btn-lg w-100 fw-semibold mb-2">🛒 Đặt tour ngay</a>
+                    <a href="tel:19001234" class="btn btn-outline-secondary w-100">📞 Gọi tư vấn: 1900 1234</a>
+                    <div class="mt-3 text-center">
+                        <span class="badge bg-success-subtle text-success rounded-pill px-3">✅ Đảm bảo hoàn tiền</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div th:replace="~{client/fragments/footer :: footer}"></div>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head th:replace="~{client/fragments/head :: head('Thanh toán', null)}"></head>
+<body>
+<div th:replace="~{client/fragments/header :: header}"></div>
+<div th:replace="~{client/fragments/navbar :: navbar}"></div>
+<section class="py-5">
+    <div class="container">
+        <h3 class="fw-bold mb-4">💳 Thanh Toán</h3>
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                    <h5 class="fw-bold mb-3">Chọn phương thức thanh toán</h5>
+                    <div class="list-group list-group-flush">
+                        <label class="list-group-item d-flex align-items-center gap-3 border rounded-3 mb-2 p-3">
+                            <input class="form-check-input" type="radio" name="payment" checked>
+                            <div><div class="fw-semibold">💳 Thẻ tín dụng / Ghi nợ</div><small class="text-muted">Visa, Mastercard, JCB</small></div>
+                        </label>
+                        <label class="list-group-item d-flex align-items-center gap-3 border rounded-3 mb-2 p-3">
+                            <input class="form-check-input" type="radio" name="payment">
+                            <div><div class="fw-semibold">🏦 Chuyển khoản ngân hàng</div><small class="text-muted">Vietcombank, Techcombank, BIDV, MB...</small></div>
+                        </label>
+                        <label class="list-group-item d-flex align-items-center gap-3 border rounded-3 mb-2 p-3">
+                            <input class="form-check-input" type="radio" name="payment">
+                            <div><div class="fw-semibold">📱 Ví điện tử</div><small class="text-muted">MoMo, ZaloPay, VNPay</small></div>
+                        </label>
+                        <label class="list-group-item d-flex align-items-center gap-3 border rounded-3 p-3">
+                            <input class="form-check-input" type="radio" name="payment">
+                            <div><div class="fw-semibold">💵 Thanh toán tại văn phòng</div><small class="text-muted">Tiền mặt hoặc quẹt thẻ</small></div>
+                        </label>
+                    </div>
+                </div>
+                <div class="card border-0 shadow-sm rounded-4 p-4">
+                    <h5 class="fw-bold mb-3">Thông tin thẻ</h5>
+                    <form>
+                        <div class="mb-3"><label class="form-label fw-semibold">Số thẻ</label><input type="text" class="form-control" placeholder="0000 0000 0000 0000"></div>
+                        <div class="row g-3">
+                            <div class="col-md-6"><label class="form-label fw-semibold">Ngày hết hạn</label><input type="text" class="form-control" placeholder="MM/YY"></div>
+                            <div class="col-md-6"><label class="form-label fw-semibold">CVV</label><input type="text" class="form-control" placeholder="***"></div>
+                        </div>
+                        <div class="mt-3"><label class="form-label fw-semibold">Tên chủ thẻ</label><input type="text" class="form-control" placeholder="NGUYEN VAN A"></div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="card border-0 shadow rounded-4 p-4 sticky-top" style="top:90px;">
+                    <h5 class="fw-bold mb-3">📋 Tóm tắt đơn hàng</h5>
+                    <div class="d-flex gap-3 mb-3">
+                        <img src="https://placehold.co/80x60/0d6efd/ffffff?text=PQ" alt="Tour" class="rounded-3">
+                        <div><h6 class="fw-bold small mb-1">Phú Quốc — Grand World — Vinpearl Safari</h6><small class="text-muted">4N3Đ • 15/04/2026</small></div>
+                    </div>
+                    <hr>
+                    <div class="small">
+                        <div class="d-flex justify-content-between mb-2"><span>2 người lớn × 4.990.000đ</span><strong>9.980.000đ</strong></div>
+                        <div class="d-flex justify-content-between mb-2"><span>1 trẻ em × 3.490.000đ</span><strong>3.490.000đ</strong></div>
+                        <div class="d-flex justify-content-between mb-2 text-success"><span>Giảm giá</span><strong>-500.000đ</strong></div>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between fw-bold fs-5 mb-4">
+                        <span>TỔNG CỘNG</span><span class="text-primary">12.970.000đ</span>
+                    </div>
+                    <button class="btn btn-primary btn-lg w-100 fw-semibold">Thanh toán ngay</button>
+                    <div class="text-center mt-3 small text-muted">🔒 Giao dịch được mã hóa SSL 256-bit</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<div th:replace="~{client/fragments/footer :: footer}"></div>
+</body>
+</html>

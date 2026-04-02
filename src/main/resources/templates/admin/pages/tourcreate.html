@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head th:replace="~{admin/fragments/head :: head('Thêm tour', null)}"></head>
+<body>
+<div th:replace="~{admin/fragments/sidebar :: sidebar}"></div>
+<div class="admin-main">
+    <div th:replace="~{admin/fragments/header :: header}"></div>
+    <main class="flex-grow-1 p-4">
+        <div th:replace="~{admin/fragments/breadcrumb :: breadcrumb('Thêm tour mới')}"></div>
+        <h4 class="fw-bold mb-4">🗺️ Thêm Tour Mới</h4>
+        <div class="card admin-card">
+            <div class="card-body p-4">
+                <form>
+                    <div class="row g-3">
+                        <div class="col-md-8"><label class="form-label fw-semibold">Tên tour <span class="text-danger">*</span></label><input type="text" class="form-control" placeholder="VD: Phú Quốc — Grand World — Vinpearl Safari" required></div>
+                        <div class="col-md-4"><label class="form-label fw-semibold">Mã tour</label><input type="text" class="form-control" placeholder="VD: PQ2026-04"></div>
+                        <div class="col-md-4"><label class="form-label fw-semibold">Điểm đến <span class="text-danger">*</span></label><select class="form-select" required><option value="">Chọn điểm đến</option><option>Phú Quốc</option><option>Đà Nẵng</option><option>Hạ Long</option><option>Sapa</option><option>Nha Trang</option><option>Đà Lạt</option><option>Huế</option></select></div>
+                        <div class="col-md-4"><label class="form-label fw-semibold">Nơi khởi hành</label><select class="form-select"><option>TP. Hồ Chí Minh</option><option>Hà Nội</option><option>Đà Nẵng</option></select></div>
+                        <div class="col-md-4"><label class="form-label fw-semibold">Thời gian</label><input type="text" class="form-control" placeholder="VD: 4 ngày 3 đêm"></div>
+                        <div class="col-md-3"><label class="form-label fw-semibold">Giá người lớn <span class="text-danger">*</span></label><input type="number" class="form-control" placeholder="4990000"></div>
+                        <div class="col-md-3"><label class="form-label fw-semibold">Giá trẻ em</label><input type="number" class="form-control" placeholder="3490000"></div>
+                        <div class="col-md-3"><label class="form-label fw-semibold">Giá gốc (nếu giảm)</label><input type="number" class="form-control" placeholder="6990000"></div>
+                        <div class="col-md-3"><label class="form-label fw-semibold">Số chỗ</label><input type="number" class="form-control" placeholder="30"></div>
+                        <div class="col-md-6"><label class="form-label fw-semibold">Ngày khởi hành</label><input type="date" class="form-control"></div>
+                        <div class="col-md-6"><label class="form-label fw-semibold">Phương tiện</label><select class="form-select"><option>Máy bay</option><option>Ô tô</option><option>Tàu hỏa</option><option>Khác</option></select></div>
+                        <div class="col-12"><label class="form-label fw-semibold">Mô tả tour</label><textarea class="form-control" rows="4" placeholder="Mô tả chi tiết về tour..."></textarea></div>
+                        <div class="col-12"><label class="form-label fw-semibold">Lịch trình</label><textarea class="form-control" rows="5" placeholder="Ngày 1: ...\nNgày 2: ...\nNgày 3: ..."></textarea></div>
+                        <div class="col-12"><label class="form-label fw-semibold">Ảnh tour (URL)</label><input type="text" class="form-control" placeholder="https://example.com/image.jpg"></div>
+                    </div>
+                    <div class="mt-4 d-flex gap-2"><button type="submit" class="btn btn-primary">Tạo tour</button><a th:href="@{/admin/tours}" class="btn btn-outline-secondary">Hủy</a></div>
+                </form>
+            </div>
+        </div>
+    </main>
+    <div th:replace="~{admin/fragments/footer :: footer}"></div>
+</div>
+</body>
+</html>

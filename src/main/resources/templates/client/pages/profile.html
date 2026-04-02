@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head th:replace="~{client/fragments/head :: head('Hồ sơ cá nhân', null)}"></head>
+<body>
+<div th:replace="~{client/fragments/header :: header}"></div>
+<div th:replace="~{client/fragments/navbar :: navbar}"></div>
+<section class="py-5">
+    <div class="container">
+        <h3 class="fw-bold mb-4">👤 Hồ Sơ Cá Nhân</h3>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm rounded-4 text-center p-4">
+                    <div class="mx-auto mb-3" style="width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,#0d6efd,#6610f2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:2rem;font-weight:700;">NA</div>
+                    <h5 class="fw-bold">Nguyễn Văn A</h5>
+                    <p class="text-muted small">nguyenvana@email.com</p>
+                    <span class="badge bg-success rounded-pill mb-3">Đã xác minh</span>
+                    <hr>
+                    <div class="text-start small">
+                        <div class="mb-2"><strong>Ngày tham gia:</strong> 15/01/2026</div>
+                        <div class="mb-2"><strong>Tổng đơn:</strong> 5 đơn</div>
+                        <div><strong>Tour đã đi:</strong> 3 tour</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card border-0 shadow-sm rounded-4 p-4">
+                    <h5 class="fw-bold mb-3">📋 Cập nhật thông tin</h5>
+                    <form>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Họ</label>
+                                <input type="text" class="form-control" value="Nguyễn">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Tên</label>
+                                <input type="text" class="form-control" value="Văn A">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Email</label>
+                                <input type="email" class="form-control" value="nguyenvana@email.com" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Số điện thoại</label>
+                                <input type="tel" class="form-control" value="0912 345 678">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Địa chỉ</label>
+                                <input type="text" class="form-control" value="Quận 1, TP. Hồ Chí Minh">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Ngày sinh</label>
+                                <input type="date" class="form-control" value="1995-06-15">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Giới tính</label>
+                                <select class="form-select"><option selected>Nam</option><option>Nữ</option><option>Khác</option></select>
+                            </div>
+                        </div>
+                        <div class="mt-4 d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                            <button type="reset" class="btn btn-outline-secondary">Hủy</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card border-0 shadow-sm rounded-4 p-4 mt-4">
+                    <h5 class="fw-bold mb-3">🔒 Đổi mật khẩu</h5>
+                    <form>
+                        <div class="mb-3"><label class="form-label fw-semibold">Mật khẩu hiện tại</label><input type="password" class="form-control"></div>
+                        <div class="mb-3"><label class="form-label fw-semibold">Mật khẩu mới</label><input type="password" class="form-control"></div>
+                        <div class="mb-3"><label class="form-label fw-semibold">Xác nhận mật khẩu mới</label><input type="password" class="form-control"></div>
+                        <button type="submit" class="btn btn-warning">Cập nhật mật khẩu</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<div th:replace="~{client/fragments/footer :: footer}"></div>
+</body>
+</html>

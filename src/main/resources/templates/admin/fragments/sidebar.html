@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="sidebar">
+    <!-- Desktop sidebar -->
+    <div class="admin-sidebar bg-dark text-white d-none d-lg-block" style="width:250px;min-height:100vh;position:fixed;top:0;left:0;z-index:1030;overflow-y:auto;">
+        <div class="p-3 border-bottom border-secondary">
+            <a class="text-decoration-none fw-bold fs-5 text-white" th:href="@{/admin/dashboard}">
+                ⚙️ <span class="text-primary">Admin</span><span class="text-warning">Panel</span>
+            </a>
+        </div>
+        <nav class="p-3">
+            <p class="text-uppercase text-white-50 small fw-bold mb-2">Menu chính</p>
+            <ul class="nav flex-column gap-1">
+                <li class="nav-item">
+                    <a class="nav-link text-white rounded px-3 py-2" th:href="@{/admin/dashboard}">📊 Dashboard</a>
+                </li>
+            </ul>
+            <p class="text-uppercase text-white-50 small fw-bold mb-2 mt-3">Quản lý</p>
+            <ul class="nav flex-column gap-1">
+                <li class="nav-item">
+                    <a class="nav-link text-white-50 rounded px-3 py-2" th:href="@{/admin/tours}">🗺️ Tour du lịch</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white-50 rounded px-3 py-2" th:href="@{/admin/bookings}">📋 Đơn đặt tour</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white-50 rounded px-3 py-2" th:href="@{/admin/customers}">👥 Khách hàng</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white-50 rounded px-3 py-2" th:href="@{/admin/staff}">👔 Nhân viên</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white-50 rounded px-3 py-2" th:href="@{/admin/promotions}">🎁 Khuyến mãi</a>
+                </li>
+            </ul>
+            <p class="text-uppercase text-white-50 small fw-bold mb-2 mt-3">Hệ thống</p>
+            <ul class="nav flex-column gap-1">
+                <li class="nav-item">
+                    <a class="nav-link text-white-50 rounded px-3 py-2" th:href="@{/admin/profile}">📋 Hồ sơ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white-50 rounded px-3 py-2" th:href="@{/admin/change-password}">🔒 Đổi mật khẩu</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-danger rounded px-3 py-2" th:href="@{/admin/login}">🚪 Đăng xuất</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Mobile offcanvas sidebar -->
+    <div class="offcanvas offcanvas-start bg-dark text-white" tabindex="-1" id="adminSidebar">
+        <div class="offcanvas-header border-bottom border-secondary">
+            <h5 class="offcanvas-title">⚙️ Admin Menu</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body p-3">
+            <ul class="nav flex-column gap-1">
+                <li><a class="nav-link text-white" th:href="@{/admin/dashboard}">📊 Dashboard</a></li>
+                <li><a class="nav-link text-white-50" th:href="@{/admin/tours}">🗺️ Tour du lịch</a></li>
+                <li><a class="nav-link text-white-50" th:href="@{/admin/bookings}">📋 Đơn đặt tour</a></li>
+                <li><a class="nav-link text-white-50" th:href="@{/admin/customers}">👥 Khách hàng</a></li>
+                <li><a class="nav-link text-white-50" th:href="@{/admin/staff}">👔 Nhân viên</a></li>
+                <li><a class="nav-link text-white-50" th:href="@{/admin/promotions}">🎁 Khuyến mãi</a></li>
+                <li><hr class="border-secondary"></li>
+                <li><a class="nav-link text-white-50" th:href="@{/admin/profile}">📋 Hồ sơ</a></li>
+                <li><a class="nav-link text-danger" th:href="@{/admin/login}">🚪 Đăng xuất</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+</html>

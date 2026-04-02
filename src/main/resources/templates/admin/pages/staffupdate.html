@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head th:replace="~{admin/fragments/head :: head('Cập nhật nhân viên', null)}"></head>
+<body>
+<div th:replace="~{admin/fragments/sidebar :: sidebar}"></div>
+<div class="admin-main">
+    <div th:replace="~{admin/fragments/header :: header}"></div>
+    <main class="flex-grow-1 p-4">
+        <div th:replace="~{admin/fragments/breadcrumb :: breadcrumb('Cập nhật nhân viên')}"></div>
+        <h4 class="fw-bold mb-4">✏️ Cập Nhật Thông Tin Nhân Viên</h4>
+        <div class="card admin-card">
+            <div class="card-body p-4">
+                <form>
+                    <div class="row g-3">
+                        <div class="col-md-6"><label class="form-label fw-semibold">Họ và tên</label><input type="text" class="form-control" value="Trần Quốc Bảo"></div>
+                        <div class="col-md-6"><label class="form-label fw-semibold">Email</label><input type="email" class="form-control" value="bao.tran@traveler.vn"></div>
+                        <div class="col-md-6"><label class="form-label fw-semibold">Số điện thoại</label><input type="tel" class="form-control" value="0901 123 456"></div>
+                        <div class="col-md-6"><label class="form-label fw-semibold">Phòng ban</label><select class="form-select"><option selected>Hướng dẫn viên</option><option>Kinh doanh</option><option>Hỗ trợ khách hàng</option><option>Quản trị</option></select></div>
+                        <div class="col-md-6"><label class="form-label fw-semibold">Chức vụ</label><input type="text" class="form-control" value="HDV chính"></div>
+                        <div class="col-md-6"><label class="form-label fw-semibold">Trạng thái</label><select class="form-select"><option selected>Đang làm</option><option>Nghỉ phép</option><option>Đã nghỉ</option></select></div>
+                        <div class="col-12"><label class="form-label fw-semibold">Địa chỉ</label><input type="text" class="form-control" value="Quận 3, TP.HCM"></div>
+                    </div>
+                    <div class="mt-4 d-flex gap-2"><button type="submit" class="btn btn-primary">Lưu thay đổi</button><a th:href="@{/admin/staff}" class="btn btn-outline-secondary">Hủy</a></div>
+                </form>
+            </div>
+        </div>
+    </main>
+    <div th:replace="~{admin/fragments/footer :: footer}"></div>
+</div>
+</body>
+</html>

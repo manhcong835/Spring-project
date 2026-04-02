@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head th:replace="~{admin/fragments/head :: head('Dashboard', '/css/admin/dashboard.css')}"></head>
+<body>
+<div th:replace="~{admin/fragments/sidebar :: sidebar}"></div>
+<div class="admin-main">
+    <div th:replace="~{admin/fragments/header :: header}"></div>
+    <main class="flex-grow-1 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 class="fw-bold mb-1">📊 Dashboard</h4>
+                <p class="text-muted mb-0 small">Tổng quan hệ thống quản trị Traveler</p>
+            </div>
+            <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">Hôm nay: 02/04/2026</span>
+        </div>
+
+        <!-- Stat Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-xl-3 col-md-6">
+                <div class="card stat-card shadow-sm">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <div class="stat-icon bg-primary-subtle text-primary">🗺️</div>
+                        <div>
+                            <div class="text-muted small">Tổng tour</div>
+                            <div class="fs-4 fw-bold">248</div>
+                            <small class="text-success">↑ 12% so với tháng trước</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card stat-card shadow-sm">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <div class="stat-icon bg-success-subtle text-success">📋</div>
+                        <div>
+                            <div class="text-muted small">Đơn đặt tour</div>
+                            <div class="fs-4 fw-bold">1.256</div>
+                            <small class="text-success">↑ 8% so với tháng trước</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card stat-card shadow-sm">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <div class="stat-icon bg-warning-subtle text-warning">👥</div>
+                        <div>
+                            <div class="text-muted small">Khách hàng</div>
+                            <div class="fs-4 fw-bold">5.432</div>
+                            <small class="text-success">↑ 15% so với tháng trước</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card stat-card shadow-sm">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <div class="stat-icon bg-danger-subtle text-danger">💰</div>
+                        <div>
+                            <div class="text-muted small">Doanh thu tháng</div>
+                            <div class="fs-4 fw-bold">2.8 tỷ</div>
+                            <small class="text-danger">↓ 3% so với tháng trước</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <!-- Chart -->
+            <div class="col-lg-8">
+                <div class="card admin-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6 class="fw-bold mb-0">📈 Biểu đồ doanh thu</h6>
+                        <select class="form-select form-select-sm" style="width:auto;">
+                            <option>Tháng này</option>
+                            <option>Quý này</option>
+                            <option>Năm nay</option>
+                        </select>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-placeholder">📊 Biểu đồ doanh thu (Chart.js placeholder)</div>
+                    </div>
+                </div>
+            </div>
+            <!-- Quick stats -->
+            <div class="col-lg-4">
+                <div class="card admin-card h-100">
+                    <div class="card-header">
+                        <h6 class="fw-bold mb-0">⚡ Hoạt động gần đây</h6>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="recent-activity-item border-bottom">
+                            <div class="small fw-semibold">Đơn mới #BK1257</div>
+                            <div class="text-muted small">Nguyễn Thị Lan đặt tour Phú Quốc • 5 phút trước</div>
+                        </div>
+                        <div class="recent-activity-item border-bottom">
+                            <div class="small fw-semibold">Thanh toán #BK1255</div>
+                            <div class="text-muted small">Trần Văn Minh thanh toán 6.580.000đ • 15 phút trước</div>
+                        </div>
+                        <div class="recent-activity-item border-bottom">
+                            <div class="small fw-semibold">Tour mới</div>
+                            <div class="text-muted small">Thêm tour "Côn Đảo 3N2Đ" • 1 giờ trước</div>
+                        </div>
+                        <div class="recent-activity-item border-bottom">
+                            <div class="small fw-semibold">Đánh giá mới</div>
+                            <div class="text-muted small">Lê Hoàng Anh đánh giá ★★★★★ • 2 giờ trước</div>
+                        </div>
+                        <div class="recent-activity-item">
+                            <div class="small fw-semibold">Hủy đơn #BK1250</div>
+                            <div class="text-muted small">Phạm Thị B hủy tour Hạ Long • 3 giờ trước</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Bookings Table -->
+        <div class="card admin-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="fw-bold mb-0">📋 Đơn đặt tour gần đây</h6>
+                <a th:href="@{/admin/bookings}" class="btn btn-sm btn-outline-primary">Xem tất cả</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-admin table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Mã đơn</th>
+                                <th>Khách hàng</th>
+                                <th>Tour</th>
+                                <th>Ngày đặt</th>
+                                <th>Tổng tiền</th>
+                                <th>Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>#BK1257</strong></td>
+                                <td>Nguyễn Thị Lan</td>
+                                <td>Phú Quốc 4N3Đ</td>
+                                <td>02/04/2026</td>
+                                <td class="fw-bold">12.970.000đ</td>
+                                <td><span class="badge bg-warning text-dark rounded-pill">Chờ xác nhận</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>#BK1256</strong></td>
+                                <td>Trần Văn Minh</td>
+                                <td>Đà Nẵng 3N2Đ</td>
+                                <td>01/04/2026</td>
+                                <td class="fw-bold">6.580.000đ</td>
+                                <td><span class="badge bg-success rounded-pill">Đã thanh toán</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>#BK1255</strong></td>
+                                <td>Lê Hoàng Anh</td>
+                                <td>Sapa 3N2Đ</td>
+                                <td>01/04/2026</td>
+                                <td class="fw-bold">14.760.000đ</td>
+                                <td><span class="badge bg-info text-dark rounded-pill">Đã xác nhận</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>#BK1254</strong></td>
+                                <td>Phạm Thị Hoa</td>
+                                <td>Hạ Long 2N1Đ</td>
+                                <td>31/03/2026</td>
+                                <td class="fw-bold">5.180.000đ</td>
+                                <td><span class="badge bg-danger rounded-pill">Đã hủy</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+    <div th:replace="~{admin/fragments/footer :: footer}"></div>
+</div>
+</body>
+</html>

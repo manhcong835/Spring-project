@@ -1,0 +1,71 @@
+/* ==================== CLIENT LAYOUT CSS ==================== */
+
+/* Smooth scroll */
+html { scroll-behavior: smooth; }
+
+/* Navbar active link */
+.navbar .nav-link:hover,
+.navbar .nav-link.active {
+    color: #0d6efd !important;
+    font-weight: 600;
+}
+
+/* Tour card hover effect */
+.tour-card-item {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.tour-card-item:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.12) !important;
+}
+
+/* Section spacing */
+.section-padding {
+    padding: 60px 0;
+}
+
+/* Section headers */
+.section-tag {
+    display: inline-block;
+    background: linear-gradient(135deg, #0d6efd20, #0d6efd10);
+    color: #0d6efd;
+    padding: 6px 18px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+.section-title {
+    font-weight: 800;
+    font-size: 2rem;
+    color: #1a1a2e;
+}
+.section-subtitle {
+    color: #6c757d;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Footer links hover */
+.client-footer a:hover {
+    color: #fff !important;
+}
+
+/* Form styling */
+.form-control:focus,
+.form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+}
+
+/* Card rounded */
+.rounded-4 { border-radius: 1rem !important; }
+
+/* Auth pages centered */
+.auth-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head th:replace="~{client/fragments/head :: head('Trang chủ', '/css/client/home.css')}"></head>
+<body>
+<!-- Header -->
+<div th:replace="~{client/fragments/header :: header}"></div>
+<!-- Navbar -->
+<div th:replace="~{client/fragments/navbar :: navbar}"></div>
+<!-- Hero Banner -->
+<div th:replace="~{client/fragments/herobanner :: herobanner}"></div>
+
+<!-- Search Bar -->
+<section class="container" style="margin-top:-40px;position:relative;z-index:10;">
+    <div th:replace="~{client/fragments/searchform :: searchform}"></div>
+</section>
+
+<!-- Tour Nổi Bật -->
+<section class="section-padding">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="section-tag">🔥 Nổi bật</span>
+            <h2 class="section-title">Tour Du Lịch Được Yêu Thích Nhất</h2>
+            <p class="section-subtitle">Khám phá các tour du lịch được đánh giá cao nhất từ hàng nghìn du khách</p>
+        </div>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+            <!-- Card 1 -->
+            <div class="col">
+                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden tour-card-item">
+                    <div class="position-relative">
+                        <img src="https://placehold.co/400x250/0d6efd/ffffff?text=Phú+Quốc" class="card-img-top" alt="Phú Quốc" style="height:220px;object-fit:cover;">
+                        <span class="badge bg-danger position-absolute top-0 end-0 m-2 rounded-pill px-3">HOT</span>
+                        <span class="badge bg-dark bg-opacity-75 position-absolute bottom-0 start-0 m-2 rounded-pill">4N3Đ</span>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex align-items-center gap-2 mb-2 small text-muted">
+                            <span class="text-warning fw-bold">★ 4.9</span><span>•</span><span>320 đánh giá</span>
+                        </div>
+                        <h6 class="card-title fw-bold">Phú Quốc — Grand World — Vinpearl Safari</h6>
+                        <p class="small text-muted mb-2">📍 Kiên Giang</p>
+                        <div class="mt-auto d-flex justify-content-between align-items-end">
+                            <div>
+                                <del class="text-muted small">6.990.000đ</del>
+                                <div class="text-primary fw-bold fs-5">4.990.000đ</div>
+                            </div>
+                            <a th:href="@{/tours/detail}" class="btn btn-primary btn-sm">Xem →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 2 -->
+            <div class="col">
+                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden tour-card-item">
+                    <div class="position-relative">
+                        <img src="https://placehold.co/400x250/198754/ffffff?text=Đà+Nẵng" class="card-img-top" alt="Đà Nẵng" style="height:220px;object-fit:cover;">
+                        <span class="badge bg-success position-absolute top-0 end-0 m-2 rounded-pill px-3">-25%</span>
+                        <span class="badge bg-dark bg-opacity-75 position-absolute bottom-0 start-0 m-2 rounded-pill">3N2Đ</span>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex align-items-center gap-2 mb-2 small text-muted">
+                            <span class="text-warning fw-bold">★ 4.8</span><span>•</span><span>218 đánh giá</span>
+                        </div>
+                        <h6 class="card-title fw-bold">Đà Nẵng — Hội An — Bà Nà Hills</h6>
+                        <p class="small text-muted mb-2">📍 Đà Nẵng</p>
+                        <div class="mt-auto d-flex justify-content-between align-items-end">
+                            <div>
+                                <del class="text-muted small">4.500.000đ</del>
+                                <div class="text-primary fw-bold fs-5">3.290.000đ</div>
+                            </div>
+                            <a th:href="@{/tours/detail}" class="btn btn-primary btn-sm">Xem →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 3 -->
+            <div class="col">
+                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden tour-card-item">
+                    <div class="position-relative">
+                        <img src="https://placehold.co/400x250/6f42c1/ffffff?text=Sapa" class="card-img-top" alt="Sapa" style="height:220px;object-fit:cover;">
+                        <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2 rounded-pill px-3">Mới</span>
+                        <span class="badge bg-dark bg-opacity-75 position-absolute bottom-0 start-0 m-2 rounded-pill">3N2Đ</span>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex align-items-center gap-2 mb-2 small text-muted">
+                            <span class="text-warning fw-bold">★ 4.7</span><span>•</span><span>156 đánh giá</span>
+                        </div>
+                        <h6 class="card-title fw-bold">Sapa — Fansipan — Bản Cát Cát</h6>
+                        <p class="small text-muted mb-2">📍 Lào Cai</p>
+                        <div class="mt-auto d-flex justify-content-between align-items-end">
+                            <div>
+                                <div class="text-primary fw-bold fs-5">3.690.000đ</div>
+                            </div>
+                            <a th:href="@{/tours/detail}" class="btn btn-primary btn-sm">Xem →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 4 -->
+            <div class="col">
+                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden tour-card-item">
+                    <div class="position-relative">
+                        <img src="https://placehold.co/400x250/dc3545/ffffff?text=Hạ+Long" class="card-img-top" alt="Hạ Long" style="height:220px;object-fit:cover;">
+                        <span class="badge bg-danger position-absolute top-0 end-0 m-2 rounded-pill px-3">Bán chạy</span>
+                        <span class="badge bg-dark bg-opacity-75 position-absolute bottom-0 start-0 m-2 rounded-pill">2N1Đ</span>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex align-items-center gap-2 mb-2 small text-muted">
+                            <span class="text-warning fw-bold">★ 4.6</span><span>•</span><span>412 đánh giá</span>
+                        </div>
+                        <h6 class="card-title fw-bold">Hạ Long — Du thuyền 5 sao — Titop</h6>
+                        <p class="small text-muted mb-2">📍 Quảng Ninh</p>
+                        <div class="mt-auto d-flex justify-content-between align-items-end">
+                            <div>
+                                <del class="text-muted small">3.200.000đ</del>
+                                <div class="text-primary fw-bold fs-5">2.590.000đ</div>
+                            </div>
+                            <a th:href="@{/tours/detail}" class="btn btn-primary btn-sm">Xem →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <a th:href="@{/tours}" class="btn btn-outline-primary px-4">Xem tất cả tour →</a>
+        </div>
+    </div>
+</section>
+
+<!-- Điểm Đến Phổ Biến -->
+<section class="section-padding bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="section-tag">📍 Điểm đến</span>
+            <h2 class="section-title">Điểm Đến Phổ Biến Nhất</h2>
+            <p class="section-subtitle">Những địa danh du lịch hấp dẫn nhất Việt Nam</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="dest-card shadow rounded-4 overflow-hidden">
+                    <img src="https://placehold.co/600x300/0d6efd/ffffff?text=Đà+Nẵng" alt="Đà Nẵng">
+                    <div class="dest-overlay"><h5 class="fw-bold mb-1">Đà Nẵng</h5><small>120+ tour</small></div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="dest-card shadow rounded-4 overflow-hidden">
+                    <img src="https://placehold.co/600x300/198754/ffffff?text=Phú+Quốc" alt="Phú Quốc">
+                    <div class="dest-overlay"><h5 class="fw-bold mb-1">Phú Quốc</h5><small>85+ tour</small></div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="dest-card shadow rounded-4 overflow-hidden">
+                    <img src="https://placehold.co/600x300/6f42c1/ffffff?text=Nha+Trang" alt="Nha Trang">
+                    <div class="dest-overlay"><h5 class="fw-bold mb-1">Nha Trang</h5><small>96+ tour</small></div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="dest-card shadow rounded-4 overflow-hidden">
+                    <img src="https://placehold.co/400x300/dc3545/ffffff?text=Hạ+Long" alt="Hạ Long">
+                    <div class="dest-overlay"><h5 class="fw-bold mb-1">Hạ Long</h5><small>74+ tour</small></div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="dest-card shadow rounded-4 overflow-hidden">
+                    <img src="https://placehold.co/400x300/fd7e14/ffffff?text=Đà+Lạt" alt="Đà Lạt">
+                    <div class="dest-overlay"><h5 class="fw-bold mb-1">Đà Lạt</h5><small>63+ tour</small></div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="dest-card shadow rounded-4 overflow-hidden">
+                    <img src="https://placehold.co/400x300/20c997/ffffff?text=Huế" alt="Huế">
+                    <div class="dest-overlay"><h5 class="fw-bold mb-1">Huế</h5><small>52+ tour</small></div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="dest-card shadow rounded-4 overflow-hidden">
+                    <img src="https://placehold.co/400x300/ffc107/000000?text=Sapa" alt="Sapa">
+                    <div class="dest-overlay"><h5 class="fw-bold mb-1">Sapa</h5><small>45+ tour</small></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Tour Khuyến Mãi -->
+<section class="section-padding">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="section-tag">🎉 Khuyến mãi</span>
+            <h2 class="section-title">Tour Giảm Giá Đặc Biệt</h2>
+            <p class="section-subtitle">Cơ hội vàng để khám phá Việt Nam với mức giá ưu đãi</p>
+        </div>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            <div class="col">
+                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden tour-card-item">
+                    <div class="position-relative">
+                        <img src="https://placehold.co/500x280/e83e8c/ffffff?text=Quy+Nhơn" class="card-img-top" style="height:220px;object-fit:cover;" alt="Quy Nhơn">
+                        <span class="badge bg-danger position-absolute top-0 end-0 m-2 rounded-pill px-3 fs-6">-30%</span>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="card-title fw-bold">Quy Nhơn — Phú Yên — Eo Gió</h6>
+                        <p class="small text-muted">📍 Bình Định · 4N3Đ · ★ 4.7</p>
+                        <del class="text-muted small">5.200.000đ</del>
+                        <span class="text-danger fw-bold fs-5 ms-2">3.640.000đ</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden tour-card-item">
+                    <div class="position-relative">
+                        <img src="https://placehold.co/500x280/fd7e14/ffffff?text=Đà+Lạt" class="card-img-top" style="height:220px;object-fit:cover;" alt="Đà Lạt">
+                        <span class="badge bg-danger position-absolute top-0 end-0 m-2 rounded-pill px-3 fs-6">-20%</span>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="card-title fw-bold">Đà Lạt — Langbiang — Thung Lũng Tình Yêu</h6>
+                        <p class="small text-muted">📍 Lâm Đồng · 3N2Đ · ★ 4.8</p>
+                        <del class="text-muted small">3.800.000đ</del>
+                        <span class="text-danger fw-bold fs-5 ms-2">3.040.000đ</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden tour-card-item">
+                    <div class="position-relative">
+                        <img src="https://placehold.co/500x280/20c997/ffffff?text=Côn+Đảo" class="card-img-top" style="height:220px;object-fit:cover;" alt="Côn Đảo">
+                        <span class="badge bg-danger position-absolute top-0 end-0 m-2 rounded-pill px-3 fs-6">-35%</span>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="card-title fw-bold">Côn Đảo — Bãi Nhát — Hòn Bảy Cạnh</h6>
+                        <p class="small text-muted">📍 Bà Rịa-VT · 3N2Đ · ★ 4.9</p>
+                        <del class="text-muted small">7.500.000đ</del>
+                        <span class="text-danger fw-bold fs-5 ms-2">4.875.000đ</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Phản Hồi Khách Hàng -->
+<section class="section-padding bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="section-tag">💬 Phản hồi</span>
+            <h2 class="section-title">Khách Hàng Nói Gì Về Chúng Tôi</h2>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4 review-card h-100">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="review-avatar">NT</div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">Nguyễn Thị Lan</h6>
+                            <small class="text-muted">Tour Phú Quốc 4N3Đ</small>
+                        </div>
+                    </div>
+                    <div class="text-warning mb-2">★★★★★</div>
+                    <p class="text-muted small mb-0">"Tour tuyệt vời, đồ ăn ngon, guide rất nhiệt tình và vui tính. Resort quá đẹp luôn! Sẽ quay lại lần nữa."</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4 review-card h-100">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="review-avatar">TV</div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">Trần Văn Minh</h6>
+                            <small class="text-muted">Tour Đà Nẵng 3N2Đ</small>
+                        </div>
+                    </div>
+                    <div class="text-warning mb-2">★★★★★</div>
+                    <p class="text-muted small mb-0">"Lần đầu đi tour mà hài lòng 100%. Lịch trình hợp lý, khách sạn sạch đẹp, nhân viên chuyên nghiệp."</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4 review-card h-100">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="review-avatar">LH</div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">Lê Hoàng Anh</h6>
+                            <small class="text-muted">Tour Sapa 3N2Đ</small>
+                        </div>
+                    </div>
+                    <div class="text-warning mb-2">★★★★☆</div>
+                    <p class="text-muted small mb-0">"Cảnh đẹp mê hồn, trải nghiệm homestay tuyệt vời. Giá cả hợp lý so với chất lượng nhận được. Recommend!"</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section text-center">
+    <div class="container py-4">
+        <h2 class="fw-bold display-6 mb-3">Bạn Đã Sẵn Sàng Lên Đường?</h2>
+        <p class="lead opacity-75 mb-4">Đăng ký ngay để nhận ưu đãi đặc biệt và cùng Traveler khám phá thế giới</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a th:href="@{/register}" class="btn btn-warning btn-lg text-dark fw-semibold px-5">Đăng ký ngay</a>
+            <a th:href="@{/tours}" class="btn btn-outline-light btn-lg px-5">Xem tour</a>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<div th:replace="~{client/fragments/footer :: footer}"></div>
+</body>
+</html>

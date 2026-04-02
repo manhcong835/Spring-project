@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head th:replace="~{admin/fragments/head :: head('Cập nhật tour', null)}"></head>
+<body>
+<div th:replace="~{admin/fragments/sidebar :: sidebar}"></div>
+<div class="admin-main">
+    <div th:replace="~{admin/fragments/header :: header}"></div>
+    <main class="flex-grow-1 p-4">
+        <div th:replace="~{admin/fragments/breadcrumb :: breadcrumb('Cập nhật tour')}"></div>
+        <h4 class="fw-bold mb-4">✏️ Cập Nhật Tour</h4>
+        <div class="card admin-card">
+            <div class="card-body p-4">
+                <form>
+                    <div class="row g-3">
+                        <div class="col-md-8"><label class="form-label fw-semibold">Tên tour</label><input type="text" class="form-control" value="Phú Quốc — Grand World — Vinpearl Safari"></div>
+                        <div class="col-md-4"><label class="form-label fw-semibold">Mã tour</label><input type="text" class="form-control" value="T001" readonly></div>
+                        <div class="col-md-4"><label class="form-label fw-semibold">Điểm đến</label><select class="form-select"><option>Phú Quốc</option><option selected>Kiên Giang</option><option>Đà Nẵng</option></select></div>
+                        <div class="col-md-4"><label class="form-label fw-semibold">Nơi khởi hành</label><select class="form-select"><option selected>TP. Hồ Chí Minh</option><option>Hà Nội</option></select></div>
+                        <div class="col-md-4"><label class="form-label fw-semibold">Thời gian</label><input type="text" class="form-control" value="4 ngày 3 đêm"></div>
+                        <div class="col-md-3"><label class="form-label fw-semibold">Giá người lớn</label><input type="number" class="form-control" value="4990000"></div>
+                        <div class="col-md-3"><label class="form-label fw-semibold">Giá trẻ em</label><input type="number" class="form-control" value="3490000"></div>
+                        <div class="col-md-3"><label class="form-label fw-semibold">Giá gốc</label><input type="number" class="form-control" value="6990000"></div>
+                        <div class="col-md-3"><label class="form-label fw-semibold">Số chỗ</label><input type="number" class="form-control" value="30"></div>
+                        <div class="col-md-6"><label class="form-label fw-semibold">Trạng thái</label><select class="form-select"><option selected>Đang mở</option><option>Hết chỗ</option><option>Tạm ngưng</option></select></div>
+                        <div class="col-md-6"><label class="form-label fw-semibold">Ngày khởi hành</label><input type="date" class="form-control" value="2026-04-15"></div>
+                        <div class="col-12"><label class="form-label fw-semibold">Mô tả</label><textarea class="form-control" rows="4">Tour Phú Quốc 4 ngày 3 đêm trải nghiệm thiên đường biển đảo hàng đầu Việt Nam.</textarea></div>
+                    </div>
+                    <div class="mt-4 d-flex gap-2"><button type="submit" class="btn btn-primary">Lưu thay đổi</button><a th:href="@{/admin/tours}" class="btn btn-outline-secondary">Hủy</a></div>
+                </form>
+            </div>
+        </div>
+    </main>
+    <div th:replace="~{admin/fragments/footer :: footer}"></div>
+</div>
+</body>
+</html>

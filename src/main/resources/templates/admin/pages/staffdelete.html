@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head th:replace="~{admin/fragments/head :: head('Xóa nhân viên', null)}"></head>
+<body>
+<div th:replace="~{admin/fragments/sidebar :: sidebar}"></div>
+<div class="admin-main">
+    <div th:replace="~{admin/fragments/header :: header}"></div>
+    <main class="flex-grow-1 p-4">
+        <div th:replace="~{admin/fragments/breadcrumb :: breadcrumb('Xóa nhân viên')}"></div>
+        <h4 class="fw-bold mb-4">🗑️ Xóa Nhân Viên</h4>
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm rounded-4 p-5 text-center">
+                    <div class="fs-1 mb-3">⚠️</div>
+                    <h5 class="fw-bold">Xác nhận xóa nhân viên?</h5>
+                    <div class="card bg-light border-0 rounded-3 p-3 my-3 text-start small">
+                        <div class="mb-1"><strong>Họ tên:</strong> Trần Quốc Bảo</div>
+                        <div class="mb-1"><strong>Email:</strong> bao.tran@traveler.vn</div>
+                        <div><strong>Phòng ban:</strong> Hướng dẫn viên</div>
+                    </div>
+                    <p class="text-muted small">Hành động này không thể hoàn tác. Tất cả dữ liệu liên quan sẽ bị xóa vĩnh viễn.</p>
+                    <div class="d-flex gap-3 justify-content-center"><button class="btn btn-danger px-4">Xác nhận xóa</button><a th:href="@{/admin/staff}" class="btn btn-outline-secondary px-4">Hủy bỏ</a></div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <div th:replace="~{admin/fragments/footer :: footer}"></div>
+</div>
+</body>
+</html>
