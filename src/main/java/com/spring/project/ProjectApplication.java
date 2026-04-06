@@ -8,7 +8,6 @@ import org.springframework.context.ApplicationContext;
 public class ProjectApplication {
 
 	public static void main(String[] args) {
-		// SpringApplication.run(ProjectApplication.class, args);
 		ApplicationContext context = SpringApplication.run(ProjectApplication.class, args);
 
 		String port = context.getEnvironment().getProperty("local.server.port");
