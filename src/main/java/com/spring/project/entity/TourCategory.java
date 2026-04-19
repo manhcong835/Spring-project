@@ -8,36 +8,42 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Entity: roles
- * Quản lý vai trò: ADMIN, STAFF, CUSTOMER
+ * Entity: tour_categories
+ * Danh mục tour: Du lịch biển, Du lịch núi, Văn hóa lịch sử, ...
  */
 @Entity
-@Table(name = "roles")
-public class Role {
+@Table(name = "tour_categories")
+public class TourCategory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Tên role không được để trống")
-    @Size(max = 50)
-    @Column(name = "name", nullable = false, unique = true, length = 50)
+    @NotBlank(message = "Tên danh mục không được để trống")
+    @Size(max = 100)
+    @Column(name = "name", nullable = false, unique = true, length = 100)
     private String name;
 
     @Size(max = 255)
     @Column(name = "description", length = 255)
     private String description;
 
+    /**
+     * Trạng thái danh mục: ACTIVE, INACTIVE
+     */
+    @Column(name = "status", nullable = false, length = 20)
+    private String status = "ACTIVE";
+
     // ===================== Relationships =====================
 
-    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<User> users = new ArrayList<>();
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Tour> tours = new ArrayList<>();
 
     // ===================== Constructors =====================
 
-    public Role() {}
+    public TourCategory() {}
 
-    public Role(String name, String description) {
+    public TourCategory(String name, String description) {
         this.name = name;
         this.description = description;
     }
@@ -53,6 +59,9 @@ public class Role {
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
 
-    public List<User> getUsers() { return users; }
-    public void setUsers(List<User> users) { this.users = users; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+
+    public List<Tour> getTours() { return tours; }
+    public void setTours(List<Tour> tours) { this.tours = tours; }
 }

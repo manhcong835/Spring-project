@@ -1,196 +1,170 @@
 package com.spring.project.entity;
 
-import java.time.LocalDateTime;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
-public class Tour {
-    private int id;
-    private int categoryId;
-    private int destinationId;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Entity: tours
+ * Thông tin chính của tour du lịch.
+ */
+@Entity
+@Table(name = "tours")
+public class Tour extends BaseEntity {
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "category_id", nullable = false)
+    private TourCategory category;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "destination_id", nullable = false)
+    private Destination destination;
+
+    @NotBlank(message = "Mã tour không được để trống")
+    @Size(max = 50)
+    @Column(name = "code", nullable = false, unique = true, length = 50)
     private String code;
+
+    @NotBlank(message = "Tên tour không được để trống")
+    @Size(max = 200)
+    @Column(name = "name", nullable = false, length = 200)
     private String name;
+
+    @NotBlank(message = "Slug không được để trống")
+    @Size(max = 255)
+    @Column(name = "slug", nullable = false, unique = true, length = 255)
     private String slug;
+
+    @NotBlank(message = "Điểm khởi hành không được để trống")
+    @Size(max = 150)
+    @Column(name = "departure_location", nullable = false, length = 150)
     private String departureLocation;
-    private String durationDay;
-    private String durationNight;
+
+    @Min(value = 1, message = "Số ngày phải ít nhất là 1")
+    @Column(name = "duration_days", nullable = false)
+    private int durationDays;
+
+    @Min(value = 0, message = "Số đêm không được âm")
+    @Column(name = "duration_nights", nullable = false)
+    private int durationNights;
+
+    @Size(max = 100)
+    @Column(name = "transport", length = 100)
     private String transport;
+
+    @Size(max = 50)
+    @Column(name = "hotel_standard", length = 50)
     private String hotelStandard;
+
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
+
+    @Column(name = "policy", columnDefinition = "TEXT")
     private String policy;
+
+    @Column(name = "included_services", columnDefinition = "TEXT")
     private String includedServices;
+
+    @Column(name = "excluded_services", columnDefinition = "TEXT")
     private String excludedServices;
+
+    @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
-    public Tour() {
-    }
+    /**
+     * Trạng thái tour: ACTIVE, INACTIVE, DELETED
+     */
+    @Column(name = "status", nullable = false, length = 20)
+    private String status = "ACTIVE";
 
-    public Tour(int id, int categoryId, int destinationId, String code, String name, String slug,
-            String departureLocation, String durationDay, String durationNight, String transport, String hotelStandard,
-            String description, String policy, String includedServices, String excludedServices, String notes,
-            LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.id = id;
-        this.categoryId = categoryId;
-        this.destinationId = destinationId;
-        this.code = code;
-        this.name = name;
-        this.slug = slug;
-        this.departureLocation = departureLocation;
-        this.durationDay = durationDay;
-        this.durationNight = durationNight;
-        this.transport = transport;
-        this.hotelStandard = hotelStandard;
-        this.description = description;
-        this.policy = policy;
-        this.includedServices = includedServices;
-        this.excludedServices = excludedServices;
-        this.notes = notes;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
+    // ===================== Relationships =====================
 
-    public int getId() {
-        return id;
-    }
+    @OneToMany(mappedBy = "tour", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TourImage> images = new ArrayList<>();
 
-    public void setId(int id) {
-        this.id = id;
-    }
+    @OneToMany(mappedBy = "tour", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("dayNumber ASC")
+    private List<TourItinerary> itineraries = new ArrayList<>();
 
-    public int getCategoryId() {
-        return categoryId;
-    }
+    @OneToMany(mappedBy = "tour", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TourDeparture> departures = new ArrayList<>();
 
-    public void setCategoryId(int categoryId) {
-        this.categoryId = categoryId;
-    }
+    @OneToMany(mappedBy = "tour", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TourPromotion> tourPromotions = new ArrayList<>();
 
-    public int getDestinationId() {
-        return destinationId;
-    }
+    @OneToMany(mappedBy = "tour", fetch = FetchType.LAZY)
+    private List<Review> reviews = new ArrayList<>();
 
-    public void setDestinationId(int destinationId) {
-        this.destinationId = destinationId;
-    }
+    // ===================== Constructors =====================
 
-    public String getCode() {
-        return code;
-    }
+    public Tour() {}
 
-    public void setCode(String code) {
-        this.code = code;
-    }
+    // ===================== Getters & Setters =====================
 
-    public String getName() {
-        return name;
-    }
+    public TourCategory getCategory() { return category; }
+    public void setCategory(TourCategory category) { this.category = category; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public Destination getDestination() { return destination; }
+    public void setDestination(Destination destination) { this.destination = destination; }
 
-    public String getSlug() {
-        return slug;
-    }
+    public String getCode() { return code; }
+    public void setCode(String code) { this.code = code; }
 
-    public void setSlug(String slug) {
-        this.slug = slug;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public String getDepartureLocation() {
-        return departureLocation;
-    }
+    public String getSlug() { return slug; }
+    public void setSlug(String slug) { this.slug = slug; }
 
-    public void setDepartureLocation(String departureLocation) {
-        this.departureLocation = departureLocation;
-    }
+    public String getDepartureLocation() { return departureLocation; }
+    public void setDepartureLocation(String departureLocation) { this.departureLocation = departureLocation; }
 
-    public String getDurationDay() {
-        return durationDay;
-    }
+    public int getDurationDays() { return durationDays; }
+    public void setDurationDays(int durationDays) { this.durationDays = durationDays; }
 
-    public void setDurationDay(String durationDay) {
-        this.durationDay = durationDay;
-    }
+    public int getDurationNights() { return durationNights; }
+    public void setDurationNights(int durationNights) { this.durationNights = durationNights; }
 
-    public String getDurationNight() {
-        return durationNight;
-    }
+    public String getTransport() { return transport; }
+    public void setTransport(String transport) { this.transport = transport; }
 
-    public void setDurationNight(String durationNight) {
-        this.durationNight = durationNight;
-    }
+    public String getHotelStandard() { return hotelStandard; }
+    public void setHotelStandard(String hotelStandard) { this.hotelStandard = hotelStandard; }
 
-    public String getTransport() {
-        return transport;
-    }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
-    public void setTransport(String transport) {
-        this.transport = transport;
-    }
+    public String getPolicy() { return policy; }
+    public void setPolicy(String policy) { this.policy = policy; }
 
-    public String getHotelStandard() {
-        return hotelStandard;
-    }
+    public String getIncludedServices() { return includedServices; }
+    public void setIncludedServices(String includedServices) { this.includedServices = includedServices; }
 
-    public void setHotelStandard(String hotelStandard) {
-        this.hotelStandard = hotelStandard;
-    }
+    public String getExcludedServices() { return excludedServices; }
+    public void setExcludedServices(String excludedServices) { this.excludedServices = excludedServices; }
 
-    public String getDescription() {
-        return description;
-    }
+    public String getNotes() { return notes; }
+    public void setNotes(String notes) { this.notes = notes; }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
-    public String getPolicy() {
-        return policy;
-    }
+    public List<TourImage> getImages() { return images; }
+    public void setImages(List<TourImage> images) { this.images = images; }
 
-    public void setPolicy(String policy) {
-        this.policy = policy;
-    }
+    public List<TourItinerary> getItineraries() { return itineraries; }
+    public void setItineraries(List<TourItinerary> itineraries) { this.itineraries = itineraries; }
 
-    public String getIncludedServices() {
-        return includedServices;
-    }
+    public List<TourDeparture> getDepartures() { return departures; }
+    public void setDepartures(List<TourDeparture> departures) { this.departures = departures; }
 
-    public void setIncludedServices(String includedServices) {
-        this.includedServices = includedServices;
-    }
+    public List<TourPromotion> getTourPromotions() { return tourPromotions; }
+    public void setTourPromotions(List<TourPromotion> tourPromotions) { this.tourPromotions = tourPromotions; }
 
-    public String getExcludedServices() {
-        return excludedServices;
-    }
-
-    public void setExcludedServices(String excludedServices) {
-        this.excludedServices = excludedServices;
-    }
-
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
+    public List<Review> getReviews() { return reviews; }
+    public void setReviews(List<Review> reviews) { this.reviews = reviews; }
 }

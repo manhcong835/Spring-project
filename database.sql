@@ -1,6 +1,4 @@
-CREATE DATABASE IF NOT EXISTS tourbookingdb
-CHARACTER SET utf8mb4
-COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS tourbookingdb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 USE tourbookingdb;
 
@@ -13,16 +11,24 @@ CREATE TABLE roles (
     description VARCHAR(255)
 );
 
+INSERT IGNORE INTO
+    roles (name, description)
+VALUES (
+        'ADMIN',
+        'Quản trị viên hệ thống'
+    ),
+    ('STAFF', 'Nhân viên'),
+    ('CUSTOMER', 'Khách hàng');
+
 -- =========================
 -- 2. USERS
 -- =========================
-CREATE TABLE users (
+alter TABLE users (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     role_id BIGINT NOT NULL,
     full_name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     phone VARCHAR(20) UNIQUE,
-    password VARCHAR(255) NOT NULL,
     gender VARCHAR(10),
     date_of_birth DATE,
     address VARCHAR(255),
@@ -30,11 +36,22 @@ CREATE TABLE users (
     status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_users_role FOREIGN KEY (role_id) REFERENCES roles (id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
 
-    CONSTRAINT fk_users_role
-        FOREIGN KEY (role_id) REFERENCES roles(id)
-        ON DELETE RESTRICT
-        ON UPDATE CASCADE
+CREATE TABLE user_auth_providers (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    provider VARCHAR(20) NOT NULL, -- LOCAL, GOOGLE
+    provider_user_id VARCHAR(255) NULL, -- với GOOGLE: lưu sub
+    password VARCHAR(255) NULL, -- với LOCAL: lưu mật khẩu băm
+    email_verified BOOLEAN NOT NULL DEFAULT FALSE,
+    provider_email VARCHAR(100) NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_user_auth_providers_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT uq_user_provider UNIQUE (user_id, provider),
+    CONSTRAINT uq_provider_user UNIQUE (provider, provider_user_id)
 );
 
 -- =========================
@@ -83,16 +100,8 @@ CREATE TABLE tours (
     status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-    CONSTRAINT fk_tours_category
-        FOREIGN KEY (category_id) REFERENCES tour_categories(id)
-        ON DELETE RESTRICT
-        ON UPDATE CASCADE,
-
-    CONSTRAINT fk_tours_destination
-        FOREIGN KEY (destination_id) REFERENCES destinations(id)
-        ON DELETE RESTRICT
-        ON UPDATE CASCADE
+    CONSTRAINT fk_tours_category FOREIGN KEY (category_id) REFERENCES tour_categories (id) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_tours_destination FOREIGN KEY (destination_id) REFERENCES destinations (id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- =========================
@@ -106,11 +115,7 @@ CREATE TABLE tour_images (
     is_thumbnail BOOLEAN NOT NULL DEFAULT FALSE,
     sort_order INT NOT NULL DEFAULT 0,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT fk_tour_images_tour
-        FOREIGN KEY (tour_id) REFERENCES tours(id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
+    CONSTRAINT fk_tour_images_tour FOREIGN KEY (tour_id) REFERENCES tours (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- =========================
@@ -125,11 +130,7 @@ CREATE TABLE tour_itineraries (
     meals VARCHAR(100),
     accommodation VARCHAR(150),
     sort_order INT NOT NULL DEFAULT 0,
-
-    CONSTRAINT fk_tour_itineraries_tour
-        FOREIGN KEY (tour_id) REFERENCES tours(id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
+    CONSTRAINT fk_tour_itineraries_tour FOREIGN KEY (tour_id) REFERENCES tours (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- =========================
@@ -142,26 +143,16 @@ CREATE TABLE tour_departures (
     return_date DATE NOT NULL,
     capacity INT NOT NULL,
     available_slots INT NOT NULL,
-    adult_price DECIMAL(15,2) NOT NULL,
-    child_price DECIMAL(15,2) DEFAULT 0,
-    infant_price DECIMAL(15,2) DEFAULT 0,
+    adult_price DECIMAL(15, 2) NOT NULL,
+    child_price DECIMAL(15, 2) DEFAULT 0,
+    infant_price DECIMAL(15, 2) DEFAULT 0,
     status VARCHAR(20) NOT NULL DEFAULT 'OPEN',
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-    CONSTRAINT fk_tour_departures_tour
-        FOREIGN KEY (tour_id) REFERENCES tours(id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-
-    CONSTRAINT chk_tour_departures_capacity
-        CHECK (capacity >= 0),
-
-    CONSTRAINT chk_tour_departures_available_slots
-        CHECK (available_slots >= 0),
-
-    CONSTRAINT chk_tour_departures_date
-        CHECK (return_date >= departure_date)
+    CONSTRAINT fk_tour_departures_tour FOREIGN KEY (tour_id) REFERENCES tours (id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT chk_tour_departures_capacity CHECK (capacity >= 0),
+    CONSTRAINT chk_tour_departures_available_slots CHECK (available_slots >= 0),
+    CONSTRAINT chk_tour_departures_date CHECK (return_date >= departure_date)
 );
 
 -- =========================
@@ -173,9 +164,9 @@ CREATE TABLE promotions (
     name VARCHAR(150) NOT NULL,
     description TEXT,
     discount_type VARCHAR(20) NOT NULL,
-    discount_value DECIMAL(15,2) NOT NULL,
-    max_discount_amount DECIMAL(15,2),
-    min_booking_amount DECIMAL(15,2),
+    discount_value DECIMAL(15, 2) NOT NULL,
+    max_discount_amount DECIMAL(15, 2),
+    min_booking_amount DECIMAL(15, 2),
     start_date DATETIME NOT NULL,
     end_date DATETIME NOT NULL,
     usage_limit INT,
@@ -183,12 +174,8 @@ CREATE TABLE promotions (
     status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-    CONSTRAINT chk_promotions_discount_value
-        CHECK (discount_value >= 0),
-
-    CONSTRAINT chk_promotions_used_count
-        CHECK (used_count >= 0)
+    CONSTRAINT chk_promotions_discount_value CHECK (discount_value >= 0),
+    CONSTRAINT chk_promotions_used_count CHECK (used_count >= 0)
 );
 
 -- =========================
@@ -198,18 +185,9 @@ CREATE TABLE tour_promotions (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     tour_id BIGINT NOT NULL,
     promotion_id BIGINT NOT NULL,
-
     CONSTRAINT uq_tour_promotions UNIQUE (tour_id, promotion_id),
-
-    CONSTRAINT fk_tour_promotions_tour
-        FOREIGN KEY (tour_id) REFERENCES tours(id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-
-    CONSTRAINT fk_tour_promotions_promotion
-        FOREIGN KEY (promotion_id) REFERENCES promotions(id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
+    CONSTRAINT fk_tour_promotions_tour FOREIGN KEY (tour_id) REFERENCES tours (id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_tour_promotions_promotion FOREIGN KEY (promotion_id) REFERENCES promotions (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- =========================
@@ -228,44 +206,26 @@ CREATE TABLE bookings (
     child_count INT NOT NULL DEFAULT 0,
     infant_count INT NOT NULL DEFAULT 0,
     total_people INT NOT NULL,
-    original_amount DECIMAL(15,2) NOT NULL,
-    discount_amount DECIMAL(15,2) NOT NULL DEFAULT 0,
-    final_amount DECIMAL(15,2) NOT NULL,
+    original_amount DECIMAL(15, 2) NOT NULL,
+    discount_amount DECIMAL(15, 2) NOT NULL DEFAULT 0,
+    final_amount DECIMAL(15, 2) NOT NULL,
     special_requests TEXT,
     booking_status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
     payment_status VARCHAR(20) NOT NULL DEFAULT 'UNPAID',
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-    CONSTRAINT fk_bookings_user
-        FOREIGN KEY (user_id) REFERENCES users(id)
-        ON DELETE RESTRICT
-        ON UPDATE CASCADE,
-
-    CONSTRAINT fk_bookings_tour_departure
-        FOREIGN KEY (tour_departure_id) REFERENCES tour_departures(id)
-        ON DELETE RESTRICT
-        ON UPDATE CASCADE,
-
-    CONSTRAINT fk_bookings_promotion
-        FOREIGN KEY (promotion_id) REFERENCES promotions(id)
-        ON DELETE SET NULL
-        ON UPDATE CASCADE,
-
-    CONSTRAINT chk_bookings_counts_adult
-        CHECK (adult_count >= 0),
-
-    CONSTRAINT chk_bookings_counts_child
-        CHECK (child_count >= 0),
-
-    CONSTRAINT chk_bookings_counts_infant
-        CHECK (infant_count >= 0),
-
-    CONSTRAINT chk_bookings_total_people
-        CHECK (total_people >= 1),
-
-    CONSTRAINT chk_bookings_amounts
-        CHECK (original_amount >= 0 AND discount_amount >= 0 AND final_amount >= 0)
+    CONSTRAINT fk_bookings_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_bookings_tour_departure FOREIGN KEY (tour_departure_id) REFERENCES tour_departures (id) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_bookings_promotion FOREIGN KEY (promotion_id) REFERENCES promotions (id) ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT chk_bookings_counts_adult CHECK (adult_count >= 0),
+    CONSTRAINT chk_bookings_counts_child CHECK (child_count >= 0),
+    CONSTRAINT chk_bookings_counts_infant CHECK (infant_count >= 0),
+    CONSTRAINT chk_bookings_total_people CHECK (total_people >= 1),
+    CONSTRAINT chk_bookings_amounts CHECK (
+        original_amount >= 0
+        AND discount_amount >= 0
+        AND final_amount >= 0
+    )
 );
 
 -- =========================
@@ -281,11 +241,7 @@ CREATE TABLE booking_travelers (
     identity_number VARCHAR(30),
     nationality VARCHAR(50),
     note VARCHAR(255),
-
-    CONSTRAINT fk_booking_travelers_booking
-        FOREIGN KEY (booking_id) REFERENCES bookings(id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
+    CONSTRAINT fk_booking_travelers_booking FOREIGN KEY (booking_id) REFERENCES bookings (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- =========================
@@ -295,7 +251,7 @@ CREATE TABLE payments (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     booking_id BIGINT NOT NULL,
     payment_code VARCHAR(50) NOT NULL UNIQUE,
-    amount DECIMAL(15,2) NOT NULL,
+    amount DECIMAL(15, 2) NOT NULL,
     payment_method VARCHAR(30) NOT NULL,
     payment_type VARCHAR(30) NOT NULL DEFAULT 'FULL',
     transaction_ref VARCHAR(100),
@@ -303,14 +259,8 @@ CREATE TABLE payments (
     status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
     note VARCHAR(255),
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT fk_payments_booking
-        FOREIGN KEY (booking_id) REFERENCES bookings(id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-
-    CONSTRAINT chk_payments_amount
-        CHECK (amount >= 0)
+    CONSTRAINT fk_payments_booking FOREIGN KEY (booking_id) REFERENCES bookings (id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT chk_payments_amount CHECK (amount >= 0)
 );
 
 -- =========================
@@ -327,24 +277,9 @@ CREATE TABLE reviews (
     status VARCHAR(20) NOT NULL DEFAULT 'VISIBLE',
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
     CONSTRAINT uq_reviews_booking UNIQUE (booking_id),
-
-    CONSTRAINT fk_reviews_booking
-        FOREIGN KEY (booking_id) REFERENCES bookings(id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-
-    CONSTRAINT fk_reviews_user
-        FOREIGN KEY (user_id) REFERENCES users(id)
-        ON DELETE RESTRICT
-        ON UPDATE CASCADE,
-
-    CONSTRAINT fk_reviews_tour
-        FOREIGN KEY (tour_id) REFERENCES tours(id)
-        ON DELETE RESTRICT
-        ON UPDATE CASCADE,
-
-    CONSTRAINT chk_reviews_rating
-        CHECK (rating BETWEEN 1 AND 5)
+    CONSTRAINT fk_reviews_booking FOREIGN KEY (booking_id) REFERENCES bookings (id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_reviews_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_reviews_tour FOREIGN KEY (tour_id) REFERENCES tours (id) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT chk_reviews_rating CHECK (rating BETWEEN 1 AND 5)
 );

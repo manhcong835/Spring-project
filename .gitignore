@@ -31,3 +31,13 @@ build/
 
 ### VS Code ###
 .vscode/
+
+/config/ConfigApplication.properties
+
+usecase.txt
+database_sqlserver.sql
+OAuthGG.json
+uc1_1_register_guide.md
+implementation_plan.md
+src/main/resources/ssl/
+src/main/resources/templates/index.html

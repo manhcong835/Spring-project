@@ -1,28 +1,42 @@
 package com.spring.project.controller;
 
+import com.spring.project.dto.RegisterRequest;
+import com.spring.project.service.AuthService;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import com.spring.project.dto.UserLoginRequest;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("")
 public class UserController {
 
+    private final AuthService authService;
+
+    public UserController(AuthService authService) {
+        this.authService = authService;
+    }
+
     // ==================== TRANG CHỦ ====================
+    @GetMapping("/index")
+    public String index() {
+        return "index";
+    }
 
     @GetMapping({ "/", "/home" })
     public String home() {
         return "client/pages/home";
     }
 
-    @GetMapping("/index")
-    public String index() {
-        return "client/pages/home";
-    }
+    // @GetMapping("/index")
+    // public String index() {
+    // return "client/pages/home";
+    // }
 
     // ==================== AUTHENTICATION ====================
 
@@ -31,15 +45,36 @@ public class UserController {
         return "client/pages/login";
     }
 
-    @PostMapping("/login")
-    public String login(@ModelAttribute UserLoginRequest userLoginRequest) {
-        userLogin.login(userLoginRequest);
-        return "redirect:/";
-    }
+    // POST /login do Spring Security tự xử lý — KHÔNG viết ở đây
 
     @GetMapping("/register")
-    public String register() {
+    public String register(Model model) {
+        model.addAttribute("registerRequest", new RegisterRequest());
         return "client/pages/register";
+    }
+
+    @PostMapping("/register")
+    public String register(@Valid @ModelAttribute("registerRequest") RegisterRequest request,
+            BindingResult bindingResult,
+            Model model,
+            RedirectAttributes redirectAttributes) {
+
+        // Nếu có lỗi validation (annotation trên DTO)
+        if (bindingResult.hasErrors()) {
+            return "client/pages/register";
+        }
+
+        try {
+            authService.register(request);
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Đăng ký thành công! Vui lòng đăng nhập.");
+            return "redirect:/login";
+
+        } catch (IllegalArgumentException e) {
+            // Lỗi nghiệp vụ (email trùng, phone trùng, password không khớp)
+            model.addAttribute("errorMessage", e.getMessage());
+            return "client/pages/register";
+        }
     }
 
     @GetMapping("/forgot-password")
