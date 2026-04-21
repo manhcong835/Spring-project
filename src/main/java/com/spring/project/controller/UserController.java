@@ -10,7 +10,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("")
@@ -41,7 +44,21 @@ public class UserController {
     // ==================== AUTHENTICATION ====================
 
     @GetMapping("/login")
-    public String login() {
+    public String login(@RequestParam(required = false) String error,
+            @RequestParam(required = false) String logout,
+            @RequestParam(required = false) String registered,
+            HttpSession session,
+            Model model) {
+
+        // Đánh dấu nguồn đăng nhập để SuccessHandler biết
+        session.setAttribute("loginSource", "client");
+
+        if (error != null)
+            model.addAttribute("errorMessage", "Email hoặc mật khẩu không đúng");
+        if (logout != null)
+            model.addAttribute("logoutMessage", "Đã đăng xuất thành công");
+        if (registered != null)
+            model.addAttribute("successMessage", "Đăng ký thành công! Vui lòng đăng nhập.");
         return "client/pages/login";
     }
 

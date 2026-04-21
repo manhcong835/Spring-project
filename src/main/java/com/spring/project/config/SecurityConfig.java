@@ -1,6 +1,8 @@
 package com.spring.project.config;
 
+import com.spring.project.security.CustomAuthenticationSuccessHandler;
 import com.spring.project.security.CustomOAuth2UserService;
+import com.spring.project.security.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,6 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
  * - Phân quyền URL (public / authenticated / admin)
  * - Form login LOCAL (email + password)
  * - OAuth2 login Google
+ * - SuccessHandler: phân biệt redirect ADMIN vs CUSTOMER
  * - Logout
  */
 @Configuration
@@ -21,9 +24,15 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomUserDetailsService customUserDetailsService;
+    private final CustomAuthenticationSuccessHandler successHandler;
 
-    public SecurityConfig(CustomOAuth2UserService customOAuth2UserService) {
+    public SecurityConfig(CustomOAuth2UserService customOAuth2UserService,
+                          CustomUserDetailsService customUserDetailsService,
+                          CustomAuthenticationSuccessHandler successHandler) {
         this.customOAuth2UserService = customOAuth2UserService;
+        this.customUserDetailsService = customUserDetailsService;
+        this.successHandler = successHandler;
     }
 
     @Bean
@@ -39,6 +48,7 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/", "/home", "/index",
                     "/login", "/register",
+                    "/admin", "/admin/", "/admin/login",
                     "/forgot-password",
                     "/tours", "/tours/**",
                     "/about", "/contact",
@@ -57,10 +67,10 @@ public class SecurityConfig {
             .formLogin(form -> form
                 .loginPage("/login")
                 .loginProcessingUrl("/login")
-                .defaultSuccessUrl("/", true)
-                .failureUrl("/login?error=true")
                 .usernameParameter("email")
                 .passwordParameter("password")
+                .successHandler(successHandler)
+                .failureUrl("/login?error=true")
                 .permitAll()
             )
 
@@ -70,7 +80,7 @@ public class SecurityConfig {
                 .userInfoEndpoint(userInfo -> userInfo
                     .userService(customOAuth2UserService)
                 )
-                .defaultSuccessUrl("/", true)
+                .successHandler(successHandler)
                 .failureUrl("/login?error=true")
             )
 
@@ -79,7 +89,10 @@ public class SecurityConfig {
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/login?logout=true")
                 .permitAll()
-            );
+            )
+
+            // ===== UserDetailsService =====
+            .userDetailsService(customUserDetailsService);
 
         return http.build();
     }

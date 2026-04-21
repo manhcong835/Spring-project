@@ -11,10 +11,12 @@ public class ProjectApplication {
 		ApplicationContext context = SpringApplication.run(ProjectApplication.class, args);
 
 		String port = context.getEnvironment().getProperty("local.server.port");
+		String sslEnabled = context.getEnvironment().getProperty("server.ssl.enabled", "false");
+		String protocol = sslEnabled.equalsIgnoreCase("true") ? "https" : "http";
 
 		System.out.println("\n---------------------------------------------------------");
 		System.out.println("\tApplication is running! Access URL:");
-		System.out.println("\tLocal: \t\thttp://localhost:" + port);
+		System.out.println("\tLocal: \t\t" + protocol + "://localhost:" + port);
 		System.out.println("---------------------------------------------------------\n");
 	}
 

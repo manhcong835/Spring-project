@@ -1,0 +1,44 @@
+package com.spring.project.security;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+
+/**
+ * Điều hướng user sau khi đăng nhập thành công.
+ * - ADMIN → /admin/dashboard
+ * - CUSTOMER/STAFF → / (trang chủ)
+ *
+ * Dùng chung cho cả formLogin (LOCAL) và oauth2Login (Google).
+ */
+@Component
+public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
+
+    @Override
+    public void onAuthenticationSuccess(HttpServletRequest request,
+                                        HttpServletResponse response,
+                                        Authentication authentication) throws IOException, ServletException {
+
+        String loginSource = (String) request.getSession().getAttribute("loginSource");
+
+        boolean isAdmin = false;
+        for (GrantedAuthority authority : authentication.getAuthorities()) {
+            if ("ROLE_ADMIN".equals(authority.getAuthority())) {
+                isAdmin = true;
+                break;
+            }
+        }
+
+        if (isAdmin && "admin".equals(loginSource)) {
+            response.sendRedirect("/admin/dashboard");
+        } else {
+            response.sendRedirect("/");
+        }
+    }
+}
