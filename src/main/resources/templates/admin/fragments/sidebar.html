@@ -8,6 +8,25 @@
                 ⚙️ <span class="text-primary">Admin</span><span class="text-warning">Panel</span>
             </a>
         </div>
+
+        <!-- Thông tin admin ở đầu sidebar -->
+        <div class="p-3 border-bottom border-secondary">
+            <div class="d-flex align-items-center gap-2">
+                <img th:if="${currentUser != null && currentUser.avatarUrl != null && !currentUser.avatarUrl.isEmpty()}"
+                     th:src="${currentUser.avatarUrl}" alt="Avatar" class="admin-avatar">
+                <div th:unless="${currentUser != null && currentUser.avatarUrl != null && !currentUser.avatarUrl.isEmpty()}"
+                     class="admin-avatar-placeholder">
+                    <span th:text="${currentUser != null && currentUser.fullName != null ? currentUser.fullName.substring(0,1).toUpperCase() : 'A'}"></span>
+                </div>
+                <div class="lh-sm">
+                    <span class="fw-semibold text-white d-block small"
+                          th:text="${currentUser != null ? currentUser.fullName : 'Admin'}">Admin</span>
+                    <small class="text-white-50" style="font-size:0.75rem;"
+                           th:text="${currentUser != null ? currentUser.email : ''}"></small>
+                </div>
+            </div>
+        </div>
+
         <nav class="p-3">
             <p class="text-uppercase text-white-50 small fw-bold mb-2">Menu chính</p>
             <ul class="nav flex-column gap-1">
@@ -36,13 +55,17 @@
             <p class="text-uppercase text-white-50 small fw-bold mb-2 mt-3">Hệ thống</p>
             <ul class="nav flex-column gap-1">
                 <li class="nav-item">
-                    <a class="nav-link text-white-50 rounded px-3 py-2" th:href="@{/admin/profile}">📋 Hồ sơ</a>
+                    <a class="nav-link text-white-50 rounded px-3 py-2" th:href="@{/admin/profile}">👤 Hồ sơ</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link text-white-50 rounded px-3 py-2" th:href="@{/admin/change-password}">🔒 Đổi mật khẩu</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-danger rounded px-3 py-2" th:href="@{/admin/login}">🚪 Đăng xuất</a>
+                    <form th:action="@{/logout}" method="post" class="m-0">
+                        <button type="submit" class="nav-link text-danger rounded px-3 py-2 w-100 text-start border-0 bg-transparent">
+                            🚪 Đăng xuất
+                        </button>
+                    </form>
                 </li>
             </ul>
         </nav>
@@ -55,6 +78,17 @@
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
         </div>
         <div class="offcanvas-body p-3">
+            <!-- Thông tin admin trên mobile -->
+            <div class="d-flex align-items-center gap-2 mb-3 pb-3 border-bottom border-secondary">
+                <div class="admin-avatar-placeholder">
+                    <span th:text="${currentUser != null && currentUser.fullName != null ? currentUser.fullName.substring(0,1).toUpperCase() : 'A'}"></span>
+                </div>
+                <div class="lh-sm">
+                    <span class="fw-semibold text-white small"
+                          th:text="${currentUser != null ? currentUser.fullName : 'Admin'}">Admin</span>
+                </div>
+            </div>
+
             <ul class="nav flex-column gap-1">
                 <li><a class="nav-link text-white" th:href="@{/admin/dashboard}">📊 Dashboard</a></li>
                 <li><a class="nav-link text-white-50" th:href="@{/admin/tours}">🗺️ Tour du lịch</a></li>
@@ -63,8 +97,14 @@
                 <li><a class="nav-link text-white-50" th:href="@{/admin/staff}">👔 Nhân viên</a></li>
                 <li><a class="nav-link text-white-50" th:href="@{/admin/promotions}">🎁 Khuyến mãi</a></li>
                 <li><hr class="border-secondary"></li>
-                <li><a class="nav-link text-white-50" th:href="@{/admin/profile}">📋 Hồ sơ</a></li>
-                <li><a class="nav-link text-danger" th:href="@{/admin/login}">🚪 Đăng xuất</a></li>
+                <li><a class="nav-link text-white-50" th:href="@{/admin/profile}">👤 Hồ sơ</a></li>
+                <li>
+                    <form th:action="@{/logout}" method="post" class="m-0">
+                        <button type="submit" class="nav-link text-danger w-100 text-start border-0 bg-transparent">
+                            🚪 Đăng xuất
+                        </button>
+                    </form>
+                </li>
             </ul>
         </div>
     </div>

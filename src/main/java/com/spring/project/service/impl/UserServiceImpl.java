@@ -1,0 +1,100 @@
+package com.spring.project.service.impl;
+
+import com.spring.project.dto.ChangePasswordRequest;
+import com.spring.project.dto.UpdateProfileRequest;
+import com.spring.project.entity.User;
+import com.spring.project.entity.UserAuthProvider;
+import com.spring.project.repository.UserAuthProviderRepository;
+import com.spring.project.repository.UserRepository;
+import com.spring.project.service.UserService;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+
+/**
+ * Implementation cho UserService.
+ * UC 1.3: Cập nhật thông tin cá nhân + Đổi mật khẩu.
+ */
+@Service
+public class UserServiceImpl implements UserService {
+
+    private final UserRepository userRepository;
+    private final UserAuthProviderRepository userAuthProviderRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    public UserServiceImpl(UserRepository userRepository,
+                           UserAuthProviderRepository userAuthProviderRepository,
+                           PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.userAuthProviderRepository = userAuthProviderRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    @Override
+    public User getUserById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
+    }
+
+    @Override
+    public boolean hasLocalProvider(Long userId) {
+        return userAuthProviderRepository.existsByUserIdAndProvider(userId, "LOCAL");
+    }
+
+    @Override
+    @Transactional
+    public User updateProfile(Long userId, UpdateProfileRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
+
+        // Kiểm tra phone trùng (loại trừ chính mình)
+        if (request.getPhone() != null && !request.getPhone().isBlank()) {
+            if (userRepository.existsByPhoneAndIdNot(request.getPhone(), userId)) {
+                throw new IllegalArgumentException("Số điện thoại đã được sử dụng bởi tài khoản khác");
+            }
+        }
+
+        // Cập nhật các trường được phép
+        user.setFullName(request.getFullName());
+        user.setPhone(request.getPhone());
+        user.setGender(request.getGender());
+        user.setAddress(request.getAddress());
+
+        // Parse dateOfBirth từ String sang LocalDate
+        if (request.getDateOfBirth() != null && !request.getDateOfBirth().isBlank()) {
+            user.setDateOfBirth(LocalDate.parse(request.getDateOfBirth()));
+        } else {
+            user.setDateOfBirth(null);
+        }
+
+        // KHÔNG cập nhật: email, role, status, avatarUrl
+
+        return userRepository.save(user);
+    }
+
+    @Override
+    @Transactional
+    public void changePassword(Long userId, ChangePasswordRequest request) {
+        // 1. Tìm UserAuthProvider theo (userId, "LOCAL")
+        UserAuthProvider authProvider = userAuthProviderRepository
+                .findByUserIdAndProvider(userId, "LOCAL")
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Tài khoản này không có mật khẩu để đổi. Vui lòng đăng nhập bằng Google."));
+
+        // 2. So sánh mật khẩu hiện tại
+        if (!passwordEncoder.matches(request.getCurrentPassword(), authProvider.getPassword())) {
+            throw new IllegalArgumentException("Mật khẩu hiện tại không đúng");
+        }
+
+        // 3. Kiểm tra newPassword == confirmNewPassword
+        if (!request.getNewPassword().equals(request.getConfirmNewPassword())) {
+            throw new IllegalArgumentException("Mật khẩu mới không khớp");
+        }
+
+        // 4. Mã hóa mật khẩu mới và lưu
+        authProvider.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userAuthProviderRepository.save(authProvider);
+    }
+}

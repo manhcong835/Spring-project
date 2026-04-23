@@ -39,6 +39,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByPhone(String phone);
 
     /**
+     * UC 1.3 - Cập nhật profile: Kiểm tra phone trùng nhưng loại trừ chính user đang update
+     */
+    boolean existsByPhoneAndIdNot(String phone, Long id);
+
+    /**
      * UC Admin 5.1 - Xem danh sách khách hàng theo role
      */
     List<User> findByRoleName(String roleName);

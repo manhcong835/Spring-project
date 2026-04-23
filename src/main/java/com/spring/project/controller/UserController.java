@@ -1,7 +1,12 @@
 package com.spring.project.controller;
 
+import com.spring.project.dto.ChangePasswordRequest;
 import com.spring.project.dto.RegisterRequest;
+import com.spring.project.dto.UpdateProfileRequest;
+import com.spring.project.entity.User;
+import com.spring.project.security.SecurityUtils;
 import com.spring.project.service.AuthService;
+import com.spring.project.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,9 +25,11 @@ import jakarta.servlet.http.HttpSession;
 public class UserController {
 
     private final AuthService authService;
+    private final UserService userService;
 
-    public UserController(AuthService authService) {
+    public UserController(AuthService authService, UserService userService) {
         this.authService = authService;
+        this.userService = userService;
     }
 
     // ==================== TRANG CHỦ ====================
@@ -102,8 +109,85 @@ public class UserController {
     // ==================== PROFILE ====================
 
     @GetMapping("/profile")
-    public String profile() {
+    public String profile(@RequestParam(required = false) String success,
+                          @RequestParam(required = false) String passwordChanged,
+                          Model model) {
+        Long userId = SecurityUtils.getCurrentUserId();
+        User user = userService.getUserById(userId);
+        boolean hasLocalProvider = userService.hasLocalProvider(userId);
+
+        model.addAttribute("user", user);
+        model.addAttribute("hasLocalProvider", hasLocalProvider);
+
+        // Thêm DTO rỗng nếu chưa có trong model (lần đầu vào trang)
+        if (!model.containsAttribute("updateProfileRequest")) {
+            UpdateProfileRequest profileReq = new UpdateProfileRequest();
+            profileReq.setFullName(user.getFullName());
+            profileReq.setPhone(user.getPhone());
+            profileReq.setGender(user.getGender());
+            profileReq.setDateOfBirth(user.getDateOfBirth() != null ? user.getDateOfBirth().toString() : "");
+            profileReq.setAddress(user.getAddress());
+            model.addAttribute("updateProfileRequest", profileReq);
+        }
+        if (!model.containsAttribute("changePasswordRequest")) {
+            model.addAttribute("changePasswordRequest", new ChangePasswordRequest());
+        }
+
+        // Thông báo thành công
+        if (success != null) model.addAttribute("successMessage", "Cập nhật thông tin thành công!");
+        if (passwordChanged != null) model.addAttribute("successMessage", "Đổi mật khẩu thành công!");
+
         return "client/pages/profile";
+    }
+
+    @PostMapping("/profile/update")
+    public String updateProfile(@Valid @ModelAttribute("updateProfileRequest") UpdateProfileRequest request,
+                                BindingResult bindingResult,
+                                RedirectAttributes redirectAttributes) {
+
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.updateProfileRequest", bindingResult);
+            redirectAttributes.addFlashAttribute("updateProfileRequest", request);
+            redirectAttributes.addFlashAttribute("profileError", "Vui lòng kiểm tra lại thông tin");
+            return "redirect:/profile";
+        }
+
+        try {
+            Long userId = SecurityUtils.getCurrentUserId();
+            User updatedUser = userService.updateProfile(userId, request);
+
+            // Đồng bộ lại principal trong SecurityContextHolder
+            SecurityUtils.refreshAuthentication(updatedUser);
+
+            return "redirect:/profile?success=true";
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("updateProfileRequest", request);
+            redirectAttributes.addFlashAttribute("profileError", e.getMessage());
+            return "redirect:/profile";
+        }
+    }
+
+    @PostMapping("/profile/change-password")
+    public String changePassword(@Valid @ModelAttribute("changePasswordRequest") ChangePasswordRequest request,
+                                 BindingResult bindingResult,
+                                 RedirectAttributes redirectAttributes) {
+
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.changePasswordRequest", bindingResult);
+            redirectAttributes.addFlashAttribute("changePasswordRequest", request);
+            redirectAttributes.addFlashAttribute("passwordError", "Vui lòng kiểm tra lại thông tin");
+            return "redirect:/profile";
+        }
+
+        try {
+            Long userId = SecurityUtils.getCurrentUserId();
+            userService.changePassword(userId, request);
+            return "redirect:/profile?passwordChanged=true";
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("changePasswordRequest", request);
+            redirectAttributes.addFlashAttribute("passwordError", e.getMessage());
+            return "redirect:/profile";
+        }
     }
 
     // ==================== TOUR ====================

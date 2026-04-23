@@ -13,14 +13,44 @@
         <div class="d-flex align-items-center gap-3">
             <span class="badge bg-success rounded-pill">Online</span>
             <div class="dropdown">
-                <a class="btn btn-light btn-sm dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                    👤 Admin
+                <a class="d-flex align-items-center gap-2 text-decoration-none dropdown-toggle admin-user-toggle"
+                   href="#" role="button" id="adminUserDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+
+                    <!-- Avatar: ảnh thật hoặc placeholder chữ cái đầu -->
+                    <img th:if="${currentUser != null && currentUser.avatarUrl != null && !currentUser.avatarUrl.isEmpty()}"
+                         th:src="${currentUser.avatarUrl}" alt="Avatar" class="admin-avatar">
+                    <div th:unless="${currentUser != null && currentUser.avatarUrl != null && !currentUser.avatarUrl.isEmpty()}"
+                         class="admin-avatar-placeholder">
+                        <span th:text="${currentUser != null && currentUser.fullName != null ? currentUser.fullName.substring(0,1).toUpperCase() : 'A'}"></span>
+                    </div>
+
+                    <div class="d-none d-md-block text-start lh-sm">
+                        <span class="fw-semibold text-dark d-block" style="font-size:0.9rem;"
+                              th:text="${currentUser != null ? currentUser.fullName : 'Admin'}">Admin</span>
+                        <small class="text-muted" style="font-size:0.75rem;"
+                               th:text="${currentUser != null ? currentUser.email : ''}"></small>
+                    </div>
                 </a>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" th:href="@{/admin/profile}">📋 Hồ sơ</a></li>
-                    <li><a class="dropdown-item" th:href="@{/admin/change-password}">🔒 Đổi mật khẩu</a></li>
+
+                <ul class="dropdown-menu dropdown-menu-end shadow-lg" aria-labelledby="adminUserDropdown">
+                    <li>
+                        <a class="dropdown-item" th:href="@{/admin/profile}">
+                            <span class="me-2">👤</span> Hồ sơ cá nhân
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" th:href="@{/admin/change-password}">
+                            <span class="me-2">🔒</span> Đổi mật khẩu
+                        </a>
+                    </li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" th:href="@{/admin/login}">🚪 Đăng xuất</a></li>
+                    <li>
+                        <form th:action="@{/logout}" method="post" class="m-0">
+                            <button type="submit" class="dropdown-item text-danger">
+                                <span class="me-2">🚪</span> Đăng xuất
+                            </button>
+                        </form>
+                    </li>
                 </ul>
             </div>
         </div>

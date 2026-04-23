@@ -71,3 +71,63 @@
 /* Scrollbar */
 .admin-sidebar::-webkit-scrollbar { width: 4px; }
 .admin-sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+
+/* ==================== ADMIN USER MENU ==================== */
+
+/* Avatar ảnh thật */
+.admin-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255,255,255,0.2);
+}
+
+/* Avatar placeholder (chữ cái đầu) */
+.admin-avatar-placeholder {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0d6efd, #6610f2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+/* Header dropdown toggle */
+.admin-user-toggle::after {
+    margin-left: 0.4rem;
+    vertical-align: middle;
+}
+.admin-user-toggle:hover .admin-avatar,
+.admin-user-toggle:hover .admin-avatar-placeholder {
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+    transition: box-shadow 0.2s ease;
+}
+
+/* Header dropdown menu */
+.admin-header .dropdown-menu {
+    border-radius: 0.75rem;
+    border: 1px solid rgba(0,0,0,0.06);
+    min-width: 220px;
+    padding: 0.5rem 0;
+    margin-top: 0.5rem;
+}
+.admin-header .dropdown-item {
+    padding: 0.55rem 1.2rem;
+    font-size: 0.9rem;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+.admin-header .dropdown-item:hover {
+    background: #f0f4ff;
+    color: #0d6efd;
+}
+.admin-header .dropdown-item.text-danger:hover {
+    background: #fff5f5;
+    color: #dc3545;
+}
+

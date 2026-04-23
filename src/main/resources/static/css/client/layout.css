@@ -69,3 +69,64 @@ html { scroll-behavior: smooth; }
     justify-content: center;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
+
+/* ==================== USER MENU (NAVBAR) ==================== */
+
+/* Avatar ảnh thật */
+.user-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #e9ecef;
+}
+
+/* Avatar placeholder (chữ cái đầu) */
+.user-avatar-placeholder {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0d6efd, #6610f2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+/* Dropdown toggle: bỏ mũi tên mặc định, thêm hover */
+.user-menu-toggle::after {
+    margin-left: 0.4rem;
+    vertical-align: middle;
+}
+.user-menu-toggle:hover .user-avatar,
+.user-menu-toggle:hover .user-avatar-placeholder {
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+    transition: box-shadow 0.2s ease;
+}
+
+/* Dropdown menu */
+.navbar .dropdown-menu {
+    border-radius: 0.75rem;
+    border: 1px solid rgba(0,0,0,0.06);
+    min-width: 240px;
+    padding: 0.5rem 0;
+    margin-top: 0.5rem;
+}
+.navbar .dropdown-item {
+    padding: 0.55rem 1.2rem;
+    font-size: 0.9rem;
+    border-radius: 0;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+.navbar .dropdown-item:hover {
+    background: #f0f4ff;
+    color: #0d6efd;
+}
+.navbar .dropdown-item.text-danger:hover {
+    background: #fff5f5;
+    color: #dc3545;
+}
+
