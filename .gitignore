@@ -37,8 +37,11 @@ build/
 usecase.txt
 database_sqlserver.sql
 OAuthGG.json
-guide.md
-guide1.md
-implementation_plan.md
+guide*.md
+implementation_plan*
 src/main/resources/ssl/
 src/main/resources/templates/index.html
+37_2023601573_NguyenCongManh.docx
+37_2023601573_NguyenCongManh.pdf
+prompt_microservice_travelbooking.txt
+PROMPT_OLD.txt

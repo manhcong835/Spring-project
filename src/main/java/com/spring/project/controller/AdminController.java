@@ -1,9 +1,11 @@
 package com.spring.project.controller;
 
 import com.spring.project.dto.ChangePasswordRequest;
+import com.spring.project.dto.RegisterRequest;
 import com.spring.project.dto.UpdateProfileRequest;
 import com.spring.project.entity.User;
 import com.spring.project.security.SecurityUtils;
+import com.spring.project.service.AuthService;
 import com.spring.project.service.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,9 +27,11 @@ import jakarta.validation.Valid;
 public class AdminController {
 
     private final UserService userService;
+    private final AuthService authService;
 
-    public AdminController(UserService userService) {
+    public AdminController(UserService userService, AuthService authService) {
         this.userService = userService;
+        this.authService = authService;
     }
 
     // ==================== AUTHENTICATION ====================
@@ -113,6 +117,11 @@ public class AdminController {
         return "admin/pages/tourdelete";
     }
 
+    @GetMapping("/tours/departures")
+    public String tourDepartures() {
+        return "admin/pages/tourdepartures";
+    }
+
     // ==================== BOOKING MANAGEMENT ====================
 
     @GetMapping("/bookings")
@@ -167,6 +176,36 @@ public class AdminController {
     @GetMapping("/customers/status")
     public String customerStatus() {
         return "admin/pages/customerstatus";
+    }
+
+    @GetMapping("/customers/create")
+    public String customerCreate(Model model) {
+        if (!model.containsAttribute("registerRequest")) {
+            model.addAttribute("registerRequest", new RegisterRequest());
+        }
+        return "admin/pages/customercreate";
+    }
+
+    @PostMapping("/customers/create")
+    public String customerCreatePost(@Valid @ModelAttribute("registerRequest") RegisterRequest request,
+                                     BindingResult bindingResult,
+                                     RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.registerRequest", bindingResult);
+            redirectAttributes.addFlashAttribute("registerRequest", request);
+            redirectAttributes.addFlashAttribute("errorMessage", "Vui lòng kiểm tra lại thông tin");
+            return "redirect:/admin/customers/create";
+        }
+
+        try {
+            authService.register(request);
+            redirectAttributes.addFlashAttribute("successMessage", "Thêm khách hàng thành công!");
+            return "redirect:/admin/customers/create";
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("registerRequest", request);
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/admin/customers/create";
+        }
     }
 
     // ==================== ADMIN PROFILE ====================

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="vi">
 <head th:replace="~{client/fragments/head :: head('Chi tiết tour', '/css/client/tourdetail.css')}"></head>
+<link rel="stylesheet" th:href="@{/css/client/tourdetail-departure.css}">
 <body>
 <div th:replace="~{client/fragments/header :: header}"></div>
 <div th:replace="~{client/fragments/navbar :: navbar}"></div>
@@ -108,36 +109,168 @@
                 </div>
             </div>
 
-            <!-- Right: Booking card -->
+            <!-- Right: Lịch Trình và Giá Tour -->
             <div class="col-lg-4">
-                <div class="card border-0 shadow rounded-4 p-4 tour-info-card">
-                    <div class="text-center mb-3">
-                        <del class="text-muted">6.990.000đ</del>
-                        <div class="text-primary fw-bold display-6">4.990.000đ</div>
-                        <small class="text-muted">/ khách</small>
+                <div class="card border-0 shadow rounded-4 p-4 tour-info-card" id="departureWidget">
+                    <h5 class="fw-bold mb-1">Lịch Trình và Giá Tour</h5>
+                    <p class="text-muted small mb-3">Chọn Lịch Trình và Xem Giá:</p>
+
+                    <!-- Departure Tabs -->
+                    <div class="departure-tabs">
+                        <div class="departure-tab active" data-idx="0"
+                             data-adult="63900000" data-child="44730000" data-infant="0">
+                            <span class="tab-day">T2</span>
+                            <span class="tab-date">25/05</span>
+                        </div>
+                        <div class="departure-tab" data-idx="1"
+                             data-adult="63900000" data-child="44730000" data-infant="0">
+                            <span class="tab-day">T6</span>
+                            <span class="tab-date">29/05</span>
+                        </div>
+                        <div class="departure-tab" data-idx="2"
+                             data-adult="70500000" data-child="49350000" data-infant="0">
+                            <span class="tab-day">T4</span>
+                            <span class="tab-date">17/06</span>
+                        </div>
+                        <div class="departure-tab-all" id="btnShowCalendar">
+                            📅 Tất cả
+                        </div>
                     </div>
-                    <hr>
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between small mb-2">
-                            <span class="text-muted">Mã tour:</span><strong>PQ2026-04</strong>
+
+                    <!-- Calendar Popup (ẩn mặc định) -->
+                    <div class="departure-calendar" id="departureCalendar">
+                        <div class="calendar-header">
+                            <button class="calendar-nav" id="calPrev">‹</button>
+                            <div style="display:flex;gap:8px;">
+                                <select id="calMonth">
+                                    <option value="0">Th01</option>
+                                    <option value="1">Th02</option>
+                                    <option value="2">Th03</option>
+                                    <option value="3">Th04</option>
+                                    <option value="4" selected>Th05</option>
+                                    <option value="5">Th06</option>
+                                    <option value="6">Th07</option>
+                                    <option value="7">Th08</option>
+                                    <option value="8">Th09</option>
+                                    <option value="9">Th10</option>
+                                    <option value="10">Th11</option>
+                                    <option value="11">Th12</option>
+                                </select>
+                                <select id="calYear">
+                                    <option value="2026" selected>2026</option>
+                                    <option value="2027">2027</option>
+                                </select>
+                            </div>
+                            <button class="calendar-nav" id="calNext">›</button>
                         </div>
-                        <div class="d-flex justify-content-between small mb-2">
-                            <span class="text-muted">Thời gian:</span><strong>4 ngày 3 đêm</strong>
-                        </div>
-                        <div class="d-flex justify-content-between small mb-2">
-                            <span class="text-muted">Khởi hành:</span><strong>15/04/2026</strong>
-                        </div>
-                        <div class="d-flex justify-content-between small mb-2">
-                            <span class="text-muted">Nơi khởi hành:</span><strong>TP. Hồ Chí Minh</strong>
-                        </div>
-                        <div class="d-flex justify-content-between small mb-2">
-                            <span class="text-muted">Số chỗ còn lại:</span><strong class="text-danger">12 chỗ</strong>
+                        <div class="calendar-grid" id="calendarGrid">
+                            <!-- Header -->
+                            <div class="cal-header">T2</div>
+                            <div class="cal-header">T3</div>
+                            <div class="cal-header">T4</div>
+                            <div class="cal-header">T5</div>
+                            <div class="cal-header">T6</div>
+                            <div class="cal-header weekend">T7</div>
+                            <div class="cal-header weekend">CN</div>
+                            <!-- Tuần 1: 28-29-30/4 + 1-2-3-4/5 -->
+                            <div class="cal-day">28</div>
+                            <div class="cal-day">29</div>
+                            <div class="cal-day">30</div>
+                            <div class="cal-day current-month">1</div>
+                            <div class="cal-day current-month">2</div>
+                            <div class="cal-day current-month">3</div>
+                            <div class="cal-day current-month">4</div>
+                            <!-- Tuần 2 -->
+                            <div class="cal-day current-month">5</div>
+                            <div class="cal-day current-month">6</div>
+                            <div class="cal-day current-month">7</div>
+                            <div class="cal-day current-month">8</div>
+                            <div class="cal-day current-month">9</div>
+                            <div class="cal-day current-month">10</div>
+                            <div class="cal-day current-month">11</div>
+                            <!-- Tuần 3 -->
+                            <div class="cal-day current-month">12</div>
+                            <div class="cal-day current-month">13</div>
+                            <div class="cal-day current-month">14</div>
+                            <div class="cal-day current-month">15</div>
+                            <div class="cal-day current-month">16</div>
+                            <div class="cal-day current-month">17</div>
+                            <div class="cal-day current-month">18</div>
+                            <!-- Tuần 4 -->
+                            <div class="cal-day current-month">19</div>
+                            <div class="cal-day current-month">20</div>
+                            <div class="cal-day current-month">21</div>
+                            <div class="cal-day current-month">22</div>
+                            <div class="cal-day current-month">23</div>
+                            <div class="cal-day current-month">24</div>
+                            <div class="cal-day current-month has-departure selected" data-idx="0">25</div>
+                            <!-- Tuần 5 -->
+                            <div class="cal-day current-month">26</div>
+                            <div class="cal-day current-month">27</div>
+                            <div class="cal-day current-month">28</div>
+                            <div class="cal-day current-month has-departure" data-idx="1">29</div>
+                            <div class="cal-day current-month">30</div>
+                            <div class="cal-day current-month">31</div>
+                            <div class="cal-day">1</div>
                         </div>
                     </div>
-                    <a th:href="@{/booking/create}" class="btn btn-primary btn-lg w-100 fw-semibold mb-2">🛒 Đặt tour ngay</a>
-                    <a href="tel:19001234" class="btn btn-outline-secondary w-100">📞 Gọi tư vấn: 1900 1234</a>
+
+                    <!-- Quantity Counter -->
+                    <div class="qty-section">
+                        <div class="qty-row">
+                            <div class="qty-label">
+                                <span class="qty-type">Người lớn</span>
+                                <span class="qty-age">> 10 tuổi</span>
+                            </div>
+                            <span class="qty-price" id="adultPriceLabel">x 63.900.000</span>
+                            <div class="qty-controls">
+                                <button class="qty-btn" data-target="adultQty" data-action="minus">−</button>
+                                <span class="qty-value" id="adultQty">2</span>
+                                <button class="qty-btn" data-target="adultQty" data-action="plus">+</button>
+                            </div>
+                        </div>
+                        <div class="qty-row">
+                            <div class="qty-label">
+                                <span class="qty-type">Trẻ em</span>
+                                <span class="qty-age">2 - 10 tuổi</span>
+                            </div>
+                            <span class="qty-price" id="childPriceLabel">x 44.730.000</span>
+                            <div class="qty-controls">
+                                <button class="qty-btn" data-target="childQty" data-action="minus">−</button>
+                                <span class="qty-value" id="childQty">0</span>
+                                <button class="qty-btn" data-target="childQty" data-action="plus">+</button>
+                            </div>
+                        </div>
+                        <div class="qty-row">
+                            <div class="qty-label">
+                                <span class="qty-type">Trẻ nhỏ</span>
+                                <span class="qty-age">< 2 tuổi</span>
+                            </div>
+                            <span class="qty-price" id="infantPriceLabel" style="color:#0d6efd;">Liên hệ</span>
+                            <div class="qty-controls">
+                                <button class="qty-btn" data-target="infantQty" data-action="minus">−</button>
+                                <span class="qty-value" id="infantQty">0</span>
+                                <button class="qty-btn" data-target="infantQty" data-action="plus">+</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact note -->
+                    <div class="contact-note">
+                        ℹ️ Liên hệ để xác nhận chỗ
+                    </div>
+
+                    <!-- Total -->
+                    <div class="total-section">
+                        <span class="total-label">Tổng Giá Tour</span>
+                        <span class="total-price" id="totalPrice">127.800.000 đ</span>
+                    </div>
+
+                    <!-- Book button -->
+                    <a th:href="@{/booking/create}" class="btn-book-tour">Yêu cầu đặt</a>
+
                     <div class="mt-3 text-center">
-                        <span class="badge bg-success-subtle text-success rounded-pill px-3">✅ Đảm bảo hoàn tiền</span>
+                        <a href="tel:19001234" class="text-muted small text-decoration-none">📞 Gọi tư vấn: 1900 1234</a>
                     </div>
                 </div>
             </div>
@@ -146,5 +279,97 @@
 </section>
 
 <div th:replace="~{client/fragments/footer :: footer}"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ========== Departure Tabs ==========
+    const tabs = document.querySelectorAll('.departure-tab');
+    const calendarBtn = document.getElementById('btnShowCalendar');
+    const calendar = document.getElementById('departureCalendar');
+
+    let currentAdultPrice = 63900000;
+    let currentChildPrice = 44730000;
+    let currentInfantPrice = 0;
+
+    function formatPrice(num) {
+        return num.toLocaleString('vi-VN');
+    }
+
+    function selectTab(tab) {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        calendarBtn.classList.remove('active');
+
+        currentAdultPrice = parseInt(tab.dataset.adult) || 0;
+        currentChildPrice = parseInt(tab.dataset.child) || 0;
+        currentInfantPrice = parseInt(tab.dataset.infant) || 0;
+
+        updatePriceLabels();
+        updateTotal();
+    }
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => selectTab(tab));
+    });
+
+    // ========== Calendar Toggle ==========
+    calendarBtn.addEventListener('click', function() {
+        this.classList.toggle('active');
+        calendar.classList.toggle('show');
+    });
+
+    // Calendar day click
+    document.querySelectorAll('.cal-day.has-departure').forEach(day => {
+        day.addEventListener('click', function() {
+            document.querySelectorAll('.cal-day.has-departure').forEach(d => d.classList.remove('selected'));
+            this.classList.add('selected');
+            const idx = this.dataset.idx;
+            if (idx !== undefined) {
+                const matchTab = document.querySelector('.departure-tab[data-idx="' + idx + '"]');
+                if (matchTab) selectTab(matchTab);
+            }
+        });
+    });
+
+    // ========== Quantity Controls ==========
+    document.querySelectorAll('.qty-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const targetId = this.dataset.target;
+            const action = this.dataset.action;
+            const valueEl = document.getElementById(targetId);
+            let val = parseInt(valueEl.textContent) || 0;
+
+            if (action === 'plus') val++;
+            if (action === 'minus' && val > 0) val--;
+
+            valueEl.textContent = val;
+            updateTotal();
+        });
+    });
+
+    // ========== Price Labels & Total ==========
+    function updatePriceLabels() {
+        document.getElementById('adultPriceLabel').textContent = 'x ' + formatPrice(currentAdultPrice);
+        document.getElementById('childPriceLabel').textContent = 'x ' + formatPrice(currentChildPrice);
+        if (currentInfantPrice > 0) {
+            document.getElementById('infantPriceLabel').textContent = 'x ' + formatPrice(currentInfantPrice);
+            document.getElementById('infantPriceLabel').style.color = '#e8913a';
+        } else {
+            document.getElementById('infantPriceLabel').textContent = 'Liên hệ';
+            document.getElementById('infantPriceLabel').style.color = '#0d6efd';
+        }
+    }
+
+    function updateTotal() {
+        const adults = parseInt(document.getElementById('adultQty').textContent) || 0;
+        const children = parseInt(document.getElementById('childQty').textContent) || 0;
+        const infants = parseInt(document.getElementById('infantQty').textContent) || 0;
+
+        const total = (adults * currentAdultPrice) + (children * currentChildPrice) + (infants * currentInfantPrice);
+        document.getElementById('totalPrice').textContent = formatPrice(total) + ' đ';
+    }
+});
+</script>
 </body>
 </html>
+

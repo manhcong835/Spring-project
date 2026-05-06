@@ -9,6 +9,7 @@ import com.spring.project.repository.UserRepository;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,8 @@ import java.util.Optional;
  * 1. Đã từng login Google → trả user cũ
  * 2. Lần đầu dùng Google, email đã có (đăng ký LOCAL trước) → liên kết Google
  * 3. Lần đầu dùng Google, email mới → tạo User + UserAuthProvider mới
+ *
+ * Sau khi xác định user, luôn kiểm tra status BANNED/INACTIVE trước khi cho đăng nhập.
  */
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
@@ -65,6 +68,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             // ===== TRƯỜNG HỢP 1: Đã từng đăng nhập Google =====
             user = existingProvider.get().getUser();
 
+            // Kiểm tra trạng thái tài khoản (BANNED/INACTIVE không được đăng nhập)
+            checkUserStatus(user);
+
             // Cập nhật avatar nếu Google thay đổi ảnh
             if (avatarUrl != null && !avatarUrl.equals(user.getAvatarUrl())) {
                 user.setAvatarUrl(avatarUrl);
@@ -80,6 +86,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             if (existingUser.isPresent()) {
                 // Email đã có → liên kết Google vào tài khoản hiện tại
                 user = existingUser.get();
+
+                // Kiểm tra trạng thái tài khoản trước khi liên kết
+                checkUserStatus(user);
             } else {
                 // Email hoàn toàn mới → tạo User mới
                 Role customerRole = roleRepository.findByName("CUSTOMER")
@@ -104,7 +113,32 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             userAuthProviderRepository.save(newProvider);
         }
 
-        // 4. Trả về CustomOAuth2User để Spring Security lưu vào session
+        // 4. Kiểm tra trạng thái lần cuối (áp dụng cho TH3: user mới tạo luôn ACTIVE, nhưng guard phòng thủ)
+        checkUserStatus(user);
+
+        // 5. Trả về CustomOAuth2User để Spring Security lưu vào session
         return new CustomOAuth2User(user, attributes);
+    }
+
+    /**
+     * Kiểm tra trạng thái tài khoản trước khi cho phép đăng nhập OAuth2.
+     * Ném OAuth2AuthenticationException nếu tài khoản bị BANNED hoặc INACTIVE.
+     *
+     * @param user User entity cần kiểm tra
+     * @throws OAuth2AuthenticationException nếu tài khoản không được phép đăng nhập
+     */
+    private void checkUserStatus(User user) throws OAuth2AuthenticationException {
+        if ("BANNED".equals(user.getStatus())) {
+            throw new OAuth2AuthenticationException(
+                    new OAuth2Error("account_banned",
+                            "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ hỗ trợ.",
+                            null));
+        }
+        if ("INACTIVE".equals(user.getStatus())) {
+            throw new OAuth2AuthenticationException(
+                    new OAuth2Error("account_inactive",
+                            "Tài khoản của bạn đã bị vô hiệu hóa.",
+                            null));
+        }
     }
 }

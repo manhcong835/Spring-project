@@ -16,17 +16,90 @@
                         <div class="col-md-4"><label class="form-label fw-semibold">Mã tour</label><input type="text" class="form-control" placeholder="VD: PQ2026-04"></div>
                         <div class="col-md-4"><label class="form-label fw-semibold">Điểm đến <span class="text-danger">*</span></label><select class="form-select" required><option value="">Chọn điểm đến</option><option>Phú Quốc</option><option>Đà Nẵng</option><option>Hạ Long</option><option>Sapa</option><option>Nha Trang</option><option>Đà Lạt</option><option>Huế</option></select></div>
                         <div class="col-md-4"><label class="form-label fw-semibold">Nơi khởi hành</label><select class="form-select"><option>TP. Hồ Chí Minh</option><option>Hà Nội</option><option>Đà Nẵng</option></select></div>
-                        <div class="col-md-4"><label class="form-label fw-semibold">Thời gian</label><input type="text" class="form-control" placeholder="VD: 4 ngày 3 đêm"></div>
-                        <div class="col-md-3"><label class="form-label fw-semibold">Giá người lớn <span class="text-danger">*</span></label><input type="number" class="form-control" placeholder="4990000"></div>
-                        <div class="col-md-3"><label class="form-label fw-semibold">Giá trẻ em</label><input type="number" class="form-control" placeholder="3490000"></div>
-                        <div class="col-md-3"><label class="form-label fw-semibold">Giá gốc (nếu giảm)</label><input type="number" class="form-control" placeholder="6990000"></div>
-                        <div class="col-md-3"><label class="form-label fw-semibold">Số chỗ</label><input type="number" class="form-control" placeholder="30"></div>
-                        <div class="col-md-6"><label class="form-label fw-semibold">Ngày khởi hành</label><input type="date" class="form-control"></div>
+                        <div class="col-md-4"><label class="form-label fw-semibold">Thời gian</label>
+                            <div class="row g-2">
+                                <div class="col-6"><input type="number" class="form-control" placeholder="Số ngày" min="1"></div>
+                                <div class="col-6"><input type="number" class="form-control" placeholder="Số đêm" min="0"></div>
+                            </div>
+                        </div>
                         <div class="col-md-6"><label class="form-label fw-semibold">Phương tiện</label><select class="form-select"><option>Máy bay</option><option>Ô tô</option><option>Tàu hỏa</option><option>Khác</option></select></div>
+                        <div class="col-md-6"><label class="form-label fw-semibold">Tiêu chuẩn khách sạn</label><select class="form-select"><option value="">Chọn tiêu chuẩn</option><option>3 sao</option><option>4 sao</option><option>5 sao</option><option>Resort</option></select></div>
                         <div class="col-12"><label class="form-label fw-semibold">Mô tả tour</label><textarea class="form-control" rows="4" placeholder="Mô tả chi tiết về tour..."></textarea></div>
-                        <div class="col-12"><label class="form-label fw-semibold">Lịch trình</label><textarea class="form-control" rows="5" placeholder="Ngày 1: ...\nNgày 2: ...\nNgày 3: ..."></textarea></div>
+                        <div class="col-12"><label class="form-label fw-semibold">Lịch trình chi tiết</label><textarea class="form-control" rows="5" placeholder="Ngày 1: ...&#10;Ngày 2: ...&#10;Ngày 3: ..."></textarea></div>
                         <div class="col-12"><label class="form-label fw-semibold">Ảnh tour (URL)</label><input type="text" class="form-control" placeholder="https://example.com/image.jpg"></div>
                     </div>
+
+                    <!-- ===== SECTION: Lịch Khởi Hành ===== -->
+                    <hr class="my-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold mb-0">📅 Lịch Khởi Hành</h5>
+                        <button type="button" class="btn btn-outline-primary btn-sm" id="btnToggleDepartureForm">
+                            + Thêm chuyến
+                        </button>
+                    </div>
+
+                    <!-- Form thêm chuyến (ẩn mặc định) -->
+                    <div class="card bg-light border mb-3" id="departureFormCard" style="display:none;">
+                        <div class="card-body">
+                            <div class="row g-2">
+                                <div class="col-md-3">
+                                    <label class="form-label small fw-semibold">Ngày đi <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control form-control-sm" id="depDate">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label small fw-semibold">Ngày về <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control form-control-sm" id="depReturnDate">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label small fw-semibold">Giá người lớn <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control form-control-sm" placeholder="63900000" id="depAdultPrice">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label small fw-semibold">Giá trẻ em</label>
+                                    <input type="number" class="form-control form-control-sm" placeholder="44730000" id="depChildPrice">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label small fw-semibold">Giá trẻ nhỏ</label>
+                                    <input type="number" class="form-control form-control-sm" placeholder="0" id="depInfantPrice">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label small fw-semibold">Sức chứa <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control form-control-sm" placeholder="30" id="depCapacity">
+                                </div>
+                                <div class="col-md-10 d-flex align-items-end gap-2">
+                                    <button type="button" class="btn btn-primary btn-sm" id="btnAddDeparture">Thêm chuyến</button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" id="btnCancelDeparture">Hủy</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bảng departures -->
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered table-hover mb-0" id="departureTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Ngày đi</th>
+                                    <th>Ngày về</th>
+                                    <th>Giá người lớn</th>
+                                    <th>Giá trẻ em</th>
+                                    <th>Giá trẻ nhỏ</th>
+                                    <th>Sức chứa</th>
+                                    <th>Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody id="departureTableBody">
+                                <tr>
+                                    <td colspan="8" class="text-center text-muted py-3">
+                                        <em>Chưa có lịch khởi hành. Bấm "Thêm chuyến" để thêm.</em>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- ===== END SECTION ===== -->
+
                     <div class="mt-4 d-flex gap-2"><button type="submit" class="btn btn-primary">Tạo tour</button><a th:href="@{/admin/tours}" class="btn btn-outline-secondary">Hủy</a></div>
                 </form>
             </div>
@@ -34,5 +107,47 @@
     </main>
     <div th:replace="~{admin/fragments/footer :: footer}"></div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleBtn = document.getElementById('btnToggleDepartureForm');
+    const formCard = document.getElementById('departureFormCard');
+    const cancelBtn = document.getElementById('btnCancelDeparture');
+    const addBtn = document.getElementById('btnAddDeparture');
+    const tbody = document.getElementById('departureTableBody');
+    let rowCount = 0;
+
+    toggleBtn.addEventListener('click', () => { formCard.style.display = 'block'; toggleBtn.style.display = 'none'; });
+    cancelBtn.addEventListener('click', () => { formCard.style.display = 'none'; toggleBtn.style.display = ''; });
+
+    addBtn.addEventListener('click', function() {
+        const depDate = document.getElementById('depDate').value;
+        const retDate = document.getElementById('depReturnDate').value;
+        const adultP = document.getElementById('depAdultPrice').value;
+        const childP = document.getElementById('depChildPrice').value || '0';
+        const infantP = document.getElementById('depInfantPrice').value || '0';
+        const cap = document.getElementById('depCapacity').value;
+
+        if (!depDate || !retDate || !adultP || !cap) { alert('Vui lòng điền đủ thông tin bắt buộc'); return; }
+
+        rowCount++;
+        if (rowCount === 1) tbody.innerHTML = '';
+
+        const fmt = (n) => parseInt(n).toLocaleString('vi-VN');
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td>' + rowCount + '</td><td>' + depDate + '</td><td>' + retDate + '</td>' +
+            '<td>' + fmt(adultP) + '</td><td>' + fmt(childP) + '</td><td>' + fmt(infantP) + '</td>' +
+            '<td>' + cap + '</td><td><button type="button" class="btn btn-outline-danger btn-sm btn-del-dep">Xóa</button></td>';
+        tbody.appendChild(tr);
+
+        tr.querySelector('.btn-del-dep').addEventListener('click', function() { tr.remove(); });
+
+        // Reset form
+        ['depDate','depReturnDate','depAdultPrice','depChildPrice','depInfantPrice','depCapacity'].forEach(id => document.getElementById(id).value = '');
+        formCard.style.display = 'none';
+        toggleBtn.style.display = '';
+    });
+});
+</script>
 </body>
 </html>

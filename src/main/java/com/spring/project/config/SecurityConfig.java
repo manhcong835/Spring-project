@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * Cấu hình Spring Security:
@@ -26,13 +27,16 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomUserDetailsService customUserDetailsService;
     private final CustomAuthenticationSuccessHandler successHandler;
+    private final DevAutoLoginFilter devAutoLoginFilter;
 
     public SecurityConfig(CustomOAuth2UserService customOAuth2UserService,
                           CustomUserDetailsService customUserDetailsService,
-                          CustomAuthenticationSuccessHandler successHandler) {
+                          CustomAuthenticationSuccessHandler successHandler,
+                          DevAutoLoginFilter devAutoLoginFilter) {
         this.customOAuth2UserService = customOAuth2UserService;
         this.customUserDetailsService = customUserDetailsService;
         this.successHandler = successHandler;
+        this.devAutoLoginFilter = devAutoLoginFilter;
     }
 
     @Bean
@@ -92,7 +96,10 @@ public class SecurityConfig {
             )
 
             // ===== UserDetailsService =====
-            .userDetailsService(customUserDetailsService);
+            .userDetailsService(customUserDetailsService)
+
+            // ===== [DEV] Auto-login Admin =====
+            .addFilterBefore(devAutoLoginFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

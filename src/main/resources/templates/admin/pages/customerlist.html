@@ -7,7 +7,10 @@
     <div th:replace="~{admin/fragments/header :: header}"></div>
     <main class="flex-grow-1 p-4">
         <div th:replace="~{admin/fragments/breadcrumb :: breadcrumb('Khách hàng')}"></div>
-        <h4 class="fw-bold mb-4">👥 Danh Sách Khách Hàng</h4>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold mb-0">👥 Danh Sách Khách Hàng</h4>
+            <a th:href="@{/admin/customers/create}" class="btn btn-primary">➕ Thêm khách hàng</a>
+        </div>
 
         <div class="card admin-card mb-4">
             <div class="card-body">
