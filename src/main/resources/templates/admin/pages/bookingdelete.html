@@ -14,16 +14,28 @@
                     <div class="fs-1 mb-3">⚠️</div>
                     <h5 class="fw-bold">Xác nhận xóa đơn đặt tour?</h5>
                     <div class="card bg-light border-0 rounded-3 p-3 my-3 text-start small">
-                        <div class="mb-1"><strong>Mã đơn:</strong> #BK1254</div>
-                        <div class="mb-1"><strong>Khách hàng:</strong> Phạm Thị Hoa</div>
-                        <div class="mb-1"><strong>Tour:</strong> Hạ Long 2N1Đ</div>
-                        <div><strong>Tổng tiền:</strong> 5.180.000đ</div>
+                        <div class="mb-1"><strong>Mã đơn:</strong> <span th:text="'#' + ${booking.bookingCode}">#BK001</span></div>
+                        <div class="mb-1"><strong>Khách hàng:</strong> <span th:text="${booking.contactName}">Tên</span></div>
+                        <div class="mb-1"><strong>Tour:</strong> <span th:text="${booking.tourDeparture.tour.name}">Tour</span></div>
+                        <div class="mb-1"><strong>Tổng tiền:</strong> <span th:text="${#numbers.formatDecimal(booking.finalAmount, 0, 'COMMA', 0, 'POINT') + 'đ'}">0đ</span></div>
+                        <div><strong>Trạng thái:</strong>
+                            <span th:if="${booking.bookingStatus == 'CANCELLED'}" class="badge bg-danger">Đã hủy</span>
+                            <span th:if="${booking.bookingStatus != 'CANCELLED'}" class="badge bg-warning text-dark" th:text="${booking.bookingStatus}">Status</span>
+                        </div>
                     </div>
-                    <div class="d-flex gap-3 justify-content-center"><button class="btn btn-danger px-4" data-bs-toggle="modal" data-bs-target="#deleteBookingModal">Xác nhận xóa</button><a th:href="@{/admin/bookings}" class="btn btn-outline-secondary px-4">Hủy bỏ</a></div>
+                    <div class="alert alert-warning small">
+                        ⚠️ Đơn đặt sẽ được chuyển sang trạng thái <strong>DELETED</strong> (xóa mềm).
+                        Chỉ đơn đã <strong>HỦY</strong> mới có thể xóa.
+                    </div>
+                    <form th:action="@{/admin/bookings/delete(id=${booking.id})}" method="post">
+                        <div class="d-flex gap-3 justify-content-center">
+                            <button type="submit" class="btn btn-danger px-4">Xác nhận xóa</button>
+                            <a th:href="@{/admin/bookings}" class="btn btn-outline-secondary px-4">Hủy bỏ</a>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-        <div th:replace="~{admin/fragments/modalconfirm :: modalconfirm('deleteBookingModal', 'Xóa đơn đặt tour', 'Đơn đặt #BK1254 sẽ bị xóa vĩnh viễn. Bạn có chắc chắn?', '/admin/bookings')}"></div>
     </main>
     <div th:replace="~{admin/fragments/footer :: footer}"></div>
 </div>

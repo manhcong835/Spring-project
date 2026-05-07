@@ -1,9 +1,11 @@
 package com.spring.project.repository;
 
 import com.spring.project.entity.Booking;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -78,4 +80,42 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
      * UC Admin 2.5 - Kiểm tra departure có đơn đặt đang active trước khi xóa
      */
     boolean existsByTourDeparture_IdAndBookingStatusIn(Long departureId, List<String> statuses);
+
+    // ==================== UC Admin 3 — Booking Management ====================
+
+    /**
+     * UC Admin 3.1 - Lấy tất cả booking kèm tour (JOIN FETCH tránh LazyInitializationException)
+     */
+    @Query(value = "SELECT b FROM Booking b JOIN FETCH b.tourDeparture td JOIN FETCH td.tour " +
+           "WHERE b.bookingStatus != 'DELETED'",
+           countQuery = "SELECT COUNT(b) FROM Booking b WHERE b.bookingStatus != 'DELETED'")
+    Page<Booking> findAllWithTour(Pageable pageable);
+
+    /**
+     * UC Admin 3.1 - Lọc booking theo trạng thái kèm tour
+     */
+    @Query(value = "SELECT b FROM Booking b JOIN FETCH b.tourDeparture td JOIN FETCH td.tour " +
+           "WHERE b.bookingStatus = :status",
+           countQuery = "SELECT COUNT(b) FROM Booking b WHERE b.bookingStatus = :status")
+    Page<Booking> findByBookingStatusWithTour(@Param("status") String status, Pageable pageable);
+
+    /**
+     * UC Admin 3.1 - Tìm kiếm booking kèm tour
+     */
+    @Query(value = "SELECT b FROM Booking b JOIN FETCH b.tourDeparture td JOIN FETCH td.tour " +
+           "WHERE (LOWER(b.bookingCode) LIKE LOWER(CONCAT('%', :kw, '%')) " +
+           "OR LOWER(b.contactName) LIKE LOWER(CONCAT('%', :kw, '%')))" +
+           " AND b.bookingStatus != 'DELETED'",
+           countQuery = "SELECT COUNT(b) FROM Booking b " +
+           "WHERE (LOWER(b.bookingCode) LIKE LOWER(CONCAT('%', :kw, '%')) " +
+           "OR LOWER(b.contactName) LIKE LOWER(CONCAT('%', :kw, '%')))" +
+           " AND b.bookingStatus != 'DELETED'")
+    Page<Booking> searchBookingsWithTour(@Param("kw") String keyword, Pageable pageable);
+
+    /**
+     * UC Admin 3.2 - Pessimistic lock khi cập nhật trạng thái (tránh race condition)
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT b FROM Booking b WHERE b.id = :id")
+    Optional<Booking> findByIdWithLock(@Param("id") Long id);
 }

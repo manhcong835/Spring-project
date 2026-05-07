@@ -49,10 +49,12 @@ public class AdminController {
     private final TourDepartureService tourDepartureService;
     private final TourCategoryRepository tourCategoryRepository;
     private final DestinationRepository destinationRepository;
+    private final com.spring.project.service.BookingService bookingService;
 
     public AdminController(UserService userService, AuthService authService, StaffService staffService,
                            TourService tourService, TourDepartureService tourDepartureService,
-                           TourCategoryRepository tourCategoryRepository, DestinationRepository destinationRepository) {
+                           TourCategoryRepository tourCategoryRepository, DestinationRepository destinationRepository,
+                           com.spring.project.service.BookingService bookingService) {
         this.userService = userService;
         this.authService = authService;
         this.staffService = staffService;
@@ -60,6 +62,7 @@ public class AdminController {
         this.tourDepartureService = tourDepartureService;
         this.tourCategoryRepository = tourCategoryRepository;
         this.destinationRepository = destinationRepository;
+        this.bookingService = bookingService;
     }
 
     // ==================== AUTHENTICATION ====================
@@ -406,18 +409,72 @@ public class AdminController {
     // ==================== BOOKING MANAGEMENT ====================
 
     @GetMapping("/bookings")
-    public String bookingList() {
+    public String bookingList(@RequestParam(required = false) String keyword,
+                              @RequestParam(required = false) String status,
+                              @RequestParam(defaultValue = "0") int page,
+                              Model model) {
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("createdAt").descending());
+        Page<com.spring.project.entity.Booking> bookingPage = bookingService.getBookingList(keyword, status, pageable);
+        model.addAttribute("bookingPage", bookingPage);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("status", status);
         return "admin/pages/bookinglist";
     }
 
     @GetMapping("/bookings/status")
-    public String bookingStatusUpdate() {
-        return "admin/pages/bookingstatusupdate";
+    public String bookingStatusUpdate(@RequestParam Long id, Model model,
+                                       RedirectAttributes redirectAttributes) {
+        try {
+            com.spring.project.entity.Booking booking = bookingService.getBookingById(id);
+            model.addAttribute("booking", booking);
+            model.addAttribute("allowedStatuses", bookingService.getAllowedTransitions(booking.getBookingStatus()));
+            return "admin/pages/bookingstatusupdate";
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Đơn đặt không tồn tại.");
+            return "redirect:/admin/bookings";
+        }
+    }
+
+    @PostMapping("/bookings/status")
+    public String bookingStatusUpdatePost(@RequestParam Long id,
+                                           @RequestParam String newStatus,
+                                           RedirectAttributes redirectAttributes) {
+        try {
+            bookingService.updateBookingStatus(id, newStatus);
+            redirectAttributes.addFlashAttribute("successMessage", "Cập nhật trạng thái thành công!");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Đơn đặt không tồn tại.");
+        }
+        return "redirect:/admin/bookings";
     }
 
     @GetMapping("/bookings/delete")
-    public String bookingDelete() {
-        return "admin/pages/bookingdelete";
+    public String bookingDelete(@RequestParam Long id, Model model,
+                                RedirectAttributes redirectAttributes) {
+        try {
+            com.spring.project.entity.Booking booking = bookingService.getBookingById(id);
+            model.addAttribute("booking", booking);
+            return "admin/pages/bookingdelete";
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Đơn đặt không tồn tại.");
+            return "redirect:/admin/bookings";
+        }
+    }
+
+    @PostMapping("/bookings/delete")
+    public String bookingDeletePost(@RequestParam Long id,
+                                     RedirectAttributes redirectAttributes) {
+        try {
+            bookingService.deleteBooking(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Xóa đơn đặt thành công!");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Đơn đặt không tồn tại.");
+        }
+        return "redirect:/admin/bookings";
     }
 
     // ==================== PROMOTION MANAGEMENT ====================
