@@ -14,16 +14,31 @@
                     <div class="fs-1 mb-3">🔐</div>
                     <h5 class="fw-bold">Thay Đổi Trạng Thái Tài Khoản</h5>
                     <div class="card bg-light border-0 rounded-3 p-3 my-3 text-start small">
-                        <div class="mb-1"><strong>Khách hàng:</strong> Phạm Thị Hoa</div>
-                        <div class="mb-1"><strong>Email:</strong> hoa.pham@email.com</div>
-                        <div><strong>Trạng thái hiện tại:</strong> <span class="badge bg-danger rounded-pill">Bị khóa</span></div>
-                    </div>
-                    <form>
-                        <div class="mb-3 text-start"><label class="form-label fw-semibold">Trạng thái mới</label>
-                            <select class="form-select"><option>Hoạt động (Mở khóa)</option><option>Bị khóa (Khóa)</option></select>
+                        <div class="mb-1"><strong>Khách hàng:</strong> <span th:text="${customer.fullName}">Tên</span></div>
+                        <div class="mb-1"><strong>Email:</strong> <span th:text="${customer.email}">email@test.com</span></div>
+                        <div class="mb-1"><strong>Điện thoại:</strong> <span th:text="${customer.phone != null ? customer.phone : '—'}">SĐT</span></div>
+                        <div><strong>Trạng thái hiện tại:</strong>
+                            <span th:if="${customer.status == 'ACTIVE'}" class="badge bg-success rounded-pill">Hoạt động</span>
+                            <span th:if="${customer.status == 'BANNED'}" class="badge bg-danger rounded-pill">Đã khóa</span>
                         </div>
-                        <div class="mb-3 text-start"><label class="form-label fw-semibold">Lý do</label><textarea class="form-control" rows="3" placeholder="Nhập lý do thay đổi trạng thái...">Vi phạm chính sách sử dụng dịch vụ.</textarea></div>
-                        <div class="d-flex gap-3 justify-content-center"><button type="submit" class="btn btn-primary px-4">Cập nhật</button><a th:href="@{/admin/customers}" class="btn btn-outline-secondary px-4">Hủy</a></div>
+                    </div>
+
+                    <!-- Cảnh báo nếu đang ACTIVE → sẽ khóa -->
+                    <div th:if="${customer.status == 'ACTIVE'}" class="alert alert-danger small text-start">
+                        ⚠️ Khách hàng sẽ <strong>không thể đăng nhập</strong> (cả email lẫn Google) sau khi bị khóa.
+                    </div>
+                    <div th:if="${customer.status == 'BANNED'}" class="alert alert-success small text-start">
+                        ✅ Khách hàng sẽ có thể <strong>đăng nhập trở lại</strong> sau khi được mở khóa.
+                    </div>
+
+                    <form th:action="@{/admin/customers/status(id=${customer.id})}" method="post">
+                        <div class="d-flex gap-3 justify-content-center">
+                            <button type="submit" class="btn px-4"
+                                    th:classappend="${customer.status == 'ACTIVE'} ? 'btn-danger' : 'btn-success'"
+                                    th:text="${customer.status == 'ACTIVE'} ? '🔒 Khóa tài khoản' : '🔓 Mở khóa tài khoản'">
+                            </button>
+                            <a th:href="@{/admin/customers}" class="btn btn-outline-secondary px-4">Hủy</a>
+                        </div>
                     </form>
                 </div>
             </div>

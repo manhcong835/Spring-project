@@ -51,12 +51,14 @@ public class AdminController {
     private final DestinationRepository destinationRepository;
     private final com.spring.project.service.BookingService bookingService;
     private final com.spring.project.service.PromotionService promotionService;
+    private final com.spring.project.service.CustomerService customerService;
 
     public AdminController(UserService userService, AuthService authService, StaffService staffService,
                            TourService tourService, TourDepartureService tourDepartureService,
                            TourCategoryRepository tourCategoryRepository, DestinationRepository destinationRepository,
                            com.spring.project.service.BookingService bookingService,
-                           com.spring.project.service.PromotionService promotionService) {
+                           com.spring.project.service.PromotionService promotionService,
+                           com.spring.project.service.CustomerService customerService) {
         this.userService = userService;
         this.authService = authService;
         this.staffService = staffService;
@@ -66,6 +68,7 @@ public class AdminController {
         this.destinationRepository = destinationRepository;
         this.bookingService = bookingService;
         this.promotionService = promotionService;
+        this.customerService = customerService;
     }
 
     // ==================== AUTHENTICATION ====================
@@ -597,18 +600,41 @@ public class AdminController {
     // ==================== CUSTOMER MANAGEMENT ====================
 
     @GetMapping("/customers")
-    public String customerList() {
+    public String customerList(@RequestParam(required = false) String keyword,
+                               @RequestParam(defaultValue = "0") int page,
+                               Model model) {
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("createdAt").descending());
+        Page<com.spring.project.entity.User> customerPage = customerService.getCustomerList(keyword, pageable);
+        model.addAttribute("customerPage", customerPage);
+        model.addAttribute("keyword", keyword);
         return "admin/pages/customerlist";
     }
 
-    @GetMapping("/customers/search")
-    public String customerSearch() {
-        return "admin/pages/customersearch";
+    @GetMapping("/customers/status")
+    public String customerStatus(@RequestParam Long id, Model model,
+                                  RedirectAttributes redirectAttributes) {
+        try {
+            com.spring.project.entity.User customer = customerService.getCustomerById(id);
+            model.addAttribute("customer", customer);
+            return "admin/pages/customerstatus";
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/admin/customers";
+        }
     }
 
-    @GetMapping("/customers/status")
-    public String customerStatus() {
-        return "admin/pages/customerstatus";
+    @PostMapping("/customers/status")
+    public String customerToggle(@RequestParam Long id,
+                                  RedirectAttributes redirectAttributes) {
+        try {
+            customerService.toggleCustomerStatus(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Cập nhật trạng thái thành công!");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Không tìm thấy khách hàng.");
+        }
+        return "redirect:/admin/customers";
     }
 
     @GetMapping("/customers/create")
