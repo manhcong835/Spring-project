@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDateTime;
 
 /**
  * Repository cho Tour entity.
@@ -96,4 +97,11 @@ public interface TourRepository extends JpaRepository<Tour, Long> {
     @Query(value = "SELECT DISTINCT t FROM Tour t LEFT JOIN FETCH t.departures WHERE t.status != 'DELETED'",
            countQuery = "SELECT COUNT(DISTINCT t) FROM Tour t WHERE t.status != 'DELETED'")
     Page<Tour> findAllWithDepartures(Pageable pageable);
+
+    long countByStatusNot(String status);
+
+    long countByStatusNotAndCreatedAtBetween(String status, LocalDateTime start, LocalDateTime end);
+
+    @Query("SELECT t FROM Tour t WHERE t.status != 'DELETED'")
+    Page<Tour> findRecentTours(Pageable pageable);
 }

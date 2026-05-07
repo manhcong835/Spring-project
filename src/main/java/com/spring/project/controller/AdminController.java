@@ -12,6 +12,7 @@ import com.spring.project.entity.User;
 import com.spring.project.repository.DestinationRepository;
 import com.spring.project.repository.TourCategoryRepository;
 import com.spring.project.security.SecurityUtils;
+import com.spring.project.service.AdminDashboardService;
 import com.spring.project.service.AuthService;
 import com.spring.project.service.StaffService;
 import com.spring.project.service.TourDepartureService;
@@ -43,6 +44,7 @@ import java.util.List;
 public class AdminController {
 
     private final UserService userService;
+    private final AdminDashboardService adminDashboardService;
     private final AuthService authService;
     private final StaffService staffService;
     private final TourService tourService;
@@ -53,13 +55,15 @@ public class AdminController {
     private final com.spring.project.service.PromotionService promotionService;
     private final com.spring.project.service.CustomerService customerService;
 
-    public AdminController(UserService userService, AuthService authService, StaffService staffService,
+    public AdminController(UserService userService, AdminDashboardService adminDashboardService,
+                           AuthService authService, StaffService staffService,
                            TourService tourService, TourDepartureService tourDepartureService,
                            TourCategoryRepository tourCategoryRepository, DestinationRepository destinationRepository,
                            com.spring.project.service.BookingService bookingService,
                            com.spring.project.service.PromotionService promotionService,
                            com.spring.project.service.CustomerService customerService) {
         this.userService = userService;
+        this.adminDashboardService = adminDashboardService;
         this.authService = authService;
         this.staffService = staffService;
         this.tourService = tourService;
@@ -106,7 +110,8 @@ public class AdminController {
     // ==================== DASHBOARD ====================
 
     @GetMapping("/dashboard")
-    public String dashboard() {
+    public String dashboard(Model model) {
+        model.addAttribute("dashboard", adminDashboardService.getDashboard());
         return "admin/pages/dashboard";
     }
 

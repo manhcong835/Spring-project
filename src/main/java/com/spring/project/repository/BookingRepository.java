@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDateTime;
 
 /**
  * Repository cho Booking entity.
@@ -123,4 +124,14 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
      * UC Admin 4.4 - Kiểm tra promotion có booking đang active trước khi xóa
      */
     boolean existsByPromotion_IdAndBookingStatusIn(Long promotionId, List<String> statuses);
+
+    long countByBookingStatus(String bookingStatus);
+
+    long countByBookingStatusNot(String bookingStatus);
+
+    long countByBookingStatusNotAndCreatedAtBetween(
+            String bookingStatus,
+            LocalDateTime start,
+            LocalDateTime end
+    );
 }

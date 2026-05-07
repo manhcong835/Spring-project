@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDateTime;
 
 /**
  * Repository cho User entity.
@@ -80,4 +81,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * UC Admin 1.1 - Lấy danh sách user theo role và status (phân trang)
      */
     Page<User> findByRoleNameAndStatus(String roleName, String status, Pageable pageable);
+
+    long countByRole_Name(String roleName);
+
+    long countByRole_NameAndCreatedAtBetween(String roleName, LocalDateTime start, LocalDateTime end);
 }

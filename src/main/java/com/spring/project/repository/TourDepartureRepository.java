@@ -46,4 +46,6 @@ public interface TourDepartureRepository extends JpaRepository<TourDeparture, Lo
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
     );
+
+    long countByStatusAndDepartureDateGreaterThanEqual(String status, LocalDate departureDate);
 }

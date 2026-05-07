@@ -54,4 +54,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
      * Lấy đánh giá theo trạng thái (Admin ẩn/hiện đánh giá)
      */
     Page<Review> findByStatus(String status, Pageable pageable);
+
+    @Query(value = "SELECT r FROM Review r JOIN FETCH r.user JOIN FETCH r.tour " +
+           "WHERE r.status = 'VISIBLE'",
+           countQuery = "SELECT COUNT(r) FROM Review r WHERE r.status = 'VISIBLE'")
+    Page<Review> findRecentVisibleReviews(Pageable pageable);
 }
