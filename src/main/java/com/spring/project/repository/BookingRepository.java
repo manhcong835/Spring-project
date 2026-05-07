@@ -118,4 +118,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT b FROM Booking b WHERE b.id = :id")
     Optional<Booking> findByIdWithLock(@Param("id") Long id);
+
+    /**
+     * UC Admin 4.4 - Kiểm tra promotion có booking đang active trước khi xóa
+     */
+    boolean existsByPromotion_IdAndBookingStatusIn(Long promotionId, List<String> statuses);
 }

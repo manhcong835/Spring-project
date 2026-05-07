@@ -50,11 +50,13 @@ public class AdminController {
     private final TourCategoryRepository tourCategoryRepository;
     private final DestinationRepository destinationRepository;
     private final com.spring.project.service.BookingService bookingService;
+    private final com.spring.project.service.PromotionService promotionService;
 
     public AdminController(UserService userService, AuthService authService, StaffService staffService,
                            TourService tourService, TourDepartureService tourDepartureService,
                            TourCategoryRepository tourCategoryRepository, DestinationRepository destinationRepository,
-                           com.spring.project.service.BookingService bookingService) {
+                           com.spring.project.service.BookingService bookingService,
+                           com.spring.project.service.PromotionService promotionService) {
         this.userService = userService;
         this.authService = authService;
         this.staffService = staffService;
@@ -63,6 +65,7 @@ public class AdminController {
         this.tourCategoryRepository = tourCategoryRepository;
         this.destinationRepository = destinationRepository;
         this.bookingService = bookingService;
+        this.promotionService = promotionService;
     }
 
     // ==================== AUTHENTICATION ====================
@@ -480,23 +483,115 @@ public class AdminController {
     // ==================== PROMOTION MANAGEMENT ====================
 
     @GetMapping("/promotions")
-    public String promotionList() {
+    public String promotionList(@RequestParam(required = false) String status,
+                                @RequestParam(defaultValue = "0") int page,
+                                Model model) {
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("createdAt").descending());
+        Page<com.spring.project.entity.Promotion> promotionPage = promotionService.getPromotionList(status, pageable);
+        model.addAttribute("promotionPage", promotionPage);
+        model.addAttribute("status", status);
         return "admin/pages/promotionlist";
     }
 
     @GetMapping("/promotions/create")
-    public String promotionCreate() {
+    public String promotionCreate(Model model) {
+        if (!model.containsAttribute("promotionRequest")) {
+            model.addAttribute("promotionRequest", new com.spring.project.dto.PromotionRequest());
+        }
         return "admin/pages/promotioncreate";
     }
 
+    @PostMapping("/promotions/create")
+    public String promotionCreatePost(@Valid @ModelAttribute("promotionRequest") com.spring.project.dto.PromotionRequest request,
+                                       BindingResult bindingResult,
+                                       RedirectAttributes redirectAttributes,
+                                       Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("errorMessage", "Vui lòng kiểm tra lại thông tin");
+            return "admin/pages/promotioncreate";
+        }
+        try {
+            promotionService.createPromotion(request);
+            redirectAttributes.addFlashAttribute("successMessage", "Tạo khuyến mãi thành công!");
+            return "redirect:/admin/promotions";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            return "admin/pages/promotioncreate";
+        }
+    }
+
     @GetMapping("/promotions/update")
-    public String promotionUpdate() {
-        return "admin/pages/promotionupdate";
+    public String promotionUpdate(@RequestParam Long id, Model model,
+                                   RedirectAttributes redirectAttributes) {
+        try {
+            com.spring.project.entity.Promotion promotion = promotionService.getPromotionById(id);
+            model.addAttribute("promotion", promotion);
+            if (!model.containsAttribute("promotionRequest")) {
+                com.spring.project.dto.PromotionRequest req = new com.spring.project.dto.PromotionRequest();
+                req.setCode(promotion.getCode());
+                req.setName(promotion.getName());
+                req.setDescription(promotion.getDescription());
+                req.setDiscountType(promotion.getDiscountType());
+                req.setDiscountValue(promotion.getDiscountValue());
+                req.setMaxDiscountAmount(promotion.getMaxDiscountAmount());
+                req.setMinBookingAmount(promotion.getMinBookingAmount());
+                req.setStartDate(promotion.getStartDate());
+                req.setEndDate(promotion.getEndDate());
+                req.setUsageLimit(promotion.getUsageLimit());
+                req.setStatus(promotion.getStatus());
+                model.addAttribute("promotionRequest", req);
+            }
+            return "admin/pages/promotionupdate";
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Khuyến mãi không tồn tại.");
+            return "redirect:/admin/promotions";
+        }
+    }
+
+    @PostMapping("/promotions/update")
+    public String promotionUpdatePost(@RequestParam Long id,
+                                       @Valid @ModelAttribute("promotionRequest") com.spring.project.dto.PromotionRequest request,
+                                       BindingResult bindingResult,
+                                       RedirectAttributes redirectAttributes,
+                                       Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("promotion", promotionService.getPromotionById(id));
+            model.addAttribute("errorMessage", "Vui lòng kiểm tra lại thông tin");
+            return "admin/pages/promotionupdate";
+        }
+        try {
+            promotionService.updatePromotion(id, request);
+            redirectAttributes.addFlashAttribute("successMessage", "Cập nhật khuyến mãi thành công!");
+            return "redirect:/admin/promotions";
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/admin/promotions/update?id=" + id;
+        }
     }
 
     @GetMapping("/promotions/delete")
-    public String promotionDelete() {
-        return "admin/pages/promotiondelete";
+    public String promotionDelete(@RequestParam Long id, Model model,
+                                   RedirectAttributes redirectAttributes) {
+        try {
+            com.spring.project.entity.Promotion promotion = promotionService.getPromotionById(id);
+            model.addAttribute("promotion", promotion);
+            return "admin/pages/promotiondelete";
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Khuyến mãi không tồn tại.");
+            return "redirect:/admin/promotions";
+        }
+    }
+
+    @PostMapping("/promotions/delete")
+    public String promotionDeletePost(@RequestParam Long id,
+                                       RedirectAttributes redirectAttributes) {
+        try {
+            promotionService.deletePromotion(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Xóa khuyến mãi thành công!");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Khuyến mãi không tồn tại.");
+        }
+        return "redirect:/admin/promotions";
     }
 
     // ==================== CUSTOMER MANAGEMENT ====================
