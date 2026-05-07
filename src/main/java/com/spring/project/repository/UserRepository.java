@@ -66,4 +66,18 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * UC Admin 5.3 - Lấy tất cả khách hàng (phân trang)
      */
     Page<User> findByRoleName(String roleName, Pageable pageable);
+
+    /**
+     * UC Admin 1.1 - Tìm kiếm nhân viên theo tên, email hoặc số điện thoại
+     */
+    @Query("SELECT u FROM User u WHERE u.role.name = 'STAFF' AND " +
+           "(LOWER(u.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(u.email) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "u.phone LIKE CONCAT('%', :keyword, '%'))")
+    Page<User> searchStaff(@Param("keyword") String keyword, Pageable pageable);
+
+    /**
+     * UC Admin 1.1 - Lấy danh sách user theo role và status (phân trang)
+     */
+    Page<User> findByRoleNameAndStatus(String roleName, String status, Pageable pageable);
 }
