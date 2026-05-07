@@ -69,4 +69,31 @@ public interface TourRepository extends JpaRepository<Tour, Long> {
      * Lấy tour theo trạng thái (phân trang cho Admin)
      */
     Page<Tour> findByStatus(String status, Pageable pageable);
+
+    /**
+     * UC Admin 2.2 - Kiểm tra mã tour trùng
+     */
+    boolean existsByCode(String code);
+
+    /**
+     * UC Admin 2.2 - Kiểm tra slug trùng khi tạo
+     */
+    boolean existsBySlug(String slug);
+
+    /**
+     * UC Admin 2.3 - Kiểm tra slug trùng khi update (loại trừ chính mình)
+     */
+    boolean existsBySlugAndIdNot(String slug, Long id);
+
+    /**
+     * UC Admin 2.1 - Filter tour theo điểm đến (phân trang)
+     */
+    Page<Tour> findByDestinationId(Long destinationId, Pageable pageable);
+
+    /**
+     * UC Admin 2.1 - Lấy tour kèm departures (tránh N+1 khi render giá)
+     */
+    @Query(value = "SELECT DISTINCT t FROM Tour t LEFT JOIN FETCH t.departures WHERE t.status != 'DELETED'",
+           countQuery = "SELECT COUNT(DISTINCT t) FROM Tour t WHERE t.status != 'DELETED'")
+    Page<Tour> findAllWithDepartures(Pageable pageable);
 }

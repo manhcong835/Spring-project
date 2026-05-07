@@ -14,13 +14,22 @@
                     <div class="fs-1 mb-3">⚠️</div>
                     <h5 class="fw-bold">Xác nhận xóa tour?</h5>
                     <div class="card bg-light border-0 rounded-3 p-3 my-3 text-start small">
-                        <div class="mb-1"><strong>Mã tour:</strong> T001</div>
-                        <div class="mb-1"><strong>Tên:</strong> Phú Quốc — Grand World — Vinpearl Safari</div>
-                        <div class="mb-1"><strong>Giá:</strong> 4.990.000đ</div>
-                        <div><strong>Chỗ trống:</strong> 12</div>
+                        <div class="mb-1"><strong>Mã tour:</strong> <span th:text="${tour.code}">T001</span></div>
+                        <div class="mb-1"><strong>Tên:</strong> <span th:text="${tour.name}">Tên tour</span></div>
+                        <div class="mb-1"><strong>Điểm đến:</strong> <span th:text="${tour.destination.name}">Đà Nẵng</span></div>
+                        <div class="mb-1"><strong>Thời gian:</strong> <span th:text="${tour.durationDays + 'N' + tour.durationNights + 'Đ'}">3N2Đ</span></div>
+                        <div><strong>Trạng thái:</strong> <span th:text="${tour.status}">ACTIVE</span></div>
                     </div>
-                    <div class="alert alert-danger small">⚠️ Tất cả đơn đặt tour liên quan cũng sẽ bị ảnh hưởng!</div>
-                    <div class="d-flex gap-3 justify-content-center"><button class="btn btn-danger px-4">Xác nhận xóa</button><a th:href="@{/admin/tours}" class="btn btn-outline-secondary px-4">Hủy bỏ</a></div>
+                    <div class="alert alert-warning small">
+                        ⚠️ Tour sẽ được chuyển sang trạng thái <strong>DELETED</strong> (xóa mềm).
+                        Nếu tour đang có đơn đặt PENDING/CONFIRMED, thao tác sẽ bị từ chối.
+                    </div>
+                    <form th:action="@{/admin/tours/delete(id=${tour.id})}" method="post">
+                        <div class="d-flex gap-3 justify-content-center">
+                            <button type="submit" class="btn btn-danger px-4">Xác nhận xóa</button>
+                            <a th:href="@{/admin/tours}" class="btn btn-outline-secondary px-4">Hủy bỏ</a>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

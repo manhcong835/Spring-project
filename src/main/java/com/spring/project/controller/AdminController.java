@@ -2,11 +2,20 @@ package com.spring.project.controller;
 
 import com.spring.project.dto.ChangePasswordRequest;
 import com.spring.project.dto.RegisterRequest;
+import com.spring.project.dto.TourCreateRequest;
+import com.spring.project.dto.TourDepartureRequest;
+import com.spring.project.dto.TourUpdateRequest;
 import com.spring.project.dto.UpdateProfileRequest;
+import com.spring.project.entity.Tour;
+import com.spring.project.entity.TourDeparture;
 import com.spring.project.entity.User;
+import com.spring.project.repository.DestinationRepository;
+import com.spring.project.repository.TourCategoryRepository;
 import com.spring.project.security.SecurityUtils;
 import com.spring.project.service.AuthService;
 import com.spring.project.service.StaffService;
+import com.spring.project.service.TourDepartureService;
+import com.spring.project.service.TourService;
 import com.spring.project.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,6 +36,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
@@ -34,11 +45,21 @@ public class AdminController {
     private final UserService userService;
     private final AuthService authService;
     private final StaffService staffService;
+    private final TourService tourService;
+    private final TourDepartureService tourDepartureService;
+    private final TourCategoryRepository tourCategoryRepository;
+    private final DestinationRepository destinationRepository;
 
-    public AdminController(UserService userService, AuthService authService, StaffService staffService) {
+    public AdminController(UserService userService, AuthService authService, StaffService staffService,
+                           TourService tourService, TourDepartureService tourDepartureService,
+                           TourCategoryRepository tourCategoryRepository, DestinationRepository destinationRepository) {
         this.userService = userService;
         this.authService = authService;
         this.staffService = staffService;
+        this.tourService = tourService;
+        this.tourDepartureService = tourDepartureService;
+        this.tourCategoryRepository = tourCategoryRepository;
+        this.destinationRepository = destinationRepository;
     }
 
     // ==================== AUTHENTICATION ====================
@@ -200,28 +221,186 @@ public class AdminController {
     // ==================== TOUR MANAGEMENT ====================
 
     @GetMapping("/tours")
-    public String tourList() {
+    public String tourList(@RequestParam(required = false) String keyword,
+                           @RequestParam(required = false) String status,
+                           @RequestParam(defaultValue = "0") int page,
+                           Model model) {
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("createdAt").descending());
+        Page<Tour> tourPage = tourService.getTourList(keyword, status, pageable);
+        model.addAttribute("tourPage", tourPage);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("status", status);
+        model.addAttribute("categories", tourCategoryRepository.findAll());
+        model.addAttribute("destinations", destinationRepository.findAll());
         return "admin/pages/tourlist";
     }
 
     @GetMapping("/tours/create")
-    public String tourCreate() {
+    public String tourCreate(Model model) {
+        if (!model.containsAttribute("tourCreateRequest")) {
+            model.addAttribute("tourCreateRequest", new TourCreateRequest());
+        }
+        model.addAttribute("categories", tourCategoryRepository.findAll());
+        model.addAttribute("destinations", destinationRepository.findAll());
         return "admin/pages/tourcreate";
     }
 
+    @PostMapping("/tours/create")
+    public String tourCreatePost(@Valid @ModelAttribute("tourCreateRequest") TourCreateRequest request,
+                                 BindingResult bindingResult,
+                                 RedirectAttributes redirectAttributes,
+                                 Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("categories", tourCategoryRepository.findAll());
+            model.addAttribute("destinations", destinationRepository.findAll());
+            model.addAttribute("errorMessage", "Vui l\u00f2ng ki\u1ec3m tra l\u1ea1i th\u00f4ng tin");
+            return "admin/pages/tourcreate";
+        }
+        try {
+            tourService.createTour(request);
+            redirectAttributes.addFlashAttribute("successMessage", "T\u1ea1o tour th\u00e0nh c\u00f4ng!");
+            return "redirect:/admin/tours";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("categories", tourCategoryRepository.findAll());
+            model.addAttribute("destinations", destinationRepository.findAll());
+            model.addAttribute("errorMessage", e.getMessage());
+            return "admin/pages/tourcreate";
+        }
+    }
+
     @GetMapping("/tours/update")
-    public String tourUpdate() {
-        return "admin/pages/tourupdate";
+    public String tourUpdate(@RequestParam Long id, Model model,
+                             RedirectAttributes redirectAttributes) {
+        try {
+            Tour tour = tourService.getTourById(id);
+            model.addAttribute("tour", tour);
+            if (!model.containsAttribute("tourUpdateRequest")) {
+                TourUpdateRequest req = new TourUpdateRequest();
+                req.setCategoryId(tour.getCategory().getId());
+                req.setDestinationId(tour.getDestination().getId());
+                req.setName(tour.getName());
+                req.setSlug(tour.getSlug());
+                req.setDepartureLocation(tour.getDepartureLocation());
+                req.setDurationDays(tour.getDurationDays());
+                req.setDurationNights(tour.getDurationNights());
+                req.setTransport(tour.getTransport());
+                req.setHotelStandard(tour.getHotelStandard());
+                req.setDescription(tour.getDescription());
+                req.setPolicy(tour.getPolicy());
+                req.setIncludedServices(tour.getIncludedServices());
+                req.setExcludedServices(tour.getExcludedServices());
+                req.setNotes(tour.getNotes());
+                req.setStatus(tour.getStatus());
+                model.addAttribute("tourUpdateRequest", req);
+            }
+            model.addAttribute("categories", tourCategoryRepository.findAll());
+            model.addAttribute("destinations", destinationRepository.findAll());
+            return "admin/pages/tourupdate";
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Tour kh\u00f4ng t\u1ed3n t\u1ea1i.");
+            return "redirect:/admin/tours";
+        }
+    }
+
+    @PostMapping("/tours/update")
+    public String tourUpdatePost(@RequestParam Long id,
+                                 @Valid @ModelAttribute("tourUpdateRequest") TourUpdateRequest request,
+                                 BindingResult bindingResult,
+                                 RedirectAttributes redirectAttributes,
+                                 Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("tour", tourService.getTourById(id));
+            model.addAttribute("categories", tourCategoryRepository.findAll());
+            model.addAttribute("destinations", destinationRepository.findAll());
+            model.addAttribute("errorMessage", "Vui l\u00f2ng ki\u1ec3m tra l\u1ea1i th\u00f4ng tin");
+            return "admin/pages/tourupdate";
+        }
+        try {
+            tourService.updateTour(id, request);
+            redirectAttributes.addFlashAttribute("successMessage", "C\u1eadp nh\u1eadt tour th\u00e0nh c\u00f4ng!");
+            return "redirect:/admin/tours";
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/admin/tours/update?id=" + id;
+        }
     }
 
     @GetMapping("/tours/delete")
-    public String tourDelete() {
-        return "admin/pages/tourdelete";
+    public String tourDelete(@RequestParam Long id, Model model,
+                             RedirectAttributes redirectAttributes) {
+        try {
+            Tour tour = tourService.getTourById(id);
+            model.addAttribute("tour", tour);
+            return "admin/pages/tourdelete";
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Tour kh\u00f4ng t\u1ed3n t\u1ea1i.");
+            return "redirect:/admin/tours";
+        }
     }
 
+    @PostMapping("/tours/delete")
+    public String tourDeletePost(@RequestParam Long id,
+                                 RedirectAttributes redirectAttributes) {
+        try {
+            tourService.deleteTour(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Tour \u0111\u00e3 \u0111\u01b0\u1ee3c x\u00f3a!");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Tour kh\u00f4ng t\u1ed3n t\u1ea1i.");
+        }
+        return "redirect:/admin/tours";
+    }
+
+    // ==================== DEPARTURE MANAGEMENT ====================
+
     @GetMapping("/tours/departures")
-    public String tourDepartures() {
-        return "admin/pages/tourdepartures";
+    public String tourDepartures(@RequestParam Long tourId, Model model,
+                                 RedirectAttributes redirectAttributes) {
+        try {
+            Tour tour = tourService.getTourById(tourId);
+            List<TourDeparture> departures = tourDepartureService.getDeparturesByTourId(tourId);
+            model.addAttribute("tour", tour);
+            model.addAttribute("departures", departures);
+            if (!model.containsAttribute("departureRequest")) {
+                TourDepartureRequest req = new TourDepartureRequest();
+                req.setTourId(tourId);
+                model.addAttribute("departureRequest", req);
+            }
+            return "admin/pages/tourdepartures";
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Tour kh\u00f4ng t\u1ed3n t\u1ea1i.");
+            return "redirect:/admin/tours";
+        }
+    }
+
+    @PostMapping("/tours/departures/add")
+    public String departureAdd(@Valid @ModelAttribute("departureRequest") TourDepartureRequest request,
+                               BindingResult bindingResult,
+                               RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Vui l\u00f2ng ki\u1ec3m tra l\u1ea1i th\u00f4ng tin");
+            return "redirect:/admin/tours/departures?tourId=" + request.getTourId();
+        }
+        try {
+            tourDepartureService.addDeparture(request);
+            redirectAttributes.addFlashAttribute("successMessage", "Th\u00eam chuy\u1ebfn th\u00e0nh c\u00f4ng!");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/admin/tours/departures?tourId=" + request.getTourId();
+    }
+
+    @PostMapping("/tours/departures/delete")
+    public String departureDelete(@RequestParam Long id, @RequestParam Long tourId,
+                                  RedirectAttributes redirectAttributes) {
+        try {
+            tourDepartureService.deleteDeparture(id);
+            redirectAttributes.addFlashAttribute("successMessage", "X\u00f3a chuy\u1ebfn th\u00e0nh c\u00f4ng!");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/admin/tours/departures?tourId=" + tourId;
     }
 
     // ==================== BOOKING MANAGEMENT ====================

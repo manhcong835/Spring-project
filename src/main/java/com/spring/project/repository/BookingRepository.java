@@ -68,4 +68,14 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
      */
     @Query("SELECT b FROM Booking b WHERE b.user.id = :customerId ORDER BY b.createdAt DESC")
     List<Booking> findBookingsByCustomerId(@Param("customerId") Long customerId);
+
+    /**
+     * UC Admin 2.4 - Kiểm tra tour có đơn đặt đang active trước khi xóa
+     */
+    boolean existsByTourDeparture_Tour_IdAndBookingStatusIn(Long tourId, List<String> statuses);
+
+    /**
+     * UC Admin 2.5 - Kiểm tra departure có đơn đặt đang active trước khi xóa
+     */
+    boolean existsByTourDeparture_IdAndBookingStatusIn(Long departureId, List<String> statuses);
 }

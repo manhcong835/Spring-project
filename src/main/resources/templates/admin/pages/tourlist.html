@@ -12,30 +12,45 @@
             <a th:href="@{/admin/tours/create}" class="btn btn-primary">+ Thêm tour mới</a>
         </div>
 
+        <!-- Flash Messages -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Search & Filter -->
         <div class="card admin-card mb-4">
             <div class="card-body">
-                <div class="row g-2 align-items-end">
-                    <div class="col-md-3"><input type="text" class="form-control form-control-sm" placeholder="Tìm theo tên tour..."></div>
-                    <div class="col-md-2">
-                        <select class="form-select form-select-sm">
-                            <option>Điểm đến</option><option>Đà Nẵng</option><option>Phú Quốc</option><option>Hạ Long</option><option>Sapa</option>
-                        </select>
+                <form th:action="@{/admin/tours}" method="get">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-4">
+                            <input type="text" name="keyword" th:value="${keyword}"
+                                   class="form-control form-control-sm" placeholder="Tìm theo tên, mã tour...">
+                        </div>
+                        <div class="col-md-3">
+                            <select name="status" class="form-select form-select-sm">
+                                <option value="">Tất cả trạng thái</option>
+                                <option value="ACTIVE" th:selected="${status == 'ACTIVE'}">Đang mở</option>
+                                <option value="INACTIVE" th:selected="${status == 'INACTIVE'}">Tạm ngưng</option>
+                                <option value="DELETED" th:selected="${status == 'DELETED'}">Đã xóa</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary btn-sm w-100">Tìm kiếm</button>
+                        </div>
+                        <div class="col-md-2">
+                            <a th:href="@{/admin/tours}" class="btn btn-outline-secondary btn-sm w-100">Đặt lại</a>
+                        </div>
                     </div>
-                    <div class="col-md-2">
-                        <select class="form-select form-select-sm">
-                            <option>Trạng thái</option><option>Đang mở</option><option>Hết chỗ</option><option>Tạm ngưng</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <select class="form-select form-select-sm">
-                            <option>Mức giá</option><option>Dưới 3 triệu</option><option>3-5 triệu</option><option>5-10 triệu</option><option>Trên 10 triệu</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3"><button class="btn btn-primary btn-sm w-100">Tìm kiếm</button></div>
-                </div>
+                </form>
             </div>
         </div>
 
+        <!-- Table -->
         <div class="card admin-card">
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -46,74 +61,30 @@
                                 <th>Tên tour</th>
                                 <th>Điểm đến</th>
                                 <th>Thời gian</th>
-                                <th>Giá (VNĐ)</th>
-                                <th>Chỗ trống</th>
                                 <th>Trạng thái</th>
                                 <th>Hành động</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td><strong>T001</strong></td>
-                                <td>Phú Quốc — Grand World</td>
-                                <td>Kiên Giang</td>
-                                <td>4N3Đ</td>
-                                <td class="fw-bold">4.990.000</td>
-                                <td>12</td>
-                                <td><span class="badge bg-success rounded-pill">Đang mở</span></td>
-                                <td>
-                                    <div class="btn-group btn-group-sm">
-                                        <a th:href="@{/admin/tours/departures}" class="btn btn-outline-info">📅</a>
-                                        <a th:href="@{/admin/tours/update}" class="btn btn-outline-primary">Sửa</a>
-                                        <a th:href="@{/admin/tours/delete}" class="btn btn-outline-danger">Xóa</a>
-                                    </div>
-                                </td>
+                            <tr th:if="${tourPage.content.isEmpty()}">
+                                <td colspan="6" class="text-center text-muted py-4">Không tìm thấy tour nào.</td>
                             </tr>
-                            <tr>
-                                <td><strong>T002</strong></td>
-                                <td>Đà Nẵng — Hội An — Bà Nà</td>
-                                <td>Đà Nẵng</td>
-                                <td>3N2Đ</td>
-                                <td class="fw-bold">3.290.000</td>
-                                <td>20</td>
-                                <td><span class="badge bg-success rounded-pill">Đang mở</span></td>
+                            <tr th:each="tour : ${tourPage.content}">
+                                <td><strong th:text="${tour.code}">T001</strong></td>
+                                <td th:text="${tour.name}">Tên tour</td>
+                                <td th:text="${tour.destination.name}">Điểm đến</td>
+                                <td th:text="${tour.durationDays + 'N' + tour.durationNights + 'Đ'}">3N2Đ</td>
                                 <td>
-                                    <div class="btn-group btn-group-sm">
-                                        <a th:href="@{/admin/tours/departures}" class="btn btn-outline-info">📅</a>
-                                        <a th:href="@{/admin/tours/update}" class="btn btn-outline-primary">Sửa</a>
-                                        <a th:href="@{/admin/tours/delete}" class="btn btn-outline-danger">Xóa</a>
-                                    </div>
+                                    <span th:if="${tour.status == 'ACTIVE'}" class="badge bg-success rounded-pill">Đang mở</span>
+                                    <span th:if="${tour.status == 'INACTIVE'}" class="badge bg-warning text-dark rounded-pill">Tạm ngưng</span>
+                                    <span th:if="${tour.status == 'DELETED'}" class="badge bg-secondary rounded-pill">Đã xóa</span>
                                 </td>
-                            </tr>
-                            <tr>
-                                <td><strong>T003</strong></td>
-                                <td>Sapa — Fansipan</td>
-                                <td>Lào Cai</td>
-                                <td>3N2Đ</td>
-                                <td class="fw-bold">3.690.000</td>
-                                <td>0</td>
-                                <td><span class="badge bg-danger rounded-pill">Hết chỗ</span></td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
-                                        <a th:href="@{/admin/tours/departures}" class="btn btn-outline-info">📅</a>
-                                        <a th:href="@{/admin/tours/update}" class="btn btn-outline-primary">Sửa</a>
-                                        <a th:href="@{/admin/tours/delete}" class="btn btn-outline-danger">Xóa</a>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><strong>T004</strong></td>
-                                <td>Hạ Long — Du thuyền 5 sao</td>
-                                <td>Quảng Ninh</td>
-                                <td>2N1Đ</td>
-                                <td class="fw-bold">2.590.000</td>
-                                <td>8</td>
-                                <td><span class="badge bg-success rounded-pill">Đang mở</span></td>
-                                <td>
-                                    <div class="btn-group btn-group-sm">
-                                        <a th:href="@{/admin/tours/departures}" class="btn btn-outline-info">📅</a>
-                                        <a th:href="@{/admin/tours/update}" class="btn btn-outline-primary">Sửa</a>
-                                        <a th:href="@{/admin/tours/delete}" class="btn btn-outline-danger">Xóa</a>
+                                        <a th:href="@{/admin/tours/departures(tourId=${tour.id})}" class="btn btn-outline-info" title="Lịch khởi hành">📅</a>
+                                        <a th:href="@{/admin/tours/update(id=${tour.id})}" class="btn btn-outline-primary">Sửa</a>
+                                        <a th:if="${tour.status != 'DELETED'}"
+                                           th:href="@{/admin/tours/delete(id=${tour.id})}" class="btn btn-outline-danger">Xóa</a>
                                     </div>
                                 </td>
                             </tr>
@@ -122,7 +93,27 @@
                 </div>
             </div>
         </div>
-        <div th:replace="~{admin/fragments/pagination :: pagination}"></div>
+
+        <!-- Pagination -->
+        <nav th:if="${tourPage.totalPages > 1}" aria-label="Phân trang" class="mt-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="text-muted small"
+                      th:text="'Hiển thị ' + (${tourPage.number * tourPage.size + 1}) + '-' + (${tourPage.number * tourPage.size + tourPage.numberOfElements}) + ' của ' + ${tourPage.totalElements} + ' kết quả'">
+                </span>
+                <ul class="pagination pagination-sm mb-0">
+                    <li class="page-item" th:classappend="${tourPage.first} ? 'disabled'">
+                        <a class="page-link" th:href="@{/admin/tours(keyword=${keyword}, status=${status}, page=${tourPage.number - 1})}">←</a>
+                    </li>
+                    <li th:each="i : ${#numbers.sequence(0, tourPage.totalPages - 1)}"
+                        class="page-item" th:classappend="${i == tourPage.number} ? 'active'">
+                        <a class="page-link" th:href="@{/admin/tours(keyword=${keyword}, status=${status}, page=${i})}" th:text="${i + 1}">1</a>
+                    </li>
+                    <li class="page-item" th:classappend="${tourPage.last} ? 'disabled'">
+                        <a class="page-link" th:href="@{/admin/tours(keyword=${keyword}, status=${status}, page=${tourPage.number + 1})}">→</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
     </main>
     <div th:replace="~{admin/fragments/footer :: footer}"></div>
 </div>
