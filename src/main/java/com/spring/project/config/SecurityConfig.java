@@ -56,7 +56,7 @@ public class SecurityConfig {
                     "/forgot-password",
                     "/tours", "/tours/**",
                     "/about", "/contact",
-                    "/css/**", "/js/**", "/images/**", "/fonts/**", "/assets/**",
+                    "/css/**", "/js/**", "/images/**", "/fonts/**", "/assets/**", "/uploads/**",
                     "/error/**"
                 ).permitAll()
 

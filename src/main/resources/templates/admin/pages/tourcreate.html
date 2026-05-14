@@ -17,7 +17,7 @@
 
         <div class="card admin-card">
             <div class="card-body p-4">
-                <form th:action="@{/admin/tours/create}" method="post" th:object="${tourCreateRequest}">
+                <form th:action="@{/admin/tours/create}" method="post" th:object="${tourCreateRequest}" enctype="multipart/form-data">
                     <div class="row g-3">
                         <div class="col-md-8">
                             <label class="form-label fw-semibold">Tên tour <span class="text-danger">*</span></label>
@@ -74,8 +74,12 @@
                             <input type="text" class="form-control" th:field="*{hotelStandard}" placeholder="3 sao, 4 sao, 5 sao...">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Ảnh tour (URL)</label>
-                            <input type="text" class="form-control" th:field="*{imageUrl}" placeholder="https://example.com/image.jpg">
+                            <label class="form-label fw-semibold">Ảnh tour</label>
+                            <input type="file" class="form-control" name="imageFile" accept="image/*" id="tourImageInput">
+                            <small class="text-muted">Chấp nhận: JPG, PNG, WebP, GIF — tối đa 10MB</small>
+                            <div class="mt-2" id="imagePreview" style="display:none">
+                                <img id="previewImg" src="" alt="Preview" class="rounded shadow-sm" style="max-height:200px;">
+                            </div>
                         </div>
                         <div class="col-12">
                             <label class="form-label fw-semibold">Mô tả tour</label>
@@ -126,6 +130,27 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // ===== Image Preview =====
+    var imageInput = document.getElementById('tourImageInput');
+    if (imageInput) {
+        imageInput.addEventListener('change', function(e) {
+            var file = e.target.files[0];
+            var preview = document.getElementById('imagePreview');
+            var previewImg = document.getElementById('previewImg');
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function(ev) {
+                    previewImg.src = ev.target.result;
+                    preview.style.display = '';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.style.display = 'none';
+            }
+        });
+    }
+
+    // ===== Itinerary =====
     const container = document.getElementById('itineraryContainer');
     const addBtn = document.getElementById('btnAddItinerary');
     const noMsg = document.getElementById('noItineraryMsg');

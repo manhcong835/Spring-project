@@ -57,6 +57,7 @@
                     <table class="table table-admin table-hover mb-0">
                         <thead>
                             <tr>
+                                <th>Ảnh</th>
                                 <th>Mã tour</th>
                                 <th>Tên tour</th>
                                 <th>Điểm đến</th>
@@ -67,9 +68,16 @@
                         </thead>
                         <tbody>
                             <tr th:if="${tourPage.content.isEmpty()}">
-                                <td colspan="6" class="text-center text-muted py-4">Không tìm thấy tour nào.</td>
+                                <td colspan="7" class="text-center text-muted py-4">Không tìm thấy tour nào.</td>
                             </tr>
                             <tr th:each="tour : ${tourPage.content}">
+                                <td>
+                                    <img th:if="${tour.images != null && !tour.images.isEmpty()}"
+                                         th:src="${tour.images[0].imageUrl}" alt="Tour"
+                                         style="width:60px; height:40px; object-fit:cover; border-radius:4px;">
+                                    <span th:if="${tour.images == null || tour.images.isEmpty()}"
+                                          class="text-muted small">—</span>
+                                </td>
                                 <td><strong th:text="${tour.code}">T001</strong></td>
                                 <td th:text="${tour.name}">Tên tour</td>
                                 <td th:text="${tour.destination.name}">Điểm đến</td>

@@ -2,15 +2,19 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <div th:fragment="sidebar">
     <!-- Desktop sidebar -->
-    <div class="admin-sidebar bg-dark text-white d-none d-lg-block" style="width:250px;min-height:100vh;position:fixed;top:0;left:0;z-index:1030;overflow-y:auto;">
-        <div class="p-3 border-bottom border-secondary">
-            <a class="text-decoration-none fw-bold fs-5 text-white" th:href="@{/admin/dashboard}">
-                ⚙️ <span class="text-primary">Admin</span><span class="text-warning">Panel</span>
+    <div class="admin-sidebar d-none d-lg-block">
+        <div class="sidebar-brand">
+            <a class="text-decoration-none d-flex align-items-center gap-2" th:href="@{/admin/dashboard}">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="url(#brandGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <defs><linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs>
+                    <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+                </svg>
+                <span class="sidebar-brand-text">Traveler</span>
             </a>
         </div>
 
-        <!-- Thông tin admin ở đầu sidebar -->
-        <div class="p-3 border-bottom border-secondary">
+        <!-- Thông tin admin -->
+        <div class="sidebar-user">
             <div class="d-flex align-items-center gap-2">
                 <img th:if="${currentUser != null && currentUser.avatarUrl != null && !currentUser.avatarUrl.isEmpty()}"
                      th:src="${currentUser.avatarUrl}" alt="Avatar" class="admin-avatar">
@@ -19,51 +23,76 @@
                     <span th:text="${currentUser != null && currentUser.fullName != null ? currentUser.fullName.substring(0,1).toUpperCase() : 'A'}"></span>
                 </div>
                 <div class="lh-sm">
-                    <span class="fw-semibold text-white d-block small"
+                    <span class="fw-semibold d-block" style="font-size:0.85rem;color:var(--text-primary)"
                           th:text="${currentUser != null ? currentUser.fullName : 'Admin'}">Admin</span>
-                    <small class="text-white-50" style="font-size:0.75rem;"
+                    <small style="font-size:0.72rem;color:var(--text-muted)"
                            th:text="${currentUser != null ? currentUser.email : ''}"></small>
                 </div>
             </div>
         </div>
 
         <nav class="p-3">
-            <p class="text-uppercase text-white-50 small fw-bold mb-2">Menu chính</p>
+            <p class="sidebar-section-label">Tổng quan</p>
             <ul class="nav flex-column gap-1">
                 <li class="nav-item">
-                    <a class="nav-link text-white rounded px-3 py-2" th:href="@{/admin/dashboard}">📊 Dashboard</a>
+                    <a class="nav-link" th:href="@{/admin/dashboard}">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                        Dashboard
+                    </a>
                 </li>
             </ul>
-            <p class="text-uppercase text-white-50 small fw-bold mb-2 mt-3">Quản lý</p>
+            <p class="sidebar-section-label">Quản lý</p>
             <ul class="nav flex-column gap-1">
                 <li class="nav-item">
-                    <a class="nav-link text-white-50 rounded px-3 py-2" th:href="@{/admin/tours}">🗺️ Tour du lịch</a>
+                    <a class="nav-link" th:href="@{/admin/tours}">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        Tour du lịch
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white-50 rounded px-3 py-2" th:href="@{/admin/bookings}">📋 Đơn đặt tour</a>
+                    <a class="nav-link" th:href="@{/admin/bookings}">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                        Đơn đặt tour
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white-50 rounded px-3 py-2" th:href="@{/admin/customers}">👥 Khách hàng</a>
+                    <a class="nav-link" th:href="@{/admin/customers}">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        Khách hàng
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white-50 rounded px-3 py-2" th:href="@{/admin/staff}">👔 Nhân viên</a>
+                    <a class="nav-link" th:href="@{/admin/staff}">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                        Nhân viên
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white-50 rounded px-3 py-2" th:href="@{/admin/promotions}">🎁 Khuyến mãi</a>
+                    <a class="nav-link" th:href="@{/admin/promotions}">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+                        Khuyến mãi
+                    </a>
                 </li>
             </ul>
-            <p class="text-uppercase text-white-50 small fw-bold mb-2 mt-3">Hệ thống</p>
+            <p class="sidebar-section-label">Hệ thống</p>
             <ul class="nav flex-column gap-1">
                 <li class="nav-item">
-                    <a class="nav-link text-white-50 rounded px-3 py-2" th:href="@{/admin/profile}">👤 Hồ sơ</a>
+                    <a class="nav-link" th:href="@{/admin/profile}">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        Hồ sơ
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white-50 rounded px-3 py-2" th:href="@{/admin/change-password}">🔒 Đổi mật khẩu</a>
+                    <a class="nav-link" th:href="@{/admin/change-password}">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        Đổi mật khẩu
+                    </a>
                 </li>
                 <li class="nav-item">
                     <form th:action="@{/logout}" method="post" class="m-0">
-                        <button type="submit" class="nav-link text-danger rounded px-3 py-2 w-100 text-start border-0 bg-transparent">
-                            🚪 Đăng xuất
+                        <button type="submit" class="nav-link w-100 text-start border-0 bg-transparent" style="color:var(--color-danger) !important">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                            Đăng xuất
                         </button>
                     </form>
                 </li>
@@ -72,35 +101,35 @@
     </div>
 
     <!-- Mobile offcanvas sidebar -->
-    <div class="offcanvas offcanvas-start bg-dark text-white" tabindex="-1" id="adminSidebar">
-        <div class="offcanvas-header border-bottom border-secondary">
-            <h5 class="offcanvas-title">⚙️ Admin Menu</h5>
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="adminSidebar">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Traveler Admin</h5>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
         </div>
         <div class="offcanvas-body p-3">
             <!-- Thông tin admin trên mobile -->
-            <div class="d-flex align-items-center gap-2 mb-3 pb-3 border-bottom border-secondary">
+            <div class="d-flex align-items-center gap-2 mb-3 pb-3" style="border-bottom:1px solid var(--border-subtle)">
                 <div class="admin-avatar-placeholder">
                     <span th:text="${currentUser != null && currentUser.fullName != null ? currentUser.fullName.substring(0,1).toUpperCase() : 'A'}"></span>
                 </div>
                 <div class="lh-sm">
-                    <span class="fw-semibold text-white small"
+                    <span class="fw-semibold" style="font-size:0.85rem;color:var(--text-primary)"
                           th:text="${currentUser != null ? currentUser.fullName : 'Admin'}">Admin</span>
                 </div>
             </div>
 
             <ul class="nav flex-column gap-1">
-                <li><a class="nav-link text-white" th:href="@{/admin/dashboard}">📊 Dashboard</a></li>
-                <li><a class="nav-link text-white-50" th:href="@{/admin/tours}">🗺️ Tour du lịch</a></li>
-                <li><a class="nav-link text-white-50" th:href="@{/admin/bookings}">📋 Đơn đặt tour</a></li>
-                <li><a class="nav-link text-white-50" th:href="@{/admin/customers}">👥 Khách hàng</a></li>
-                <li><a class="nav-link text-white-50" th:href="@{/admin/staff}">👔 Nhân viên</a></li>
-                <li><a class="nav-link text-white-50" th:href="@{/admin/promotions}">🎁 Khuyến mãi</a></li>
-                <li><hr class="border-secondary"></li>
-                <li><a class="nav-link text-white-50" th:href="@{/admin/profile}">👤 Hồ sơ</a></li>
+                <li><a class="nav-link" th:href="@{/admin/dashboard}">📊 Dashboard</a></li>
+                <li><a class="nav-link" th:href="@{/admin/tours}">🗺️ Tour du lịch</a></li>
+                <li><a class="nav-link" th:href="@{/admin/bookings}">📋 Đơn đặt tour</a></li>
+                <li><a class="nav-link" th:href="@{/admin/customers}">👥 Khách hàng</a></li>
+                <li><a class="nav-link" th:href="@{/admin/staff}">👔 Nhân viên</a></li>
+                <li><a class="nav-link" th:href="@{/admin/promotions}">🎁 Khuyến mãi</a></li>
+                <li><hr style="border-color:var(--border-subtle)"></li>
+                <li><a class="nav-link" th:href="@{/admin/profile}">👤 Hồ sơ</a></li>
                 <li>
                     <form th:action="@{/logout}" method="post" class="m-0">
-                        <button type="submit" class="nav-link text-danger w-100 text-start border-0 bg-transparent">
+                        <button type="submit" class="nav-link w-100 text-start border-0 bg-transparent" style="color:var(--color-danger)">
                             🚪 Đăng xuất
                         </button>
                     </form>

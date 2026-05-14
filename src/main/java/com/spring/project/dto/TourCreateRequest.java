@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,8 +54,8 @@ public class TourCreateRequest {
     private String excludedServices;
     private String notes;
 
-    @Size(max = 255)
-    private String imageUrl;
+    /** File ảnh upload từ form (không dùng annotation validate, xử lý trong Service) */
+    private MultipartFile imageFile;
 
     private List<ItineraryItem> itineraries = new ArrayList<>();
 
@@ -128,8 +129,8 @@ public class TourCreateRequest {
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }
 
-    public String getImageUrl() { return imageUrl; }
-    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+    public MultipartFile getImageFile() { return imageFile; }
+    public void setImageFile(MultipartFile imageFile) { this.imageFile = imageFile; }
 
     public List<ItineraryItem> getItineraries() { return itineraries; }
     public void setItineraries(List<ItineraryItem> itineraries) { this.itineraries = itineraries; }

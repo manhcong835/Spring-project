@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,8 +50,8 @@ public class TourUpdateRequest {
     private String excludedServices;
     private String notes;
 
-    @Size(max = 255)
-    private String imageUrl;
+    /** File ảnh upload từ form (để trống nếu không thay đổi ảnh) */
+    private MultipartFile imageFile;
 
     /** Trạng thái: ACTIVE / INACTIVE */
     private String status;
@@ -101,8 +102,8 @@ public class TourUpdateRequest {
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }
 
-    public String getImageUrl() { return imageUrl; }
-    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+    public MultipartFile getImageFile() { return imageFile; }
+    public void setImageFile(MultipartFile imageFile) { this.imageFile = imageFile; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }

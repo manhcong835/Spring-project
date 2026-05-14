@@ -5,11 +5,13 @@ import com.spring.project.dto.TourUpdateRequest;
 import com.spring.project.entity.Destination;
 import com.spring.project.entity.Tour;
 import com.spring.project.entity.TourCategory;
+import com.spring.project.entity.TourImage;
 import com.spring.project.entity.TourItinerary;
 import com.spring.project.repository.BookingRepository;
 import com.spring.project.repository.DestinationRepository;
 import com.spring.project.repository.TourCategoryRepository;
 import com.spring.project.repository.TourRepository;
+import com.spring.project.service.FileStorageService;
 import com.spring.project.service.TourService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,15 +32,18 @@ public class TourServiceImpl implements TourService {
     private final TourCategoryRepository tourCategoryRepository;
     private final DestinationRepository destinationRepository;
     private final BookingRepository bookingRepository;
+    private final FileStorageService fileStorageService;
 
     public TourServiceImpl(TourRepository tourRepository,
                            TourCategoryRepository tourCategoryRepository,
                            DestinationRepository destinationRepository,
-                           BookingRepository bookingRepository) {
+                           BookingRepository bookingRepository,
+                           FileStorageService fileStorageService) {
         this.tourRepository = tourRepository;
         this.tourCategoryRepository = tourCategoryRepository;
         this.destinationRepository = destinationRepository;
         this.bookingRepository = bookingRepository;
+        this.fileStorageService = fileStorageService;
     }
 
     // ==================== UC 2.1 — Xem danh sách ====================
@@ -123,7 +128,19 @@ public class TourServiceImpl implements TourService {
             }
         }
 
-        // 7. Lưu
+        // 7. Xử lý ảnh upload
+        if (request.getImageFile() != null && !request.getImageFile().isEmpty()) {
+            String fileName = fileStorageService.storeFile(request.getImageFile());
+            TourImage image = new TourImage();
+            image.setTour(tour);
+            image.setImageUrl("/uploads/tours/" + fileName);
+            image.setAltText(tour.getName());
+            image.setThumbnail(true);
+            image.setSortOrder(0);
+            tour.getImages().add(image);
+        }
+
+        // 8. Lưu
         tourRepository.save(tour);
     }
 
@@ -186,7 +203,32 @@ public class TourServiceImpl implements TourService {
             }
         }
 
-        // 6. Lưu
+        // 6. Xử lý ảnh upload mới (nếu có)
+        if (request.getImageFile() != null && !request.getImageFile().isEmpty()) {
+            // Xóa ảnh cũ (file trên disk)
+            if (!tour.getImages().isEmpty()) {
+                for (TourImage oldImage : tour.getImages()) {
+                    String oldUrl = oldImage.getImageUrl();
+                    if (oldUrl != null && oldUrl.startsWith("/uploads/tours/")) {
+                        String oldFileName = oldUrl.substring("/uploads/tours/".length());
+                        fileStorageService.deleteFile(oldFileName);
+                    }
+                }
+                tour.getImages().clear(); // orphanRemoval sẽ xóa record trong DB
+            }
+
+            // Lưu ảnh mới
+            String fileName = fileStorageService.storeFile(request.getImageFile());
+            TourImage newImage = new TourImage();
+            newImage.setTour(tour);
+            newImage.setImageUrl("/uploads/tours/" + fileName);
+            newImage.setAltText(tour.getName());
+            newImage.setThumbnail(true);
+            newImage.setSortOrder(0);
+            tour.getImages().add(newImage);
+        }
+
+        // 7. Lưu
         tourRepository.save(tour);
     }
 
