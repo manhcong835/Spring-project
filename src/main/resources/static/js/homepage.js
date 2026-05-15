@@ -1,52 +1,22 @@
 /* ============================================
    HOMEPAGE INTERACTIONS
-   Premium Travel Booking — travel.com.vn style
+   Tropical Luxe — Traveler
    ============================================ */
 
 document.addEventListener('DOMContentLoaded', () => {
-  initStickyHeader();
-  initMobileMenu();
+  initStickyNavbar();
   initScrollReveal();
   initSmoothScroll();
-  initSearchTabs();
-  initWishlistButtons();
   initCountUp();
 });
 
-/* ----- Sticky Header Shadow ----- */
-function initStickyHeader() {
-  const header = document.querySelector('.header');
-  if (!header) return;
+/* ----- Sticky Navbar Glass Effect ----- */
+function initStickyNavbar() {
+  const nav = document.querySelector('.navbar-traveler');
+  if (!nav) return;
   window.addEventListener('scroll', () => {
-    header.classList.toggle('scrolled', window.pageYOffset > 20);
+    nav.classList.toggle('scrolled', window.pageYOffset > 30);
   }, { passive: true });
-}
-
-/* ----- Mobile Menu ----- */
-function initMobileMenu() {
-  const btn = document.querySelector('.hamburger');
-  const nav = document.querySelector('.mobile-nav');
-  const overlay = document.querySelector('.mobile-overlay');
-  const close = document.querySelector('.mobile-nav-close');
-  if (!btn || !nav) return;
-
-  const open = () => {
-    btn.classList.add('active');
-    nav.classList.add('open');
-    overlay && overlay.classList.add('open');
-    document.body.style.overflow = 'hidden';
-  };
-  const shut = () => {
-    btn.classList.remove('active');
-    nav.classList.remove('open');
-    overlay && overlay.classList.remove('open');
-    document.body.style.overflow = '';
-  };
-
-  btn.addEventListener('click', () => nav.classList.contains('open') ? shut() : open());
-  close && close.addEventListener('click', shut);
-  overlay && overlay.addEventListener('click', shut);
-  nav.querySelectorAll('a').forEach(a => a.addEventListener('click', shut));
 }
 
 /* ----- Scroll Reveal ----- */
@@ -60,7 +30,7 @@ function initScrollReveal() {
         io.unobserve(e.target);
       }
     });
-  }, { threshold: 0.12, rootMargin: '0px 0px -30px 0px' });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
   els.forEach(el => io.observe(el));
 }
 
@@ -76,29 +46,6 @@ function initSmoothScroll() {
           behavior: 'smooth'
         });
       }
-    });
-  });
-}
-
-/* ----- Search Tabs ----- */
-function initSearchTabs() {
-  const tabs = document.querySelectorAll('.search-tab');
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-    });
-  });
-}
-
-/* ----- Wishlist Toggle ----- */
-function initWishlistButtons() {
-  document.querySelectorAll('.tour-wishlist').forEach(btn => {
-    btn.addEventListener('click', function (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      this.classList.toggle('liked');
-      this.textContent = this.classList.contains('liked') ? '❤️' : '🤍';
     });
   });
 }

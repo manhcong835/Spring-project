@@ -1,32 +1,32 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <div th:fragment="tourcard" class="col">
-    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden tour-card-item">
-        <div class="position-relative">
-            <img src="https://placehold.co/400x250/0d6efd/ffffff?text=Tour+Du+Lịch" class="card-img-top" alt="Tour" style="height:220px;object-fit:cover;">
-            <span class="badge bg-danger position-absolute top-0 end-0 m-2 rounded-pill px-3">Bán chạy</span>
-            <span class="badge bg-dark bg-opacity-75 position-absolute bottom-0 start-0 m-2 rounded-pill px-2">4N3Đ</span>
+    <div class="card h-100 border-0 overflow-hidden tour-card-item">
+        <div class="position-relative overflow-hidden">
+            <img src="https://placehold.co/400x250/0B3D5E/ffffff?text=Tour+Du+Lịch" class="card-img-top" alt="Tour" style="height:220px;object-fit:cover;">
+            <span class="badge badge-hot position-absolute top-0 end-0 m-2">Bán chạy</span>
+            <span class="badge badge-duration position-absolute bottom-0 start-0 m-2">4N3Đ</span>
         </div>
         <div class="card-body d-flex flex-column">
-            <div class="d-flex align-items-center gap-2 mb-2 small text-muted">
-                <span class="text-warning fw-bold">★ 4.8</span>
+            <div class="d-flex align-items-center gap-2 mb-2 small" style="color:var(--color-text-muted);">
+                <span style="color:var(--color-amber);font-weight:700;">★ 4.8</span>
                 <span>•</span>
                 <span>218 đánh giá</span>
                 <span>•</span>
                 <span>📍 Phú Quốc</span>
             </div>
-            <h6 class="card-title fw-bold mb-2">Phú Quốc – Grand World – Sunset Town</h6>
+            <h6 class="card-title mb-2">Phú Quốc – Grand World – Sunset Town</h6>
             <div class="d-flex flex-wrap gap-1 mb-3">
-                <span class="badge bg-light text-dark border small">✈️ Bay VietJet</span>
-                <span class="badge bg-light text-dark border small">🏨 Resort 5★</span>
-                <span class="badge bg-light text-dark border small">🍜 3 bữa/ngày</span>
+                <span class="badge bg-light border small" style="color:var(--color-text);">✈️ Bay VietJet</span>
+                <span class="badge bg-light border small" style="color:var(--color-text);">🏨 Resort 5★</span>
+                <span class="badge bg-light border small" style="color:var(--color-text);">🍜 3 bữa/ngày</span>
             </div>
             <div class="mt-auto d-flex justify-content-between align-items-end">
                 <div>
-                    <del class="text-muted small">6.490.000đ</del>
-                    <div class="text-primary fw-bold fs-5">4.990.000đ <span class="fw-normal text-muted small">/khách</span></div>
+                    <del class="price-old">6.490.000đ</del>
+                    <div class="price-current">4.990.000đ <span class="fw-normal small" style="color:var(--color-text-muted);">/khách</span></div>
                 </div>
-                <a th:href="@{/tours/detail}" class="btn btn-primary btn-sm px-3">Xem chi tiết</a>
+                <a th:href="@{/tours/detail}" class="btn btn-view-tour">Xem chi tiết</a>
             </div>
         </div>
     </div>

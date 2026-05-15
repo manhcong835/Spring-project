@@ -1,33 +1,49 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<section th:fragment="herobanner" class="hero-banner position-relative overflow-hidden" style="min-height:520px;background:linear-gradient(135deg,#0d6efd 0%,#0a58ca 50%,#084298 100%);">
-    <div class="position-absolute top-0 start-0 w-100 h-100" style="background:url('') center/cover;opacity:0.15;"></div>
-    <div class="container position-relative py-5">
-        <div class="row align-items-center min-vh-50">
-            <div class="col-lg-7 text-white py-5">
-                <span class="badge bg-warning text-dark px-3 py-2 mb-3 rounded-pill fw-semibold">🌟 Nền tảng du lịch số 1 Việt Nam</span>
-                <h1 class="display-4 fw-bold mb-3">Khám Phá <span class="text-warning">Việt Nam</span> Tuyệt Đẹp Cùng Bạn</h1>
-                <p class="lead mb-4 opacity-75">Hàng nghìn tour du lịch trong nước và quốc tế — Đặt nhanh, giá tốt, dịch vụ 5 sao.</p>
-                <div class="d-flex gap-3 mb-5">
-                    <a th:href="@{/tours}" class="btn btn-warning btn-lg text-dark fw-semibold px-4">Khám phá tour →</a>
-                    <a th:href="@{/about}" class="btn btn-outline-light btn-lg px-4">Tìm hiểu thêm</a>
+<section th:fragment="herobanner" class="hero-luxe">
+    <!-- Decorative floating shapes -->
+    <div class="hero-deco hero-deco-1"></div>
+    <div class="hero-deco hero-deco-2"></div>
+
+    <div class="container position-relative py-5" style="z-index:2;">
+        <div class="row align-items-center">
+            <div class="col-lg-7 py-5">
+                <div class="hero-badge mb-3 reveal">🌟 Nền tảng du lịch số 1 Việt Nam</div>
+                <h1 class="hero-title mb-3 reveal reveal-delay-1">
+                    Khám Phá<br>
+                    <span class="text-accent">Việt Nam</span> Tuyệt Đẹp
+                </h1>
+                <p class="hero-subtitle mb-4 reveal reveal-delay-2">
+                    Hàng nghìn tour du lịch trong nước và quốc tế — Đặt nhanh, giá tốt, dịch vụ 5 sao. Mỗi chuyến đi là một hành trình đáng nhớ.
+                </p>
+                <div class="d-flex gap-3 mb-5 reveal reveal-delay-3">
+                    <a th:href="@{/tours}" class="btn btn-primary-luxe btn-lg px-4">Khám phá tour →</a>
+                    <a th:href="@{/about}" class="btn btn-outline-luxe btn-lg px-4">Tìm hiểu thêm</a>
                 </div>
-                <div class="row g-4 text-center">
+                <div class="row g-3 reveal reveal-delay-4">
                     <div class="col-3">
-                        <div class="fs-3 fw-bold">1200+</div>
-                        <div class="small opacity-75">Tour đa dạng</div>
+                        <div class="hero-stat-card">
+                            <div class="hero-stat-value" data-count="1200" data-suffix="+">0</div>
+                            <div class="hero-stat-label">Tour đa dạng</div>
+                        </div>
                     </div>
                     <div class="col-3">
-                        <div class="fs-3 fw-bold">500K+</div>
-                        <div class="small opacity-75">Khách hài lòng</div>
+                        <div class="hero-stat-card">
+                            <div class="hero-stat-value" data-count="500" data-suffix="K+">0</div>
+                            <div class="hero-stat-label">Khách hài lòng</div>
+                        </div>
                     </div>
                     <div class="col-3">
-                        <div class="fs-3 fw-bold">50+</div>
-                        <div class="small opacity-75">Điểm đến</div>
+                        <div class="hero-stat-card">
+                            <div class="hero-stat-value" data-count="50" data-suffix="+">0</div>
+                            <div class="hero-stat-label">Điểm đến</div>
+                        </div>
                     </div>
                     <div class="col-3">
-                        <div class="fs-3 fw-bold">15</div>
-                        <div class="small opacity-75">Năm kinh nghiệm</div>
+                        <div class="hero-stat-card">
+                            <div class="hero-stat-value" data-count="15" data-suffix="">0</div>
+                            <div class="hero-stat-label">Năm kinh nghiệm</div>
+                        </div>
                     </div>
                 </div>
             </div>

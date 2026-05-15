@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+<nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-traveler sticky-top">
     <div class="container">
-        <a class="navbar-brand fw-bold fs-4" th:href="@{/}">
-            <span class="text-primary">✈️ Travel</span><span class="text-warning">er</span>
+        <a class="navbar-brand d-flex align-items-center gap-1" th:href="@{/}">
+            <span class="navbar-brand-text"><span class="brand-primary">Tra</span><span class="brand-accent">veler</span></span>
         </a>
         <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#clientNavbar">
             <span class="navbar-toggler-icon"></span>
@@ -27,8 +27,8 @@
 
             <!-- ===== CHƯA ĐĂNG NHẬP ===== -->
             <div sec:authorize="!isAuthenticated()" class="d-flex align-items-center gap-2">
-                <a th:href="@{/login}" class="btn btn-primary btn-sm">Đăng nhập</a>
-                <a th:href="@{/register}" class="btn btn-outline-primary btn-sm">Đăng ký</a>
+                <a th:href="@{/login}" class="btn btn-nav-login">Đăng nhập</a>
+                <a th:href="@{/register}" class="btn btn-nav-register">Đăng ký</a>
             </div>
 
             <!-- ===== ĐÃ ĐĂNG NHẬP ===== -->

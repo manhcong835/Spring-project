@@ -10,9 +10,9 @@
     <div class="container">
         <nav aria-label="breadcrumb" class="mb-4">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a th:href="@{/}" class="text-decoration-none">Trang chủ</a></li>
-                <li class="breadcrumb-item"><a th:href="@{/tours}" class="text-decoration-none">Tour du lịch</a></li>
-                <li class="breadcrumb-item active">Phú Quốc — Grand World — Vinpearl Safari</li>
+                <li class="breadcrumb-item"><a th:href="@{/}" class="text-decoration-none" style="color:var(--color-ocean);">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/tours}" class="text-decoration-none" style="color:var(--color-ocean);">Tour du lịch</a></li>
+                <li class="breadcrumb-item active" style="color:var(--color-text-muted);">Phú Quốc — Grand World — Vinpearl Safari</li>
             </ol>
         </nav>
 
@@ -21,13 +21,13 @@
             <div class="col-lg-8">
                 <!-- Gallery -->
                 <div class="tour-gallery mb-4">
-                    <img src="https://placehold.co/900x450/0d6efd/ffffff?text=Phú+Quốc+Paradise" alt="Phú Quốc">
+                    <img th:src="@{/img/tour-phuquoc.png}" alt="Phú Quốc">
                 </div>
                 <div class="row g-2 tour-gallery-thumb mb-4">
-                    <div class="col-3"><img src="https://placehold.co/250x100/198754/ffffff?text=Ảnh+1" alt="thumb" class="active"></div>
-                    <div class="col-3"><img src="https://placehold.co/250x100/6f42c1/ffffff?text=Ảnh+2" alt="thumb"></div>
-                    <div class="col-3"><img src="https://placehold.co/250x100/dc3545/ffffff?text=Ảnh+3" alt="thumb"></div>
-                    <div class="col-3"><img src="https://placehold.co/250x100/fd7e14/ffffff?text=Ảnh+4" alt="thumb"></div>
+                    <div class="col-3"><img th:src="@{/img/tour-phuquoc.png}" alt="thumb" class="active"></div>
+                    <div class="col-3"><img th:src="@{/img/tour-danang.png}" alt="thumb"></div>
+                    <div class="col-3"><img th:src="@{/img/tour-hoian.png}" alt="thumb"></div>
+                    <div class="col-3"><img th:src="@{/img/tour-nhatrang.png}" alt="thumb"></div>
                 </div>
 
                 <!-- Title & Quick Info -->
@@ -36,12 +36,12 @@
                     <span>📍 Kiên Giang, Việt Nam</span>
                     <span>⏱️ 4 ngày 3 đêm</span>
                     <span>✈️ Bay VietJet Air</span>
-                    <span class="text-warning fw-bold">★ 4.9 (320 đánh giá)</span>
+                    <span style="color:var(--color-amber);" class="fw-bold">★ 4.9 (320 đánh giá)</span>
                 </div>
 
                 <!-- Highlights -->
-                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
-                    <h5 class="fw-bold mb-3">✨ Điểm nổi bật</h5>
+                <div class="glass-card p-4 mb-4">
+                    <h5 class="fw-bold mb-3" style="color:var(--color-ocean);">✨ Điểm nổi bật</h5>
                     <div class="row g-3">
                         <div class="col-md-6"><span class="badge bg-primary-subtle text-primary me-2">✈️</span>Bay thẳng VietJet Air</div>
                         <div class="col-md-6"><span class="badge bg-primary-subtle text-primary me-2">🏨</span>Resort 5 sao Vinpearl</div>
@@ -53,15 +53,15 @@
                 </div>
 
                 <!-- Description -->
-                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
-                    <h5 class="fw-bold mb-3">📋 Mô tả tour</h5>
+                <div class="glass-card p-4 mb-4">
+                    <h5 class="fw-bold mb-3" style="color:var(--color-ocean);">📋 Mô tả tour</h5>
                     <p>Tour Phú Quốc 4 ngày 3 đêm đưa bạn trải nghiệm thiên đường biển đảo hàng đầu Việt Nam. Tham quan Grand World — thị trấn Địa Trung Hải, Vinpearl Safari — vườn thú bán hoang dã lớn nhất Đông Nam Á, tắm biển Bãi Sao, lặn ngắm san hô, và thưởng thức hải sản tươi sống.</p>
                     <p>Tour bao gồm vé máy bay khứ hồi, ăn uống, khách sạn, xe đưa đón, và hướng dẫn viên chuyên nghiệp.</p>
                 </div>
 
                 <!-- Itinerary -->
-                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
-                    <h5 class="fw-bold mb-4">📅 Lịch trình tour</h5>
+                <div class="glass-card p-4 mb-4">
+                    <h5 class="fw-bold mb-4" style="color:var(--color-ocean);">📅 Lịch trình tour</h5>
                     <div class="itinerary-day">
                         <h6 class="fw-bold text-primary">Ngày 1: TP.HCM — Phú Quốc</h6>
                         <p class="text-muted small mb-0">Đón khách tại sân bay Tân Sơn Nhất, bay đến Phú Quốc. Check-in resort, tham quan Grand World — show nhạc nước, ăn tối hải sản.</p>
@@ -81,9 +81,9 @@
                 </div>
 
                 <!-- Reviews Section -->
-                <div class="card border-0 shadow-sm rounded-4 p-4">
+                <div class="glass-card p-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="fw-bold mb-0">💬 Đánh giá từ khách hàng</h5>
+                        <h5 class="fw-bold mb-0" style="color:var(--color-ocean);">💬 Đánh giá từ khách hàng</h5>
                         <a th:href="@{/review/create}" class="btn btn-outline-primary btn-sm">Viết đánh giá</a>
                     </div>
                     <div class="border-bottom pb-3 mb-3">
@@ -111,8 +111,8 @@
 
             <!-- Right: Lịch Trình và Giá Tour -->
             <div class="col-lg-4">
-                <div class="card border-0 shadow rounded-4 p-4 tour-info-card" id="departureWidget">
-                    <h5 class="fw-bold mb-1">Lịch Trình và Giá Tour</h5>
+                <div class="glass-card p-4 tour-info-card" id="departureWidget">
+                    <h5 class="fw-bold mb-1" style="color:var(--color-ocean);">Lịch Trình và Giá Tour</h5>
                     <p class="text-muted small mb-3">Chọn Lịch Trình và Xem Giá:</p>
 
                     <!-- Departure Tabs -->

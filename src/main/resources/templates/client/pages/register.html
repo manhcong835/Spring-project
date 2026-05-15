@@ -6,16 +6,15 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-6">
-                <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="auth-card overflow-hidden">
                     <div class="card-body p-5">
                         <div class="text-center mb-4">
-                            <h3 class="fw-bold"><span class="text-primary">✈️ Travel</span><span class="text-warning">er</span></h3>
-                            <p class="text-muted">Tạo tài khoản để bắt đầu hành trình</p>
+                            <h3 class="fw-bold"><span class="navbar-brand-text"><span class="brand-primary">Tra</span><span class="brand-accent">veler</span></span></h3>
+                            <p style="color:var(--color-text-muted);">Tạo tài khoản để bắt đầu hành trình</p>
                         </div>
 
                         <!-- Thông báo lỗi nghiệp vụ (email trùng, password không khớp...) -->
                         <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
                             <span th:text="${errorMessage}"></span>
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
@@ -70,27 +69,27 @@
                             <!-- Điều khoản -->
                             <div class="form-check mb-4">
                                 <input type="checkbox" class="form-check-input" id="agree" required>
-                                <label class="form-check-label small" for="agree">Tôi đồng ý với <a href="#" class="text-decoration-none">điều khoản sử dụng</a> và <a href="#" class="text-decoration-none">chính sách bảo mật</a></label>
+                                <label class="form-check-label small" for="agree">Tôi đồng ý với <a href="#" class="text-decoration-none" style="color:var(--color-amber);">điều khoản sử dụng</a> và <a href="#" class="text-decoration-none" style="color:var(--color-amber);">chính sách bảo mật</a></label>
                             </div>
 
-                            <button type="submit" class="btn btn-primary w-100 btn-lg fw-semibold">Đăng ký</button>
+                            <button type="submit" class="btn w-100 btn-lg fw-semibold" style="background:var(--color-ocean);color:#fff;border-radius:var(--radius-sm);">Đăng ký</button>
                         </form>
 
                         <hr class="my-4">
 
                         <!-- Nút đăng ký bằng Google -->
                         <div class="d-grid mb-4">
-                            <a th:href="@{/oauth2/authorization/google}" class="btn btn-light border py-2 fw-semibold d-flex align-items-center justify-content-center">
+                            <a th:href="@{/oauth2/authorization/google}" class="btn btn-light border py-2 fw-semibold d-flex align-items-center justify-content-center" style="border-radius:var(--radius-sm);">
                                 <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" width="20" class="me-2">
                                 Tiếp tục bằng Google
                             </a>
                         </div>
 
-                        <p class="text-center mb-0 small">Đã có tài khoản? <a th:href="@{/login}" class="text-decoration-none fw-semibold">Đăng nhập</a></p>
+                        <p class="text-center mb-0 small">Đã có tài khoản? <a th:href="@{/login}" class="text-decoration-none fw-semibold" style="color:var(--color-amber);">Đăng nhập</a></p>
                     </div>
                 </div>
                 <div class="text-center mt-3">
-                    <a th:href="@{/}" class="text-white text-decoration-none small">← Quay về trang chủ</a>
+                    <a th:href="@{/}" class="text-white text-decoration-none small opacity-75">← Quay về trang chủ</a>
                 </div>
             </div>
         </div>
