@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.time.LocalDateTime;
@@ -104,4 +105,44 @@ public interface TourRepository extends JpaRepository<Tour, Long> {
 
     @Query("SELECT t FROM Tour t WHERE t.status != 'DELETED'")
     Page<Tour> findRecentTours(Pageable pageable);
+
+    // ==================== UC 2.1 + 2.2 — Client tìm kiếm & lọc tour ====================
+
+    /**
+     * UC 2.1 + 2.2 — Tìm kiếm & lọc tour cho client (chỉ ACTIVE, còn slot).
+     * Eager fetch category, destination, thumbnail image, departure để tránh N+1.
+     */
+    @Query(value = "SELECT DISTINCT t FROM Tour t " +
+           "LEFT JOIN FETCH t.category " +
+           "LEFT JOIN FETCH t.destination " +
+           "LEFT JOIN t.images img " +
+           "LEFT JOIN t.departures dep " +
+           "WHERE t.status = 'ACTIVE' " +
+           "AND (:keyword IS NULL OR :keyword = '' OR " +
+           "     LOWER(t.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "     LOWER(t.destination.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "     LOWER(t.departureLocation) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+           "AND (:destinationId IS NULL OR t.destination.id = :destinationId) " +
+           "AND (:categoryId IS NULL OR t.category.id = :categoryId) " +
+           "AND (:minDuration IS NULL OR t.durationDays >= :minDuration) " +
+           "AND (:maxDuration IS NULL OR t.durationDays <= :maxDuration) " +
+           "AND (:minPrice IS NULL OR :maxPrice IS NULL OR " +
+           "     EXISTS (SELECT dep2 FROM TourDeparture dep2 WHERE dep2.tour = t AND dep2.adultPrice BETWEEN :minPrice AND :maxPrice AND dep2.status = 'OPEN' AND dep2.availableSlots > 0))",
+           countQuery = "SELECT COUNT(DISTINCT t) FROM Tour t WHERE t.status = 'ACTIVE' " +
+           "AND (:keyword IS NULL OR :keyword = '' OR " +
+           "     LOWER(t.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "     LOWER(t.destination.name) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+           "AND (:destinationId IS NULL OR t.destination.id = :destinationId) " +
+           "AND (:categoryId IS NULL OR t.category.id = :categoryId) " +
+           "AND (:minDuration IS NULL OR t.durationDays >= :minDuration) " +
+           "AND (:maxDuration IS NULL OR t.durationDays <= :maxDuration)")
+    Page<Tour> searchToursForClient(
+            @Param("keyword") String keyword,
+            @Param("destinationId") Long destinationId,
+            @Param("categoryId") Long categoryId,
+            @Param("minDuration") Integer minDuration,
+            @Param("maxDuration") Integer maxDuration,
+            @Param("minPrice") BigDecimal minPrice,
+            @Param("maxPrice") BigDecimal maxPrice,
+            Pageable pageable);
 }

@@ -47,3 +47,4 @@ prompt_microservice_travelbooking.txt
 PROMPT_OLD.txt
 seed_data.sql
 .agent/
+tourbookingdb_dump.sql

@@ -24,164 +24,114 @@
             <!-- Sidebar Filters -->
             <div class="col-lg-3">
                 <div class="glass-card p-4 sticky-top" style="top:90px;">
-                    <h6 class="fw-bold mb-3" style="color:var(--color-ocean);">🔍 Bộ lọc tìm kiếm</h6>
-                    <div class="mb-3">
-                        <label class="form-label small fw-semibold">Từ khóa</label>
-                        <input type="text" class="form-control form-control-sm" placeholder="Nhập tên tour...">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-semibold">Điểm đến</label>
-                        <select class="form-select form-select-sm">
-                            <option>Tất cả</option><option>Đà Nẵng</option><option>Phú Quốc</option><option>Hạ Long</option><option>Sapa</option><option>Nha Trang</option><option>Huế</option><option>Đà Lạt</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-semibold">Mức giá</label>
-                        <select class="form-select form-select-sm">
-                            <option>Tất cả</option><option>Dưới 3 triệu</option><option>3 – 5 triệu</option><option>5 – 10 triệu</option><option>Trên 10 triệu</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-semibold">Thời gian</label>
-                        <select class="form-select form-select-sm">
-                            <option>Tất cả</option><option>1 – 2 ngày</option><option>3 – 4 ngày</option><option>5 – 7 ngày</option><option>Trên 7 ngày</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-semibold">Ngày khởi hành</label>
-                        <input type="date" class="form-control form-control-sm">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-semibold">Đánh giá</label>
-                        <select class="form-select form-select-sm">
-                            <option>Tất cả</option><option>★★★★★ (5 sao)</option><option>★★★★ (4 sao trở lên)</option><option>★★★ (3 sao trở lên)</option>
-                        </select>
-                    </div>
-                    <button class="btn btn-sm w-100 mt-2" style="background:var(--color-ocean);color:#fff;border-radius:var(--radius-sm);">Áp dụng lọc</button>
-                    <button class="btn btn-outline-secondary w-100 btn-sm mt-2" style="border-radius:var(--radius-sm);">Xóa bộ lọc</button>
+                    <form th:action="@{/tours}" method="GET" id="filterForm">
+                        <h6 class="fw-bold mb-3" style="color:var(--color-ocean);">🔍 Bộ lọc tìm kiếm</h6>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Từ khóa</label>
+                            <input type="text" name="keyword" class="form-control form-control-sm"
+                                   placeholder="Nhập tên tour..." th:value="${keyword}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Điểm đến</label>
+                            <select name="destinationId" class="form-select form-select-sm">
+                                <option value="">Tất cả</option>
+                                <option th:each="d : ${destinations}"
+                                        th:value="${d.id}"
+                                        th:text="${d.name}"
+                                        th:selected="${destinationId != null && destinationId == d.id}">
+                                </option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Danh mục</label>
+                            <select name="categoryId" class="form-select form-select-sm">
+                                <option value="">Tất cả</option>
+                                <option th:each="c : ${categories}"
+                                        th:value="${c.id}"
+                                        th:text="${c.name}"
+                                        th:selected="${categoryId != null && categoryId == c.id}">
+                                </option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Thời gian</label>
+                            <select name="duration" class="form-select form-select-sm">
+                                <option value="">Tất cả</option>
+                                <option value="1-2" th:selected="${minDuration == 1 && maxDuration == 2}">1 – 2 ngày</option>
+                                <option value="3-4" th:selected="${minDuration == 3 && maxDuration == 4}">3 – 4 ngày</option>
+                                <option value="5-7" th:selected="${minDuration == 5 && maxDuration == 7}">5 – 7 ngày</option>
+                                <option value="8+" th:selected="${minDuration == 8}">Trên 7 ngày</option>
+                            </select>
+                            <input type="hidden" name="minDuration" th:value="${minDuration}">
+                            <input type="hidden" name="maxDuration" th:value="${maxDuration}">
+                        </div>
+                        <button type="submit" class="btn btn-sm w-100 mt-2"
+                                style="background:var(--color-ocean);color:#fff;border-radius:var(--radius-sm);">
+                            Áp dụng lọc
+                        </button>
+                        <a th:href="@{/tours}" class="btn btn-outline-secondary w-100 btn-sm mt-2"
+                           style="border-radius:var(--radius-sm);">
+                            Xóa bộ lọc
+                        </a>
+                    </form>
                 </div>
             </div>
 
             <!-- Tour List -->
             <div class="col-lg-9">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <span style="color:var(--color-text-muted);">Tìm thấy <strong style="color:var(--color-ocean);">48</strong> tour</span>
-                    <div class="d-flex gap-2 align-items-center">
-                        <label class="small" style="color:var(--color-text-muted);">Sắp xếp:</label>
-                        <select class="form-select form-select-sm" style="width:auto;">
-                            <option>Phổ biến nhất</option><option>Giá thấp → cao</option><option>Giá cao → thấp</option><option>Đánh giá cao</option><option>Mới nhất</option>
-                        </select>
-                    </div>
+                    <span style="color:var(--color-text-muted);">
+                        Tìm thấy <strong style="color:var(--color-ocean);" th:text="${tourPage.totalElements}">0</strong> tour
+                    </span>
                 </div>
 
-                <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
-                    <!-- Tour Card 1 -->
-                    <div class="col reveal">
+                <!-- Empty state -->
+                <div th:if="${tourPage.content.isEmpty()}" class="text-center py-5">
+                    <div style="font-size:3rem;opacity:0.3;">🔍</div>
+                    <h5 class="mt-3" style="color:var(--color-text-muted);">Không tìm thấy tour nào</h5>
+                    <p class="text-muted">Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm</p>
+                    <a th:href="@{/tours}" class="btn btn-sm" style="background:var(--color-ocean);color:#fff;">Xem tất cả tour</a>
+                </div>
+
+                <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4"
+                     th:if="${!tourPage.content.isEmpty()}">
+                    <div class="col reveal"
+                         th:each="tour, iterStat : ${tourPage.content}">
                         <div class="card h-100 border-0 overflow-hidden tour-card-item">
+                            <!-- Image -->
                             <div class="position-relative overflow-hidden">
-                                <img th:src="@{/img/tour-phuquoc.png}" class="card-img-top" style="height:200px;object-fit:cover;" alt="Phú Quốc">
-                                <span class="badge badge-hot position-absolute top-0 end-0 m-2">HOT</span>
-                                <span class="badge badge-duration position-absolute bottom-0 start-0 m-2">4N3Đ</span>
+                                <img th:if="${!tour.images.isEmpty()}"
+                                     th:src="@{${tour.images[0].imageUrl}}"
+                                     class="card-img-top"
+                                     style="height:200px;object-fit:cover;"
+                                     th:alt="${tour.name}">
+                                <img th:if="${tour.images.isEmpty()}"
+                                     th:src="@{/img/tour-phuquoc.png}"
+                                     class="card-img-top"
+                                     style="height:200px;object-fit:cover;"
+                                     th:alt="${tour.name}">
+                                <span class="badge badge-duration position-absolute bottom-0 start-0 m-2"
+                                      th:text="${tour.durationDays + 'N' + tour.durationNights + 'Đ'}">
+                                </span>
                             </div>
+                            <!-- Body -->
                             <div class="card-body d-flex flex-column">
-                                <div class="small mb-1" style="color:var(--color-text-muted);"><span style="color:var(--color-amber);font-weight:700;">★ 4.9</span> • 320 đánh giá</div>
-                                <h6 class="card-title fw-bold">Phú Quốc — Vinpearl — Grand World</h6>
-                                <p class="small" style="color:var(--color-text-muted);">📍 Kiên Giang</p>
-                                <div class="mt-auto d-flex justify-content-between align-items-end">
-                                    <div><del class="price-old">6.990.000đ</del><div class="price-current">4.990.000đ</div></div>
-                                    <a th:href="@{/tours/detail}" class="btn btn-view-tour">Xem →</a>
+                                <div class="small mb-1" style="color:var(--color-text-muted);">
+                                    <span style="color:var(--color-amber);font-weight:700;"
+                                          th:text="${tour.category.name}">Danh mục</span>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Tour Card 2 -->
-                    <div class="col reveal reveal-delay-1">
-                        <div class="card h-100 border-0 overflow-hidden tour-card-item">
-                            <div class="position-relative overflow-hidden">
-                                <img th:src="@{/img/tour-danang.png}" class="card-img-top" style="height:200px;object-fit:cover;" alt="Đà Nẵng">
-                                <span class="badge badge-discount position-absolute top-0 end-0 m-2">-25%</span>
-                                <span class="badge badge-duration position-absolute bottom-0 start-0 m-2">3N2Đ</span>
-                            </div>
-                            <div class="card-body d-flex flex-column">
-                                <div class="small mb-1" style="color:var(--color-text-muted);"><span style="color:var(--color-amber);font-weight:700;">★ 4.8</span> • 218 đánh giá</div>
-                                <h6 class="card-title fw-bold">Đà Nẵng — Bà Nà — Hội An</h6>
-                                <p class="small" style="color:var(--color-text-muted);">📍 Đà Nẵng</p>
+                                <h6 class="card-title fw-bold" th:text="${tour.name}">Tên tour</h6>
+                                <p class="small" style="color:var(--color-text-muted);">
+                                    📍 <span th:text="${tour.destination.name}">Điểm đến</span>
+                                </p>
                                 <div class="mt-auto d-flex justify-content-between align-items-end">
-                                    <div><del class="price-old">4.500.000đ</del><div class="price-current">3.290.000đ</div></div>
-                                    <a th:href="@{/tours/detail}" class="btn btn-view-tour">Xem →</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Tour Card 3 -->
-                    <div class="col reveal reveal-delay-2">
-                        <div class="card h-100 border-0 overflow-hidden tour-card-item">
-                            <div class="position-relative overflow-hidden">
-                                <img th:src="@{/img/tour-sapa.png}" class="card-img-top" style="height:200px;object-fit:cover;" alt="Sapa">
-                                <span class="badge badge-duration position-absolute bottom-0 start-0 m-2">3N2Đ</span>
-                            </div>
-                            <div class="card-body d-flex flex-column">
-                                <div class="small mb-1" style="color:var(--color-text-muted);"><span style="color:var(--color-amber);font-weight:700;">★ 4.7</span> • 156 đánh giá</div>
-                                <h6 class="card-title fw-bold">Sapa — Fansipan — Bản Cát Cát</h6>
-                                <p class="small" style="color:var(--color-text-muted);">📍 Lào Cai</p>
-                                <div class="mt-auto d-flex justify-content-between align-items-end">
-                                    <div><div class="price-current">3.690.000đ</div></div>
-                                    <a th:href="@{/tours/detail}" class="btn btn-view-tour">Xem →</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Tour Card 4 -->
-                    <div class="col reveal">
-                        <div class="card h-100 border-0 overflow-hidden tour-card-item">
-                            <div class="position-relative overflow-hidden">
-                                <img th:src="@{/img/tour-halong.png}" class="card-img-top" style="height:200px;object-fit:cover;" alt="Hạ Long">
-                                <span class="badge badge-duration position-absolute bottom-0 start-0 m-2">2N1Đ</span>
-                            </div>
-                            <div class="card-body d-flex flex-column">
-                                <div class="small mb-1" style="color:var(--color-text-muted);"><span style="color:var(--color-amber);font-weight:700;">★ 4.6</span> • 412 đánh giá</div>
-                                <h6 class="card-title fw-bold">Hạ Long — Du thuyền 5 sao</h6>
-                                <p class="small" style="color:var(--color-text-muted);">📍 Quảng Ninh</p>
-                                <div class="mt-auto d-flex justify-content-between align-items-end">
-                                    <div><del class="price-old">3.200.000đ</del><div class="price-current">2.590.000đ</div></div>
-                                    <a th:href="@{/tours/detail}" class="btn btn-view-tour">Xem →</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Tour Card 5 -->
-                    <div class="col reveal reveal-delay-1">
-                        <div class="card h-100 border-0 overflow-hidden tour-card-item">
-                            <div class="position-relative overflow-hidden">
-                                <img th:src="@{/img/tour-hoian.png}" class="card-img-top" style="height:200px;object-fit:cover;" alt="Đà Lạt">
-                                <span class="badge badge-duration position-absolute bottom-0 start-0 m-2">3N2Đ</span>
-                            </div>
-                            <div class="card-body d-flex flex-column">
-                                <div class="small mb-1" style="color:var(--color-text-muted);"><span style="color:var(--color-amber);font-weight:700;">★ 4.8</span> • 189 đánh giá</div>
-                                <h6 class="card-title fw-bold">Đà Lạt — Langbiang — Thung Lũng Tình Yêu</h6>
-                                <p class="small" style="color:var(--color-text-muted);">📍 Lâm Đồng</p>
-                                <div class="mt-auto d-flex justify-content-between align-items-end">
-                                    <div><div class="price-current">3.800.000đ</div></div>
-                                    <a th:href="@{/tours/detail}" class="btn btn-view-tour">Xem →</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Tour Card 6 -->
-                    <div class="col reveal reveal-delay-2">
-                        <div class="card h-100 border-0 overflow-hidden tour-card-item">
-                            <div class="position-relative overflow-hidden">
-                                <img th:src="@{/img/tour-nhatrang.png}" class="card-img-top" style="height:200px;object-fit:cover;" alt="Nha Trang">
-                                <span class="badge badge-new position-absolute top-0 end-0 m-2">Mới</span>
-                                <span class="badge badge-duration position-absolute bottom-0 start-0 m-2">4N3Đ</span>
-                            </div>
-                            <div class="card-body d-flex flex-column">
-                                <div class="small mb-1" style="color:var(--color-text-muted);"><span style="color:var(--color-amber);font-weight:700;">★ 4.5</span> • 97 đánh giá</div>
-                                <h6 class="card-title fw-bold">Nha Trang — VinWonders — Hòn Tằm</h6>
-                                <p class="small" style="color:var(--color-text-muted);">📍 Khánh Hòa</p>
-                                <div class="mt-auto d-flex justify-content-between align-items-end">
-                                    <div><del class="price-old">5.800.000đ</del><div class="price-current">4.290.000đ</div></div>
-                                    <a th:href="@{/tours/detail}" class="btn btn-view-tour">Xem →</a>
+                                    <div>
+                                        <div class="price-current"
+                                             th:text="${#numbers.formatDecimal(tour.departures.isEmpty() ? 0 : tour.departures[0].adultPrice, 0, 'COMMA', 0, 'POINT') + 'đ'}">
+                                        </div>
+                                    </div>
+                                    <a th:href="@{/tours/detail(id=${tour.id})}"
+                                       class="btn btn-view-tour">Xem →</a>
                                 </div>
                             </div>
                         </div>
@@ -189,7 +139,8 @@
                 </div>
 
                 <!-- Pagination -->
-                <div th:replace="~{client/fragments/pagination :: pagination}"></div>
+                <div th:if="${tourPage.totalPages > 1}"
+                     th:replace="~{client/fragments/pagination :: pagination}"></div>
             </div>
         </div>
     </div>
@@ -197,5 +148,33 @@
 
 <div th:replace="~{client/fragments/footer :: footer}"></div>
 <script th:src="@{/js/homepage.js}"></script>
+<script>
+    // Xử lý duration filter chuyển thành min/max
+    document.getElementById('filterForm').addEventListener('submit', function(e) {
+        var durationSelect = this.querySelector('select[name="duration"]');
+        var minInput = this.querySelector('input[name="minDuration"]');
+        var maxInput = this.querySelector('input[name="maxDuration"]');
+        var val = durationSelect.value;
+
+        if (val === '1-2') { minInput.value = 1; maxInput.value = 2; }
+        else if (val === '3-4') { minInput.value = 3; maxInput.value = 4; }
+        else if (val === '5-7') { minInput.value = 5; maxInput.value = 7; }
+        else if (val === '8+') { minInput.value = 8; maxInput.value = ''; }
+        else { minInput.value = ''; maxInput.value = ''; }
+    });
+
+    // Preserve current duration values on page load
+    window.addEventListener('DOMContentLoaded', function() {
+        var minDuration = document.querySelector('input[name="minDuration"]').value;
+        var maxDuration = document.querySelector('input[name="maxDuration"]').value;
+        var durationSelect = document.querySelector('select[name="duration"]');
+        var val = durationSelect.value;
+
+        if (minDuration === '1' && maxDuration === '2') durationSelect.value = '1-2';
+        else if (minDuration === '3' && maxDuration === '4') durationSelect.value = '3-4';
+        else if (minDuration === '5' && maxDuration === '7') durationSelect.value = '5-7';
+        else if (minDuration === '8') durationSelect.value = '8+';
+    });
+</script>
 </body>
 </html>

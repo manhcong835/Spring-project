@@ -3,11 +3,21 @@ package com.spring.project.controller;
 import com.spring.project.dto.ChangePasswordRequest;
 import com.spring.project.dto.RegisterRequest;
 import com.spring.project.dto.UpdateProfileRequest;
+import com.spring.project.entity.Tour;
+import com.spring.project.entity.TourCategory;
+import com.spring.project.entity.Destination;
 import com.spring.project.entity.User;
+import com.spring.project.repository.TourCategoryRepository;
+import com.spring.project.repository.DestinationRepository;
 import com.spring.project.security.SecurityUtils;
 import com.spring.project.service.AuthService;
+import com.spring.project.service.TourService;
 import com.spring.project.service.UserService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -26,10 +36,19 @@ public class UserController {
 
     private final AuthService authService;
     private final UserService userService;
+    private final TourService tourService;
+    private final TourCategoryRepository tourCategoryRepository;
+    private final DestinationRepository destinationRepository;
 
-    public UserController(AuthService authService, UserService userService) {
+    public UserController(AuthService authService, UserService userService,
+                         TourService tourService,
+                         TourCategoryRepository tourCategoryRepository,
+                         DestinationRepository destinationRepository) {
         this.authService = authService;
         this.userService = userService;
+        this.tourService = tourService;
+        this.tourCategoryRepository = tourCategoryRepository;
+        this.destinationRepository = destinationRepository;
     }
 
     // ==================== TRANG CHỦ ====================
@@ -193,7 +212,24 @@ public class UserController {
     // ==================== TOUR ====================
 
     @GetMapping("/tours")
-    public String tourList() {
+    public String tourList(@RequestParam(required = false) String keyword,
+                           @RequestParam(required = false) Long destinationId,
+                           @RequestParam(required = false) Long categoryId,
+                           @RequestParam(required = false) Integer minDuration,
+                           @RequestParam(required = false) Integer maxDuration,
+                           @RequestParam(defaultValue = "0") int page,
+                           Model model) {
+        Pageable pageable = PageRequest.of(page, 9, Sort.by("createdAt").descending());
+        Page<Tour> tourPage = tourService.searchToursForClient(
+                keyword, destinationId, categoryId, minDuration, maxDuration, pageable);
+        model.addAttribute("tourPage", tourPage);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("destinationId", destinationId);
+        model.addAttribute("categoryId", categoryId);
+        model.addAttribute("minDuration", minDuration);
+        model.addAttribute("maxDuration", maxDuration);
+        model.addAttribute("categories", tourCategoryRepository.findAll());
+        model.addAttribute("destinations", destinationRepository.findAll());
         return "client/pages/tourlist";
     }
 

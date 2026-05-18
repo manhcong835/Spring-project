@@ -18,6 +18,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+
 import java.text.Normalizer;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -270,5 +272,15 @@ public class TourServiceImpl implements TourService {
                 .replaceAll("[\\s]+", "-")
                 .replaceAll("-{2,}", "-")
                 .replaceAll("^-|-$", "");
+    }
+
+    // ==================== UC 2.1 + 2.2 — Client tìm kiếm & lọc tour ====================
+
+    @Override
+    public Page<Tour> searchToursForClient(String keyword, Long destinationId, Long categoryId,
+                                            Integer minDuration, Integer maxDuration,
+                                            Pageable pageable) {
+        return tourRepository.searchToursForClient(
+                keyword, destinationId, categoryId, minDuration, maxDuration, null, null, pageable);
     }
 }

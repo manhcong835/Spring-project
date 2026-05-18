@@ -5,7 +5,9 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -15,15 +17,13 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 /**
- * [DEV ONLY] Tự động đăng nhập bằng tài khoản Admin khi khởi chạy.
+ * [DEV ONLY] Tu dong dang nhap bang tai khoan Admin khi duoc bat bang cau hinh.
  *
- * Khi bật cấu hình này, mọi request sẽ tự động được xác thực
- * bằng tài khoản admin@tourbooking.com nếu chưa có ai đăng nhập.
- *
- * ⚠️ KHÔNG SỬ DỤNG TRONG PRODUCTION!
- * Để tắt: Xóa hoặc comment @Component trong class này.
+ * Bat bang: app.dev-auto-login.enabled=true
+ * Khong su dung trong production.
  */
 @Component
+@ConditionalOnProperty(name = "app.dev-auto-login.enabled", havingValue = "true")
 public class DevAutoLoginFilter extends OncePerRequestFilter {
 
     private static final String ADMIN_EMAIL = "admin@tourbooking.com";
@@ -39,7 +39,6 @@ public class DevAutoLoginFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        // Bỏ qua static resources
         String path = request.getRequestURI();
         if (path.startsWith("/css/") || path.startsWith("/js/") ||
             path.startsWith("/images/") || path.startsWith("/fonts/") ||
@@ -48,25 +47,25 @@ public class DevAutoLoginFilter extends OncePerRequestFilter {
             return;
         }
 
-        // Chỉ auto-login nếu chưa có authentication
-        if (SecurityContextHolder.getContext().getAuthentication() == null ||
-            !SecurityContextHolder.getContext().getAuthentication().isAuthenticated() ||
-            "anonymousUser".equals(SecurityContextHolder.getContext().getAuthentication().getPrincipal())) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null ||
+            !authentication.isAuthenticated() ||
+            "anonymousUser".equals(authentication.getPrincipal())) {
 
             try {
                 UserDetails adminDetails = userDetailsService.loadUserByUsername(ADMIN_EMAIL);
 
                 UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(
-                                adminDetails,
-                                null,
-                                adminDetails.getAuthorities()
-                        );
+                    new UsernamePasswordAuthenticationToken(
+                        adminDetails,
+                        null,
+                        adminDetails.getAuthorities()
+                    );
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             } catch (Exception e) {
-                // Admin chưa được tạo trong DB, bỏ qua
+                // Admin account may not exist in a fresh database.
             }
         }
 

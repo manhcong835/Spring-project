@@ -5,6 +5,7 @@ import com.spring.project.security.CustomOAuth2UserService;
 import com.spring.project.security.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -27,16 +28,16 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomUserDetailsService customUserDetailsService;
     private final CustomAuthenticationSuccessHandler successHandler;
-    private final DevAutoLoginFilter devAutoLoginFilter;
+    private final ObjectProvider<DevAutoLoginFilter> devAutoLoginFilterProvider;
 
     public SecurityConfig(CustomOAuth2UserService customOAuth2UserService,
                           CustomUserDetailsService customUserDetailsService,
                           CustomAuthenticationSuccessHandler successHandler,
-                          DevAutoLoginFilter devAutoLoginFilter) {
+                          ObjectProvider<DevAutoLoginFilter> devAutoLoginFilterProvider) {
         this.customOAuth2UserService = customOAuth2UserService;
         this.customUserDetailsService = customUserDetailsService;
         this.successHandler = successHandler;
-        this.devAutoLoginFilter = devAutoLoginFilter;
+        this.devAutoLoginFilterProvider = devAutoLoginFilterProvider;
     }
 
     @Bean
@@ -96,10 +97,12 @@ public class SecurityConfig {
             )
 
             // ===== UserDetailsService =====
-            .userDetailsService(customUserDetailsService)
+            .userDetailsService(customUserDetailsService);
 
-            // ===== [DEV] Auto-login Admin =====
-            .addFilterBefore(devAutoLoginFilter, UsernamePasswordAuthenticationFilter.class);
+        // ===== [DEV] Auto-login Admin =====
+        devAutoLoginFilterProvider.ifAvailable(filter ->
+            http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
+        );
 
         return http.build();
     }

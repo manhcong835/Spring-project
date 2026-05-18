@@ -6,6 +6,8 @@ import com.spring.project.entity.Tour;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.math.BigDecimal;
+
 /**
  * Service quản lý Tour — UC Admin 2.
  */
@@ -25,4 +27,9 @@ public interface TourService {
 
     /** UC 2.4 — Xóa tour (soft delete → DELETED) */
     void deleteTour(Long id);
+
+    /** UC 2.1 + 2.2 — Tìm kiếm & lọc tour cho client (khách hàng) */
+    Page<Tour> searchToursForClient(String keyword, Long destinationId, Long categoryId,
+                                    Integer minDuration, Integer maxDuration,
+                                    Pageable pageable);
 }
