@@ -283,4 +283,18 @@ public class TourServiceImpl implements TourService {
         return tourRepository.searchToursForClient(
                 keyword, destinationId, categoryId, minDuration, maxDuration, null, null, pageable);
     }
+
+    // ==================== UC 3 — Xem chi tiết tour ====================
+
+    @Override
+    @Transactional(readOnly = true)
+    public Tour getTourDetailForClient(Long id) {
+        Tour tour = tourRepository.findByIdWithImagesAndCategory(id)
+                .orElse(null);
+        if (tour != null) {
+            // Explicitly initialize itineraries (loaded riêng để tránh MultipleBagFetchException)
+            tour.getItineraries().size();
+        }
+        return tour;
+    }
 }

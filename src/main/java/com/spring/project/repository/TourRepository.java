@@ -106,6 +106,19 @@ public interface TourRepository extends JpaRepository<Tour, Long> {
     @Query("SELECT t FROM Tour t WHERE t.status != 'DELETED'")
     Page<Tour> findRecentTours(Pageable pageable);
 
+    // ==================== UC 3 — Xem chi tiết tour ====================
+
+    /**
+     * UC 3 — Load tour kèm images, category, destination (eager fetch).
+     * Itineraries load riêng để tránh MultipleBagFetchException.
+     */
+    @Query("SELECT t FROM Tour t " +
+           "LEFT JOIN FETCH t.category " +
+           "LEFT JOIN FETCH t.destination " +
+           "LEFT JOIN FETCH t.images " +
+           "WHERE t.id = :id AND t.status = 'ACTIVE'")
+    Optional<Tour> findByIdWithImagesAndCategory(@Param("id") Long id);
+
     // ==================== UC 2.1 + 2.2 — Client tìm kiếm & lọc tour ====================
 
     /**

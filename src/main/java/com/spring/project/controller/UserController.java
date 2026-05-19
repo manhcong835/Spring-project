@@ -8,6 +8,8 @@ import com.spring.project.entity.TourCategory;
 import com.spring.project.entity.Destination;
 import com.spring.project.entity.User;
 import com.spring.project.repository.TourCategoryRepository;
+import com.spring.project.repository.TourDepartureRepository;
+import com.spring.project.repository.ReviewRepository;
 import com.spring.project.repository.DestinationRepository;
 import com.spring.project.security.SecurityUtils;
 import com.spring.project.service.AuthService;
@@ -39,16 +41,22 @@ public class UserController {
     private final TourService tourService;
     private final TourCategoryRepository tourCategoryRepository;
     private final DestinationRepository destinationRepository;
+    private final TourDepartureRepository tourDepartureRepository;
+    private final ReviewRepository reviewRepository;
 
     public UserController(AuthService authService, UserService userService,
                          TourService tourService,
                          TourCategoryRepository tourCategoryRepository,
-                         DestinationRepository destinationRepository) {
+                         DestinationRepository destinationRepository,
+                         TourDepartureRepository tourDepartureRepository,
+                         ReviewRepository reviewRepository) {
         this.authService = authService;
         this.userService = userService;
         this.tourService = tourService;
         this.tourCategoryRepository = tourCategoryRepository;
         this.destinationRepository = destinationRepository;
+        this.tourDepartureRepository = tourDepartureRepository;
+        this.reviewRepository = reviewRepository;
     }
 
     // ==================== TRANG CHỦ ====================
@@ -234,7 +242,27 @@ public class UserController {
     }
 
     @GetMapping("/tours/detail")
-    public String tourDetail() {
+    public String tourDetail(@RequestParam Long id, Model model, RedirectAttributes redirectAttributes) {
+        Tour tour = tourService.getTourDetailForClient(id);
+        if (tour == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Tour không tồn tại hoặc đã ngừng hoạt động");
+            return "redirect:/tours";
+        }
+
+        // Load departures còn slot (riêng để tránh MultipleBagFetchException)
+        var departures = tourDepartureRepository.findAvailableDeparturesByTour(id, java.time.LocalDate.now());
+
+        // Load reviews (VISIBLE only)
+        var reviews = reviewRepository.findByTourIdAndStatusOrderByCreatedAtDesc(id, "VISIBLE");
+        Double avgRating = reviewRepository.calculateAverageRatingByTourId(id);
+        Long reviewCount = reviewRepository.countVisibleReviewsByTourId(id);
+
+        model.addAttribute("tour", tour);
+        model.addAttribute("departures", departures);
+        model.addAttribute("reviews", reviews);
+        model.addAttribute("avgRating", avgRating != null ? String.format("%.1f", avgRating) : "0");
+        model.addAttribute("reviewCount", reviewCount != null ? reviewCount : 0);
+
         return "client/pages/tourdetail";
     }
 

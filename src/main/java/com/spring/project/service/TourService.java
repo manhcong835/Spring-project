@@ -32,4 +32,7 @@ public interface TourService {
     Page<Tour> searchToursForClient(String keyword, Long destinationId, Long categoryId,
                                     Integer minDuration, Integer maxDuration,
                                     Pageable pageable);
+
+    /** UC 3 — Lấy chi tiết tour cho client (eager load images, category, destination, itineraries) */
+    Tour getTourDetailForClient(Long id);
 }
