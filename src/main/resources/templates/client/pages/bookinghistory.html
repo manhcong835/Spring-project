@@ -102,6 +102,9 @@
                             <div class="btn-group btn-group-sm">
                                 <a th:href="@{/booking/detail(id=${booking.id})}"
                                    class="btn btn-outline-primary">Chi tiết</a>
+                                <a th:if="${(booking.bookingStatus == 'PENDING' or booking.bookingStatus == 'CONFIRMED') and booking.paymentStatus != 'PAID'}"
+                                   th:href="@{/payment(bookingId=${booking.id})}"
+                                   class="btn btn-outline-success">Thanh toán</a>
                                 <a th:if="${booking.bookingStatus == 'PENDING'}"
                                    th:href="@{/booking/edit(id=${booking.id})}"
                                    class="btn btn-outline-secondary">Sửa</a>

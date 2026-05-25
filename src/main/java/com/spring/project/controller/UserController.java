@@ -16,6 +16,7 @@ import com.spring.project.repository.DestinationRepository;
 import com.spring.project.security.SecurityUtils;
 import com.spring.project.service.AuthService;
 import com.spring.project.service.BookingService;
+import com.spring.project.service.PaymentService;
 import com.spring.project.service.TourService;
 import com.spring.project.service.UserService;
 import jakarta.validation.Valid;
@@ -47,10 +48,12 @@ public class UserController {
     private final DestinationRepository destinationRepository;
     private final TourDepartureRepository tourDepartureRepository;
     private final ReviewRepository reviewRepository;
+    private final PaymentService paymentService;
 
     public UserController(AuthService authService, UserService userService,
                          TourService tourService,
                          BookingService bookingService,
+                         PaymentService paymentService,
                          TourCategoryRepository tourCategoryRepository,
                          DestinationRepository destinationRepository,
                          TourDepartureRepository tourDepartureRepository,
@@ -59,6 +62,7 @@ public class UserController {
         this.userService = userService;
         this.tourService = tourService;
         this.bookingService = bookingService;
+        this.paymentService = paymentService;
         this.tourCategoryRepository = tourCategoryRepository;
         this.destinationRepository = destinationRepository;
         this.tourDepartureRepository = tourDepartureRepository;
@@ -392,8 +396,49 @@ public class UserController {
     // ==================== PAYMENT ====================
 
     @GetMapping("/payment")
-    public String payment() {
+    public String payment(@RequestParam Long bookingId,
+                           Model model,
+                           RedirectAttributes redirectAttributes) {
+        Long userId = SecurityUtils.getCurrentUserId();
+        Booking booking = bookingService.getBookingById(bookingId);
+
+        // Kiểm tra booking thuộc user
+        if (!booking.getUser().getId().equals(userId)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Bạn không có quyền truy cập đơn này");
+            return "redirect:/booking/history";
+        }
+
+        // Kiểm tra đã thanh toán
+        if ("PAID".equals(booking.getPaymentStatus())) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Đơn đặt tour đã được thanh toán");
+            return "redirect:/booking/history";
+        }
+
+        // Kiểm tra đơn hủy
+        if ("CANCELLED".equals(booking.getBookingStatus()) || "DELETED".equals(booking.getBookingStatus())) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Không thể thanh toán đơn đã hủy");
+            return "redirect:/booking/history";
+        }
+
+        model.addAttribute("booking", booking);
         return "client/pages/payment";
+    }
+
+    @PostMapping("/payment")
+    public String paymentProcess(@RequestParam Long bookingId,
+                                  @RequestParam String paymentMethod,
+                                  @RequestParam(required = false) String note,
+                                  RedirectAttributes redirectAttributes) {
+        try {
+            Long userId = SecurityUtils.getCurrentUserId();
+            com.spring.project.entity.Payment payment = paymentService.processPayment(bookingId, userId, paymentMethod, note);
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Thanh toán thành công! Mã giao dịch: " + payment.getPaymentCode());
+            return "redirect:/booking/history";
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/payment?bookingId=" + bookingId;
+        }
     }
 
     // ==================== REVIEW ====================
