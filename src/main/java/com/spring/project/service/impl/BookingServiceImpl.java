@@ -1,21 +1,24 @@
 package com.spring.project.service.impl;
 
-import com.spring.project.entity.Booking;
-import com.spring.project.entity.TourDeparture;
-import com.spring.project.repository.BookingRepository;
-import com.spring.project.repository.TourDepartureRepository;
+import com.spring.project.dto.BookingCreateRequest;
+import com.spring.project.entity.*;
+import com.spring.project.repository.*;
 import com.spring.project.service.BookingService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
- * Implementation quản lý Đơn đặt tour — UC Admin 3.
+ * Implementation quản lý Đơn đặt tour — UC Admin 3 + UC Customer 4.1.
  */
 @Service
 public class BookingServiceImpl implements BookingService {
@@ -31,11 +34,147 @@ public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
     private final TourDepartureRepository tourDepartureRepository;
+    private final UserRepository userRepository;
+    private final PromotionRepository promotionRepository;
 
     public BookingServiceImpl(BookingRepository bookingRepository,
-                               TourDepartureRepository tourDepartureRepository) {
+                               TourDepartureRepository tourDepartureRepository,
+                               UserRepository userRepository,
+                               PromotionRepository promotionRepository) {
         this.bookingRepository = bookingRepository;
         this.tourDepartureRepository = tourDepartureRepository;
+        this.userRepository = userRepository;
+        this.promotionRepository = promotionRepository;
+    }
+
+    // ==================== UC 4.1 — Customer: Đặt tour ====================
+
+    @Override
+    @Transactional
+    public Booking createBooking(Long userId, BookingCreateRequest request) {
+        // 1. Lấy user
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Người dùng không tồn tại"));
+
+        // 2. Lấy departure + pessimistic lock để tránh race condition
+        TourDeparture departure = tourDepartureRepository.findById(request.getDepartureId())
+                .orElseThrow(() -> new IllegalArgumentException("Chuyến khởi hành không tồn tại"));
+
+        // 3. Validate departure
+        if (!"OPEN".equals(departure.getStatus())) {
+            throw new IllegalArgumentException("Chuyến khởi hành đã đóng hoặc bị hủy");
+        }
+        if (departure.getDepartureDate().isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Chuyến khởi hành đã qua ngày");
+        }
+
+        int totalPeople = request.getAdultCount() + request.getChildCount() + request.getInfantCount();
+        if (totalPeople < 1) {
+            throw new IllegalArgumentException("Phải có ít nhất 1 hành khách");
+        }
+        if (departure.getAvailableSlots() < totalPeople) {
+            throw new IllegalArgumentException(
+                    "Không đủ chỗ trống. Còn lại: " + departure.getAvailableSlots() + " chỗ");
+        }
+
+        // 4. Tính giá
+        BigDecimal adultTotal = departure.getAdultPrice()
+                .multiply(BigDecimal.valueOf(request.getAdultCount()));
+        BigDecimal childTotal = departure.getChildPrice() != null
+                ? departure.getChildPrice().multiply(BigDecimal.valueOf(request.getChildCount()))
+                : BigDecimal.ZERO;
+        BigDecimal infantTotal = departure.getInfantPrice() != null
+                ? departure.getInfantPrice().multiply(BigDecimal.valueOf(request.getInfantCount()))
+                : BigDecimal.ZERO;
+
+        BigDecimal originalAmount = adultTotal.add(childTotal).add(infantTotal);
+        BigDecimal discountAmount = BigDecimal.ZERO;
+        Promotion promotion = null;
+
+        // 5. Áp dụng promotion nếu có
+        if (request.getPromotionCode() != null && !request.getPromotionCode().isBlank()) {
+            promotion = promotionRepository.findValidPromotionByCode(
+                    request.getPromotionCode().trim(), LocalDateTime.now()
+            ).orElse(null);
+
+            if (promotion != null) {
+                // Kiểm tra min booking amount
+                if (promotion.getMinBookingAmount() != null
+                        && originalAmount.compareTo(promotion.getMinBookingAmount()) < 0) {
+                    promotion = null; // Không đủ điều kiện
+                } else {
+                    if ("PERCENT".equals(promotion.getDiscountType())) {
+                        discountAmount = originalAmount.multiply(promotion.getDiscountValue())
+                                .divide(BigDecimal.valueOf(100), 0, java.math.RoundingMode.HALF_UP);
+                        // Cap tối đa
+                        if (promotion.getMaxDiscountAmount() != null
+                                && discountAmount.compareTo(promotion.getMaxDiscountAmount()) > 0) {
+                            discountAmount = promotion.getMaxDiscountAmount();
+                        }
+                    } else { // FIXED
+                        discountAmount = promotion.getDiscountValue();
+                    }
+                }
+            }
+        }
+
+        BigDecimal finalAmount = originalAmount.subtract(discountAmount);
+        if (finalAmount.compareTo(BigDecimal.ZERO) < 0) {
+            finalAmount = BigDecimal.ZERO;
+        }
+
+        // 6. Tạo booking
+        Booking booking = new Booking();
+        booking.setBookingCode(generateBookingCode());
+        booking.setUser(user);
+        booking.setTourDeparture(departure);
+        booking.setPromotion(promotion);
+        booking.setContactName(request.getContactName());
+        booking.setContactEmail(request.getContactEmail());
+        booking.setContactPhone(request.getContactPhone());
+        booking.setAdultCount(request.getAdultCount());
+        booking.setChildCount(request.getChildCount());
+        booking.setInfantCount(request.getInfantCount());
+        booking.setTotalPeople(totalPeople);
+        booking.setOriginalAmount(originalAmount);
+        booking.setDiscountAmount(discountAmount);
+        booking.setFinalAmount(finalAmount);
+        booking.setSpecialRequests(request.getSpecialRequests());
+        booking.setBookingStatus("PENDING");
+        booking.setPaymentStatus("UNPAID");
+
+        // 7. Thêm travelers
+        if (request.getTravelers() != null) {
+            for (BookingCreateRequest.TravelerInfo ti : request.getTravelers()) {
+                if (ti.getFullName() != null && !ti.getFullName().isBlank()) {
+                    BookingTraveler traveler = new BookingTraveler();
+                    traveler.setBooking(booking);
+                    traveler.setFullName(ti.getFullName());
+                    traveler.setGender(ti.getGender());
+                    traveler.setTravelerType(ti.getTravelerType() != null ? ti.getTravelerType() : "ADULT");
+                    booking.getTravelers().add(traveler);
+                }
+            }
+        }
+
+        // 8. Giảm available slots
+        departure.setAvailableSlots(departure.getAvailableSlots() - totalPeople);
+        if (departure.getAvailableSlots() == 0) {
+            departure.setStatus("FULL");
+        }
+        tourDepartureRepository.save(departure);
+
+        // 9. Tăng used_count cho promotion
+        if (promotion != null) {
+            promotion.setUsedCount(promotion.getUsedCount() + 1);
+            promotionRepository.save(promotion);
+        }
+
+        return bookingRepository.save(booking);
+    }
+
+    private String generateBookingCode() {
+        return "BK-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
 
     // ==================== UC 3.1 — Xem danh sách ====================
@@ -125,3 +264,4 @@ public class BookingServiceImpl implements BookingService {
         bookingRepository.save(booking);
     }
 }
+

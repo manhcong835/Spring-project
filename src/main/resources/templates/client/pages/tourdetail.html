@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="vi">
 <head th:replace="~{client/fragments/head :: head('Chi tiết tour', '/css/client/tourdetail.css')}"></head>
-<link rel="stylesheet" th:href="@{/css/client/tourdetail-departure.css}">
 <body>
 <div th:replace="~{client/fragments/header :: header}"></div>
 <div th:replace="~{client/fragments/navbar :: navbar}"></div>
@@ -250,6 +249,7 @@
 
                     <!-- Book button -->
                     <a th:href="@{/booking/create(tourId=${tour.id})}"
+                       id="btnBookTour"
                        class="btn-book-tour"
                        th:if="${!#lists.isEmpty(departures)}">Yêu cầu đặt</a>
 
@@ -274,8 +274,7 @@
 
 <script th:inline="javascript">
 document.addEventListener('DOMContentLoaded', function() {
-    // ========== Departure data from server ==========
-    var departuresJson = /*[[${departures}]]*/ [];
+    // ========== Departure data from tabs ==========
     var departureDataList = [];
 
     // Parse departure data from tabs
@@ -502,6 +501,32 @@ document.addEventListener('DOMContentLoaded', function() {
             mainImg.src = el.dataset.full;
         }
     };
+
+    // ========== Handle Book Tour Button Click ==========
+    var bookBtn = document.getElementById('btnBookTour');
+    if (bookBtn) {
+        bookBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            var url = new URL(this.href, window.location.origin);
+            var tourId = url.searchParams.get('tourId');
+            
+            // Get selected departure ID
+            var activeTab = document.querySelector('.departure-tab.active');
+            var depId = activeTab ? activeTab.dataset.depId : '';
+            
+            // Get quantity counter values
+            var adults = document.getElementById('adultQty').textContent.trim();
+            var children = document.getElementById('childQty').textContent.trim();
+            var infants = document.getElementById('infantQty').textContent.trim();
+            
+            // Redirect with all parameters
+            window.location.href = '/booking/create?tourId=' + tourId + 
+                                   '&departureId=' + depId + 
+                                   '&adultCount=' + adults + 
+                                   '&childCount=' + children + 
+                                   '&infantCount=' + infants;
+        });
+    }
 
     // Initialize prices
     updatePriceLabels();

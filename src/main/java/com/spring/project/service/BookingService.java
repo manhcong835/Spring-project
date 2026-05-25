@@ -1,5 +1,6 @@
 package com.spring.project.service;
 
+import com.spring.project.dto.BookingCreateRequest;
 import com.spring.project.entity.Booking;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -7,9 +8,16 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 /**
- * Service quản lý Đơn đặt tour — UC Admin 3.
+ * Service quản lý Đơn đặt tour — UC Admin 3 + UC Customer 4.1.
  */
 public interface BookingService {
+
+    // ==================== UC 4.1 — Customer: Đặt tour ====================
+
+    /** UC 4.1 — Tạo booking mới (customer) */
+    Booking createBooking(Long userId, BookingCreateRequest request);
+
+    // ==================== UC Admin 3 — Quản lý đơn ====================
 
     /** UC 3.1 — Xem danh sách đơn đặt với tìm kiếm và filter */
     Page<Booking> getBookingList(String keyword, String status, Pageable pageable);

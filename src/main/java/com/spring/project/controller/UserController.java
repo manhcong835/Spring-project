@@ -1,8 +1,10 @@
 package com.spring.project.controller;
 
+import com.spring.project.dto.BookingCreateRequest;
 import com.spring.project.dto.ChangePasswordRequest;
 import com.spring.project.dto.RegisterRequest;
 import com.spring.project.dto.UpdateProfileRequest;
+import com.spring.project.entity.Booking;
 import com.spring.project.entity.Tour;
 import com.spring.project.entity.TourCategory;
 import com.spring.project.entity.Destination;
@@ -13,6 +15,7 @@ import com.spring.project.repository.ReviewRepository;
 import com.spring.project.repository.DestinationRepository;
 import com.spring.project.security.SecurityUtils;
 import com.spring.project.service.AuthService;
+import com.spring.project.service.BookingService;
 import com.spring.project.service.TourService;
 import com.spring.project.service.UserService;
 import jakarta.validation.Valid;
@@ -39,6 +42,7 @@ public class UserController {
     private final AuthService authService;
     private final UserService userService;
     private final TourService tourService;
+    private final BookingService bookingService;
     private final TourCategoryRepository tourCategoryRepository;
     private final DestinationRepository destinationRepository;
     private final TourDepartureRepository tourDepartureRepository;
@@ -46,6 +50,7 @@ public class UserController {
 
     public UserController(AuthService authService, UserService userService,
                          TourService tourService,
+                         BookingService bookingService,
                          TourCategoryRepository tourCategoryRepository,
                          DestinationRepository destinationRepository,
                          TourDepartureRepository tourDepartureRepository,
@@ -53,6 +58,7 @@ public class UserController {
         this.authService = authService;
         this.userService = userService;
         this.tourService = tourService;
+        this.bookingService = bookingService;
         this.tourCategoryRepository = tourCategoryRepository;
         this.destinationRepository = destinationRepository;
         this.tourDepartureRepository = tourDepartureRepository;
@@ -269,8 +275,90 @@ public class UserController {
     // ==================== BOOKING ====================
 
     @GetMapping("/booking/create")
-    public String bookingCreate() {
+    public String bookingCreate(@RequestParam Long tourId,
+                                 @RequestParam(required = false) Long departureId,
+                                 @RequestParam(required = false) Integer adultCount,
+                                 @RequestParam(required = false) Integer childCount,
+                                 @RequestParam(required = false) Integer infantCount,
+                                 Model model,
+                                 RedirectAttributes redirectAttributes) {
+        Tour tour = tourService.getTourDetailForClient(tourId);
+        if (tour == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Tour không tồn tại");
+            return "redirect:/tours";
+        }
+
+        var departures = tourDepartureRepository.findAvailableDeparturesByTour(tourId, java.time.LocalDate.now());
+        if (departures.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Tour hiện chưa có lịch khởi hành");
+            return "redirect:/tours/detail?id=" + tourId;
+        }
+
+        // Pre-fill contact info from logged-in user
+        Long userId = SecurityUtils.getCurrentUserId();
+        User user = userService.getUserById(userId);
+
+        BookingCreateRequest bookingRequest = new BookingCreateRequest();
+        bookingRequest.setTourId(tourId);
+        bookingRequest.setContactName(user.getFullName());
+        bookingRequest.setContactEmail(user.getEmail());
+        bookingRequest.setContactPhone(user.getPhone() != null ? user.getPhone() : "");
+
+        if (adultCount != null) {
+            bookingRequest.setAdultCount(adultCount);
+        }
+        if (childCount != null) {
+            bookingRequest.setChildCount(childCount);
+        }
+        if (infantCount != null) {
+            bookingRequest.setInfantCount(infantCount);
+        }
+
+        // Pre-select departure if specified
+        if (departureId != null) {
+            bookingRequest.setDepartureId(departureId);
+        } else {
+            bookingRequest.setDepartureId(departures.get(0).getId());
+        }
+
+        model.addAttribute("tour", tour);
+        model.addAttribute("departures", departures);
+        model.addAttribute("bookingRequest", bookingRequest);
+
         return "client/pages/bookingcreate";
+    }
+
+    @PostMapping("/booking/create")
+    public String bookingCreatePost(@Valid @ModelAttribute("bookingRequest") BookingCreateRequest request,
+                                     BindingResult bindingResult,
+                                     Model model,
+                                     RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            // Reload tour + departures for re-rendering form
+            Tour tour = tourService.getTourDetailForClient(request.getTourId());
+            var departures = tourDepartureRepository.findAvailableDeparturesByTour(
+                    request.getTourId(), java.time.LocalDate.now());
+            model.addAttribute("tour", tour);
+            model.addAttribute("departures", departures);
+            model.addAttribute("errorMessage", "Vui lòng kiểm tra lại thông tin");
+            return "client/pages/bookingcreate";
+        }
+
+        try {
+            Long userId = SecurityUtils.getCurrentUserId();
+            Booking booking = bookingService.createBooking(userId, request);
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Đặt tour thành công! Mã đơn: " + booking.getBookingCode());
+            return "redirect:/booking/history";
+        } catch (IllegalArgumentException e) {
+            Tour tour = tourService.getTourDetailForClient(request.getTourId());
+            var departures = tourDepartureRepository.findAvailableDeparturesByTour(
+                    request.getTourId(), java.time.LocalDate.now());
+            model.addAttribute("tour", tour);
+            model.addAttribute("departures", departures);
+            model.addAttribute("errorMessage", e.getMessage());
+            return "client/pages/bookingcreate";
+        }
     }
 
     @GetMapping("/booking/edit")

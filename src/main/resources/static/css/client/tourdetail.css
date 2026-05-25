@@ -1,6 +1,7 @@
 /* ============================================================
    TOUR DETAIL — Tropical Luxe
    ============================================================ */
+@import url('tourdetail-departure.css');
 .tour-gallery img {
     border-radius: var(--radius-xl);
     width: 100%;
