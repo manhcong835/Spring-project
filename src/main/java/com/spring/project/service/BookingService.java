@@ -20,6 +20,13 @@ public interface BookingService {
     /** UC 6 — Xem lịch sử đặt tour (customer) */
     Page<Booking> getBookingHistory(Long userId, String status, Pageable pageable);
 
+    /** UC 4.2 — Sửa booking (chỉ PENDING) */
+    Booking updateBooking(Long bookingId, Long userId, Long departureId,
+                           int adultCount, int childCount, int infantCount, String specialRequests);
+
+    /** UC 4.3 — Hủy booking (PENDING/CONFIRMED) */
+    Booking cancelBooking(Long bookingId, Long userId, String reason);
+
     // ==================== UC Admin 3 — Quản lý đơn ====================
 
     /** UC 3.1 — Xem danh sách đơn đặt với tìm kiếm và filter */

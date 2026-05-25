@@ -57,7 +57,7 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new RuntimeException("Người dùng không tồn tại"));
 
         // 2. Lấy departure + pessimistic lock để tránh race condition
-        TourDeparture departure = tourDepartureRepository.findById(request.getDepartureId())
+        TourDeparture departure = tourDepartureRepository.findByIdForUpdate(request.getDepartureId())
                 .orElseThrow(() -> new IllegalArgumentException("Chuyến khởi hành không tồn tại"));
 
         // 3. Validate departure
@@ -187,7 +187,152 @@ public class BookingServiceImpl implements BookingService {
         return bookingRepository.findByUserIdWithTour(userId, pageable);
     }
 
-    // ==================== UC 3.1 — Xem danh sách ====================
+    // ==================== UC 4.2 — Customer: Sửa booking ====================
+
+    @Override
+    @Transactional
+    public Booking updateBooking(Long bookingId, Long userId, Long departureId,
+                                  int adultCount, int childCount, int infantCount, String specialRequests) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new IllegalArgumentException("Đơn đặt tour không tồn tại"));
+
+        // Chỉ cho sửa PENDING
+        if (!"PENDING".equals(booking.getBookingStatus())) {
+            throw new IllegalArgumentException("Chỉ có thể sửa đơn đang ở trạng thái Chờ xác nhận");
+        }
+        if (!booking.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("Bạn không có quyền sửa đơn này");
+        }
+
+        int newTotalPeople = adultCount + childCount + infantCount;
+        if (newTotalPeople < 1) {
+            throw new IllegalArgumentException("Phải có ít nhất 1 hành khách");
+        }
+
+        TourDeparture oldDeparture = booking.getTourDeparture();
+        TourDeparture newDeparture;
+
+        if (departureId.equals(oldDeparture.getId())) {
+            // Cùng departure → tính slot available + slot hiện tại của booking
+            newDeparture = oldDeparture;
+            int effectiveSlots = newDeparture.getAvailableSlots() + booking.getTotalPeople();
+            if (effectiveSlots < newTotalPeople) {
+                throw new IllegalArgumentException(
+                        "Không đủ chỗ trống. Còn lại: " + effectiveSlots + " chỗ");
+            }
+            // Cập nhật slots: trả cũ rồi trừ mới
+            newDeparture.setAvailableSlots(effectiveSlots - newTotalPeople);
+        } else {
+            // Khác departure → trả slot cho departure cũ, trừ slot departure mới
+            oldDeparture.setAvailableSlots(oldDeparture.getAvailableSlots() + booking.getTotalPeople());
+            if ("FULL".equals(oldDeparture.getStatus())) {
+                oldDeparture.setStatus("OPEN");
+            }
+            tourDepartureRepository.save(oldDeparture);
+
+            newDeparture = tourDepartureRepository.findById(departureId)
+                    .orElseThrow(() -> new IllegalArgumentException("Chuyến khởi hành không tồn tại"));
+            if (!"OPEN".equals(newDeparture.getStatus())) {
+                throw new IllegalArgumentException("Chuyến khởi hành đã đóng");
+            }
+            if (newDeparture.getDepartureDate().isBefore(LocalDate.now())) {
+                throw new IllegalArgumentException("Chuyến khởi hành đã qua ngày");
+            }
+            if (newDeparture.getAvailableSlots() < newTotalPeople) {
+                throw new IllegalArgumentException(
+                        "Không đủ chỗ trống. Còn lại: " + newDeparture.getAvailableSlots() + " chỗ");
+            }
+            newDeparture.setAvailableSlots(newDeparture.getAvailableSlots() - newTotalPeople);
+        }
+
+        if (newDeparture.getAvailableSlots() == 0) {
+            newDeparture.setStatus("FULL");
+        }
+        tourDepartureRepository.save(newDeparture);
+
+        // Tính lại giá
+        BigDecimal adultTotal = newDeparture.getAdultPrice()
+                .multiply(BigDecimal.valueOf(adultCount));
+        BigDecimal childTotal = newDeparture.getChildPrice() != null
+                ? newDeparture.getChildPrice().multiply(BigDecimal.valueOf(childCount))
+                : BigDecimal.ZERO;
+        BigDecimal infantTotal = newDeparture.getInfantPrice() != null
+                ? newDeparture.getInfantPrice().multiply(BigDecimal.valueOf(infantCount))
+                : BigDecimal.ZERO;
+        BigDecimal originalAmount = adultTotal.add(childTotal).add(infantTotal);
+
+        // Giữ nguyên promotion nếu có
+        BigDecimal discountAmount = BigDecimal.ZERO;
+        Promotion promotion = booking.getPromotion();
+        if (promotion != null) {
+            if ("PERCENT".equals(promotion.getDiscountType())) {
+                discountAmount = originalAmount.multiply(promotion.getDiscountValue())
+                        .divide(BigDecimal.valueOf(100), 0, java.math.RoundingMode.HALF_UP);
+                if (promotion.getMaxDiscountAmount() != null
+                        && discountAmount.compareTo(promotion.getMaxDiscountAmount()) > 0) {
+                    discountAmount = promotion.getMaxDiscountAmount();
+                }
+            } else {
+                discountAmount = promotion.getDiscountValue();
+            }
+        }
+
+        BigDecimal finalAmount = originalAmount.subtract(discountAmount);
+        if (finalAmount.compareTo(BigDecimal.ZERO) < 0) {
+            finalAmount = BigDecimal.ZERO;
+        }
+
+        // Cập nhật booking
+        booking.setTourDeparture(newDeparture);
+        booking.setAdultCount(adultCount);
+        booking.setChildCount(childCount);
+        booking.setInfantCount(infantCount);
+        booking.setTotalPeople(newTotalPeople);
+        booking.setOriginalAmount(originalAmount);
+        booking.setDiscountAmount(discountAmount);
+        booking.setFinalAmount(finalAmount);
+        booking.setSpecialRequests(specialRequests);
+
+        return bookingRepository.save(booking);
+    }
+
+    // ==================== UC 4.3 — Customer: Hủy booking ====================
+
+    @Override
+    @Transactional
+    public Booking cancelBooking(Long bookingId, Long userId, String reason) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new IllegalArgumentException("Đơn đặt tour không tồn tại"));
+
+        if (!booking.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("Bạn không có quyền hủy đơn này");
+        }
+
+        String status = booking.getBookingStatus();
+        if (!"PENDING".equals(status) && !"CONFIRMED".equals(status)) {
+            throw new IllegalArgumentException(
+                    "Chỉ có thể hủy đơn ở trạng thái Chờ xác nhận hoặc Đã xác nhận");
+        }
+
+        // Trả slot cho departure
+        TourDeparture departure = booking.getTourDeparture();
+        departure.setAvailableSlots(departure.getAvailableSlots() + booking.getTotalPeople());
+        if ("FULL".equals(departure.getStatus())) {
+            departure.setStatus("OPEN");
+        }
+        tourDepartureRepository.save(departure);
+
+        // Cập nhật booking
+        booking.setBookingStatus("CANCELLED");
+        if (reason != null && !reason.isBlank()) {
+            String existingNotes = booking.getSpecialRequests();
+            String cancelNote = "Lý do hủy: " + reason;
+            booking.setSpecialRequests(existingNotes != null && !existingNotes.isBlank()
+                    ? existingNotes + " | " + cancelNote : cancelNote);
+        }
+
+        return bookingRepository.save(booking);
+    }
 
     @Override
     public Page<Booking> getBookingList(String keyword, String status, Pageable pageable) {
@@ -274,4 +419,3 @@ public class BookingServiceImpl implements BookingService {
         bookingRepository.save(booking);
     }
 }
-

@@ -19,5 +19,4 @@ public class ProjectApplication {
 		System.out.println("\tLocal: \t\t" + protocol + "://localhost:" + port);
 		System.out.println("---------------------------------------------------------\n");
 	}
-
 }

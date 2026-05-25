@@ -1,13 +1,16 @@
 package com.spring.project.repository;
 
 import com.spring.project.entity.TourDeparture;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Repository cho TourDeparture entity.
@@ -15,6 +18,13 @@ import java.util.List;
  */
 @Repository
 public interface TourDepartureRepository extends JpaRepository<TourDeparture, Long> {
+
+    /**
+     * Lock chuyến khởi hành khi tạo booking để tránh oversell slot.
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT d FROM TourDeparture d WHERE d.id = :id")
+    Optional<TourDeparture> findByIdForUpdate(@Param("id") Long id);
 
     /**
      * Lấy tất cả chuyến của một tour

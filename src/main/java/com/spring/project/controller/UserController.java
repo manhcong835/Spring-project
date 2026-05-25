@@ -366,13 +366,83 @@ public class UserController {
     }
 
     @GetMapping("/booking/edit")
-    public String bookingEdit() {
+    public String bookingEdit(@RequestParam Long id,
+                               Model model,
+                               RedirectAttributes redirectAttributes) {
+        Long userId = SecurityUtils.getCurrentUserId();
+        Booking booking = bookingService.getBookingById(id);
+
+        if (!booking.getUser().getId().equals(userId)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Bạn không có quyền sửa đơn này");
+            return "redirect:/booking/history";
+        }
+        if (!"PENDING".equals(booking.getBookingStatus())) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Chỉ có thể sửa đơn đang Chờ xác nhận");
+            return "redirect:/booking/history";
+        }
+
+        var departures = tourDepartureRepository.findAvailableDeparturesByTour(
+                booking.getTourDeparture().getTour().getId(), java.time.LocalDate.now());
+
+        model.addAttribute("booking", booking);
+        model.addAttribute("departures", departures);
         return "client/pages/bookingedit";
     }
 
+    @PostMapping("/booking/edit")
+    public String bookingEditPost(@RequestParam Long id,
+                                   @RequestParam Long departureId,
+                                   @RequestParam int adultCount,
+                                   @RequestParam int childCount,
+                                   @RequestParam int infantCount,
+                                   @RequestParam(required = false) String specialRequests,
+                                   RedirectAttributes redirectAttributes) {
+        try {
+            Long userId = SecurityUtils.getCurrentUserId();
+            bookingService.updateBooking(id, userId, departureId, adultCount, childCount, infantCount, specialRequests);
+            redirectAttributes.addFlashAttribute("successMessage", "Cập nhật đơn đặt tour thành công!");
+            return "redirect:/booking/history";
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/booking/edit?id=" + id;
+        }
+    }
+
     @GetMapping("/booking/cancel")
-    public String bookingCancel() {
+    public String bookingCancel(@RequestParam Long id,
+                                 Model model,
+                                 RedirectAttributes redirectAttributes) {
+        Long userId = SecurityUtils.getCurrentUserId();
+        Booking booking = bookingService.getBookingById(id);
+
+        if (!booking.getUser().getId().equals(userId)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Bạn không có quyền hủy đơn này");
+            return "redirect:/booking/history";
+        }
+
+        String status = booking.getBookingStatus();
+        if (!"PENDING".equals(status) && !"CONFIRMED".equals(status)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Không thể hủy đơn ở trạng thái này");
+            return "redirect:/booking/history";
+        }
+
+        model.addAttribute("booking", booking);
         return "client/pages/bookingcancel";
+    }
+
+    @PostMapping("/booking/cancel")
+    public String bookingCancelPost(@RequestParam Long id,
+                                     @RequestParam(required = false) String reason,
+                                     RedirectAttributes redirectAttributes) {
+        try {
+            Long userId = SecurityUtils.getCurrentUserId();
+            bookingService.cancelBooking(id, userId, reason);
+            redirectAttributes.addFlashAttribute("successMessage", "Đã hủy đơn đặt tour thành công!");
+            return "redirect:/booking/history";
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/booking/history";
+        }
     }
 
     @GetMapping("/booking/detail")
