@@ -17,6 +17,9 @@ public interface BookingService {
     /** UC 4.1 — Tạo booking mới (customer) */
     Booking createBooking(Long userId, BookingCreateRequest request);
 
+    /** UC 6 — Xem lịch sử đặt tour (customer) */
+    Page<Booking> getBookingHistory(Long userId, String status, Pageable pageable);
+
     // ==================== UC Admin 3 — Quản lý đơn ====================
 
     /** UC 3.1 — Xem danh sách đơn đặt với tìm kiếm và filter */

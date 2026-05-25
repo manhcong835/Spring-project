@@ -177,6 +177,16 @@ public class BookingServiceImpl implements BookingService {
         return "BK-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
 
+    // ==================== UC 6 — Customer: Lịch sử đặt tour ====================
+
+    @Override
+    public Page<Booking> getBookingHistory(Long userId, String status, Pageable pageable) {
+        if (status != null && !status.isBlank()) {
+            return bookingRepository.findByUserIdAndStatusWithTour(userId, status, pageable);
+        }
+        return bookingRepository.findByUserIdWithTour(userId, pageable);
+    }
+
     // ==================== UC 3.1 — Xem danh sách ====================
 
     @Override

@@ -37,6 +37,22 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     Page<Booking> findByUserId(Long userId, Pageable pageable);
 
     /**
+     * UC 6 - Xem lịch sử đặt tour (phân trang, JOIN FETCH tour info)
+     */
+    @Query(value = "SELECT b FROM Booking b JOIN FETCH b.tourDeparture td JOIN FETCH td.tour " +
+           "WHERE b.user.id = :userId AND b.bookingStatus != 'DELETED'",
+           countQuery = "SELECT COUNT(b) FROM Booking b WHERE b.user.id = :userId AND b.bookingStatus != 'DELETED'")
+    Page<Booking> findByUserIdWithTour(@Param("userId") Long userId, Pageable pageable);
+
+    /**
+     * UC 6 - Lọc lịch sử theo trạng thái
+     */
+    @Query(value = "SELECT b FROM Booking b JOIN FETCH b.tourDeparture td JOIN FETCH td.tour " +
+           "WHERE b.user.id = :userId AND b.bookingStatus = :status",
+           countQuery = "SELECT COUNT(b) FROM Booking b WHERE b.user.id = :userId AND b.bookingStatus = :status")
+    Page<Booking> findByUserIdAndStatusWithTour(@Param("userId") Long userId, @Param("status") String status, Pageable pageable);
+
+    /**
      * Admin 3.1 - Xem danh sách đơn đặt theo trạng thái
      */
     Page<Booking> findByBookingStatus(String bookingStatus, Pageable pageable);

@@ -377,7 +377,15 @@ public class UserController {
     }
 
     @GetMapping("/booking/history")
-    public String bookingHistory() {
+    public String bookingHistory(@RequestParam(required = false) String status,
+                                  @RequestParam(defaultValue = "0") int page,
+                                  Model model) {
+        Long userId = SecurityUtils.getCurrentUserId();
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("createdAt").descending());
+        Page<Booking> bookingPage = bookingService.getBookingHistory(userId, status, pageable);
+
+        model.addAttribute("bookingPage", bookingPage);
+        model.addAttribute("status", status);
         return "client/pages/bookinghistory";
     }
 
