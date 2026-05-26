@@ -1,6 +1,7 @@
 package com.spring.project.service.impl;
 
 import com.spring.project.dto.BookingCreateRequest;
+import com.spring.project.dto.TravelerInput;
 import com.spring.project.entity.*;
 import com.spring.project.repository.*;
 import com.spring.project.service.BookingService;
@@ -334,6 +335,66 @@ public class BookingServiceImpl implements BookingService {
         return bookingRepository.save(booking);
     }
 
+    // ==================== Cập nhật hành khách ====================
+
+    @Override
+    @Transactional
+    public void updateTravelers(Long bookingId, Long userId, List<TravelerInput> travelers) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new IllegalArgumentException("Đơn đặt tour không tồn tại"));
+
+        if (!"PENDING".equals(booking.getBookingStatus())) {
+            throw new IllegalArgumentException("Chỉ có thể cập nhật hành khách khi đơn đang Chờ xác nhận");
+        }
+        if (!booking.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("Bạn không có quyền cập nhật đơn này");
+        }
+
+        // Validate tổng số khớp chính xác
+        int expectedTotal = booking.getTotalPeople();
+        if (travelers.size() != expectedTotal) {
+            throw new IllegalArgumentException(
+                    "Phải nhập đúng " + expectedTotal + " hành khách (" +
+                    booking.getAdultCount() + " người lớn, " +
+                    booking.getChildCount() + " trẻ em, " +
+                    booking.getInfantCount() + " trẻ nhỏ)");
+        }
+
+        // Validate số lượng theo loại
+        long adultInputCount = travelers.stream().filter(t -> "ADULT".equals(t.getTravelerType())).count();
+        long childInputCount = travelers.stream().filter(t -> "CHILD".equals(t.getTravelerType())).count();
+        long infantInputCount = travelers.stream().filter(t -> "INFANT".equals(t.getTravelerType())).count();
+
+        if (adultInputCount != booking.getAdultCount()) {
+            throw new IllegalArgumentException("Số người lớn phải là " + booking.getAdultCount());
+        }
+        if (childInputCount != booking.getChildCount()) {
+            throw new IllegalArgumentException("Số trẻ em phải là " + booking.getChildCount());
+        }
+        if (infantInputCount != booking.getInfantCount()) {
+            throw new IllegalArgumentException("Số trẻ nhỏ phải là " + booking.getInfantCount());
+        }
+
+        // Clear + rebuild (orphanRemoval xóa records cũ)
+        booking.getTravelers().clear();
+
+        for (TravelerInput ti : travelers) {
+            if (ti.getFullName() == null || ti.getFullName().isBlank()) continue;
+            BookingTraveler traveler = new BookingTraveler();
+            traveler.setBooking(booking);
+            traveler.setFullName(ti.getFullName().trim());
+            traveler.setDateOfBirth(ti.getDateOfBirth());
+            traveler.setGender(ti.getGender());
+            traveler.setTravelerType(ti.getTravelerType());
+            traveler.setIdentityNumber(ti.getIdentityNumber());
+            traveler.setNationality(ti.getNationality());
+            traveler.setNote(ti.getNote());
+            booking.getTravelers().add(traveler);
+        }
+
+        bookingRepository.save(booking);
+    }
+
     @Override
     public Page<Booking> getBookingList(String keyword, String status, Pageable pageable) {
         if (keyword != null && !keyword.isBlank()) {
@@ -375,6 +436,19 @@ public class BookingServiceImpl implements BookingService {
             throw new IllegalArgumentException(
                     "Không thể chuyển từ " + currentStatus + " sang " + newStatus +
                     ". Trạng thái cho phép: " + allowed);
+        }
+
+        // Guard cho CONFIRMED: kiểm tra danh sách hành khách
+        if ("CONFIRMED".equals(newStatus)) {
+            if (booking.getTravelers().isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Không thể xác nhận đơn chưa có danh sách hành khách");
+            }
+            if (booking.getTravelers().size() != booking.getTotalPeople()) {
+                throw new IllegalArgumentException(
+                        "Danh sách hành khách chưa đầy đủ (" + booking.getTravelers().size()
+                        + "/" + booking.getTotalPeople() + ")");
+            }
         }
 
         // Guard cho COMPLETED: kiểm tra đã thanh toán

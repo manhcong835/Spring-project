@@ -97,4 +97,19 @@ public class UserServiceImpl implements UserService {
         authProvider.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userAuthProviderRepository.save(authProvider);
     }
+
+    @Override
+    @Transactional
+    public void resetPassword(String email, String newPassword) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Email không tồn tại trong hệ thống"));
+
+        UserAuthProvider authProvider = userAuthProviderRepository
+                .findByUserIdAndProvider(user.getId(), "LOCAL")
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Tài khoản của bạn đăng nhập bằng Google, không có mật khẩu để đặt lại."));
+
+        authProvider.setPassword(passwordEncoder.encode(newPassword));
+        userAuthProviderRepository.save(authProvider);
+    }
 }

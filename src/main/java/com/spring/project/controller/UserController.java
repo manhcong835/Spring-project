@@ -80,7 +80,24 @@ public class UserController {
     }
 
     @GetMapping({ "/", "/home" })
-    public String home() {
+    public String home(Model model) {
+        // Tour nổi bật (4 tour mới nhất)
+        Pageable hotPageable = PageRequest.of(0, 4, Sort.by("id").descending());
+        Page<Tour> hotPage = tourService.searchToursForClient(null, null, null, null, null, hotPageable);
+        model.addAttribute("hotTours", hotPage.getContent());
+
+        // Tour khuyến mãi (3 tour cũ nhất)
+        Pageable promoPageable = PageRequest.of(0, 3, Sort.by("id").ascending());
+        Page<Tour> promoPage = tourService.searchToursForClient(null, null, null, null, null, promoPageable);
+        model.addAttribute("promoTours", promoPage.getContent());
+
+        // Điểm đến phổ biến
+        model.addAttribute("destinations", destinationRepository.findByStatus("ACTIVE"));
+
+        // Đánh giá gần nhất
+        Pageable reviewPageable = PageRequest.of(0, 3, Sort.by("createdAt").descending());
+        model.addAttribute("reviews", reviewRepository.findRecentVisibleReviews(reviewPageable).getContent());
+
         return "client/pages/home";
     }
 
@@ -138,8 +155,25 @@ public class UserController {
     }
 
     @GetMapping("/forgot-password")
-    public String forgotPassword() {
+    public String forgotPassword(Model model) {
+        model.addAttribute("email", "");
         return "client/pages/forgotpassword";
+    }
+
+    @PostMapping("/forgot-password")
+    public String forgotPasswordPost(@RequestParam String email,
+            Model model,
+            RedirectAttributes redirectAttributes) {
+        try {
+            userService.resetPassword(email.trim(), "123456");
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Đặt lại mật khẩu thành công! Mật khẩu tạm thời của bạn là: 123456. Vui lòng đăng nhập và đổi mật khẩu trong trang cá nhân.");
+            return "redirect:/login";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            model.addAttribute("email", email);
+            return "client/pages/forgotpassword";
+        }
     }
 
     // ==================== PROFILE ====================
@@ -449,8 +483,76 @@ public class UserController {
     }
 
     @GetMapping("/booking/detail")
-    public String bookingDetail() {
+    public String bookingDetail(@RequestParam Long id,
+            Model model,
+            RedirectAttributes redirectAttributes) {
+        Long userId = SecurityUtils.getCurrentUserId();
+        Booking booking = bookingService.getBookingById(id);
+
+        if (!booking.getUser().getId().equals(userId)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Bạn không có quyền xem đơn này");
+            return "redirect:/booking/history";
+        }
+
+        model.addAttribute("booking", booking);
         return "client/pages/bookingdetail";
+    }
+
+    @GetMapping("/booking/travelers")
+    public String bookingTravelers(@RequestParam Long id,
+            Model model,
+            RedirectAttributes redirectAttributes) {
+        Long userId = SecurityUtils.getCurrentUserId();
+        Booking booking = bookingService.getBookingById(id);
+
+        if (!booking.getUser().getId().equals(userId)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Bạn không có quyền cập nhật đơn này");
+            return "redirect:/booking/history";
+        }
+        if (!"PENDING".equals(booking.getBookingStatus())) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Chỉ có thể cập nhật hành khách khi đơn đang Chờ xác nhận");
+            return "redirect:/booking/detail?id=" + id;
+        }
+
+        model.addAttribute("booking", booking);
+        return "client/pages/bookingtravelers";
+    }
+
+    @PostMapping("/booking/travelers")
+    public String bookingTravelersPost(@RequestParam Long id,
+            @RequestParam("fullName") java.util.List<String> fullNames,
+            @RequestParam("travelerType") java.util.List<String> travelerTypes,
+            @RequestParam(value = "gender", required = false) java.util.List<String> genders,
+            @RequestParam(value = "dateOfBirth", required = false) java.util.List<String> dateOfBirths,
+            @RequestParam(value = "identityNumber", required = false) java.util.List<String> identityNumbers,
+            @RequestParam(value = "nationality", required = false) java.util.List<String> nationalities,
+            @RequestParam(value = "note", required = false) java.util.List<String> notes,
+            RedirectAttributes redirectAttributes) {
+        try {
+            Long userId = SecurityUtils.getCurrentUserId();
+
+            java.util.List<com.spring.project.dto.TravelerInput> travelers = new java.util.ArrayList<>();
+            for (int i = 0; i < fullNames.size(); i++) {
+                com.spring.project.dto.TravelerInput ti = new com.spring.project.dto.TravelerInput();
+                ti.setFullName(fullNames.get(i));
+                ti.setTravelerType(travelerTypes.get(i));
+                ti.setGender(genders != null && i < genders.size() ? genders.get(i) : null);
+                if (dateOfBirths != null && i < dateOfBirths.size() && dateOfBirths.get(i) != null && !dateOfBirths.get(i).isBlank()) {
+                    ti.setDateOfBirth(java.time.LocalDate.parse(dateOfBirths.get(i)));
+                }
+                ti.setIdentityNumber(identityNumbers != null && i < identityNumbers.size() ? identityNumbers.get(i) : null);
+                ti.setNationality(nationalities != null && i < nationalities.size() ? nationalities.get(i) : null);
+                ti.setNote(notes != null && i < notes.size() ? notes.get(i) : null);
+                travelers.add(ti);
+            }
+
+            bookingService.updateTravelers(id, userId, travelers);
+            redirectAttributes.addFlashAttribute("successMessage", "Cập nhật danh sách hành khách thành công!");
+            return "redirect:/booking/detail?id=" + id;
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/booking/travelers?id=" + id;
+        }
     }
 
     @GetMapping("/booking/history")

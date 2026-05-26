@@ -1,6 +1,7 @@
 package com.spring.project.service;
 
 import com.spring.project.dto.BookingCreateRequest;
+import com.spring.project.dto.TravelerInput;
 import com.spring.project.entity.Booking;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +27,9 @@ public interface BookingService {
 
     /** UC 4.3 — Hủy booking (PENDING/CONFIRMED) */
     Booking cancelBooking(Long bookingId, Long userId, String reason);
+
+    /** Cập nhật danh sách hành khách (chỉ PENDING, count phải khớp chính xác) */
+    void updateTravelers(Long bookingId, Long userId, List<TravelerInput> travelers);
 
     // ==================== UC Admin 3 — Quản lý đơn ====================
 

@@ -31,4 +31,9 @@ public interface UserService {
      * Đổi mật khẩu cho tài khoản LOCAL.
      */
     void changePassword(Long userId, ChangePasswordRequest request);
+
+    /**
+     * Đặt lại mật khẩu tạm thời cho tài khoản LOCAL theo email.
+     */
+    void resetPassword(String email, String newPassword);
 }

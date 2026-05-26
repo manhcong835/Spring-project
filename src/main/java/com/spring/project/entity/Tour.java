@@ -167,4 +167,26 @@ public class Tour extends BaseEntity {
 
     public List<Review> getReviews() { return reviews; }
     public void setReviews(List<Review> reviews) { this.reviews = reviews; }
+
+    // ===================== Computed Helpers =====================
+
+    /**
+     * Tính rating trung bình từ các review VISIBLE.
+     */
+    public double getAverageRating() {
+        return reviews.stream()
+                .filter(r -> "VISIBLE".equals(r.getStatus()))
+                .mapToInt(Review::getRating)
+                .average()
+                .orElse(0.0);
+    }
+
+    /**
+     * Đếm số review VISIBLE.
+     */
+    public int getVisibleReviewCount() {
+        return (int) reviews.stream()
+                .filter(r -> "VISIBLE".equals(r.getStatus()))
+                .count();
+    }
 }
