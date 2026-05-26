@@ -17,6 +17,7 @@ import com.spring.project.security.SecurityUtils;
 import com.spring.project.service.AuthService;
 import com.spring.project.service.BookingService;
 import com.spring.project.service.PaymentService;
+import com.spring.project.service.ReviewService;
 import com.spring.project.service.TourService;
 import com.spring.project.service.UserService;
 import jakarta.validation.Valid;
@@ -49,20 +50,23 @@ public class UserController {
     private final TourDepartureRepository tourDepartureRepository;
     private final ReviewRepository reviewRepository;
     private final PaymentService paymentService;
+    private final ReviewService reviewService;
 
     public UserController(AuthService authService, UserService userService,
-                         TourService tourService,
-                         BookingService bookingService,
-                         PaymentService paymentService,
-                         TourCategoryRepository tourCategoryRepository,
-                         DestinationRepository destinationRepository,
-                         TourDepartureRepository tourDepartureRepository,
-                         ReviewRepository reviewRepository) {
+            TourService tourService,
+            BookingService bookingService,
+            PaymentService paymentService,
+            ReviewService reviewService,
+            TourCategoryRepository tourCategoryRepository,
+            DestinationRepository destinationRepository,
+            TourDepartureRepository tourDepartureRepository,
+            ReviewRepository reviewRepository) {
         this.authService = authService;
         this.userService = userService;
         this.tourService = tourService;
         this.bookingService = bookingService;
         this.paymentService = paymentService;
+        this.reviewService = reviewService;
         this.tourCategoryRepository = tourCategoryRepository;
         this.destinationRepository = destinationRepository;
         this.tourDepartureRepository = tourDepartureRepository;
@@ -79,11 +83,6 @@ public class UserController {
     public String home() {
         return "client/pages/home";
     }
-
-    // @GetMapping("/index")
-    // public String index() {
-    // return "client/pages/home";
-    // }
 
     // ==================== AUTHENTICATION ====================
 
@@ -147,8 +146,8 @@ public class UserController {
 
     @GetMapping("/profile")
     public String profile(@RequestParam(required = false) String success,
-                          @RequestParam(required = false) String passwordChanged,
-                          Model model) {
+            @RequestParam(required = false) String passwordChanged,
+            Model model) {
         Long userId = SecurityUtils.getCurrentUserId();
         User user = userService.getUserById(userId);
         boolean hasLocalProvider = userService.hasLocalProvider(userId);
@@ -171,19 +170,22 @@ public class UserController {
         }
 
         // Thông báo thành công
-        if (success != null) model.addAttribute("successMessage", "Cập nhật thông tin thành công!");
-        if (passwordChanged != null) model.addAttribute("successMessage", "Đổi mật khẩu thành công!");
+        if (success != null)
+            model.addAttribute("successMessage", "Cập nhật thông tin thành công!");
+        if (passwordChanged != null)
+            model.addAttribute("successMessage", "Đổi mật khẩu thành công!");
 
         return "client/pages/profile";
     }
 
     @PostMapping("/profile/update")
     public String updateProfile(@Valid @ModelAttribute("updateProfileRequest") UpdateProfileRequest request,
-                                BindingResult bindingResult,
-                                RedirectAttributes redirectAttributes) {
+            BindingResult bindingResult,
+            RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.updateProfileRequest", bindingResult);
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.updateProfileRequest",
+                    bindingResult);
             redirectAttributes.addFlashAttribute("updateProfileRequest", request);
             redirectAttributes.addFlashAttribute("profileError", "Vui lòng kiểm tra lại thông tin");
             return "redirect:/profile";
@@ -206,11 +208,12 @@ public class UserController {
 
     @PostMapping("/profile/change-password")
     public String changePassword(@Valid @ModelAttribute("changePasswordRequest") ChangePasswordRequest request,
-                                 BindingResult bindingResult,
-                                 RedirectAttributes redirectAttributes) {
+            BindingResult bindingResult,
+            RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.changePasswordRequest", bindingResult);
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.changePasswordRequest",
+                    bindingResult);
             redirectAttributes.addFlashAttribute("changePasswordRequest", request);
             redirectAttributes.addFlashAttribute("passwordError", "Vui lòng kiểm tra lại thông tin");
             return "redirect:/profile";
@@ -231,12 +234,12 @@ public class UserController {
 
     @GetMapping("/tours")
     public String tourList(@RequestParam(required = false) String keyword,
-                           @RequestParam(required = false) Long destinationId,
-                           @RequestParam(required = false) Long categoryId,
-                           @RequestParam(required = false) Integer minDuration,
-                           @RequestParam(required = false) Integer maxDuration,
-                           @RequestParam(defaultValue = "0") int page,
-                           Model model) {
+            @RequestParam(required = false) Long destinationId,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) Integer minDuration,
+            @RequestParam(required = false) Integer maxDuration,
+            @RequestParam(defaultValue = "0") int page,
+            Model model) {
         Pageable pageable = PageRequest.of(page, 9, Sort.by("createdAt").descending());
         Page<Tour> tourPage = tourService.searchToursForClient(
                 keyword, destinationId, categoryId, minDuration, maxDuration, pageable);
@@ -280,12 +283,12 @@ public class UserController {
 
     @GetMapping("/booking/create")
     public String bookingCreate(@RequestParam Long tourId,
-                                 @RequestParam(required = false) Long departureId,
-                                 @RequestParam(required = false) Integer adultCount,
-                                 @RequestParam(required = false) Integer childCount,
-                                 @RequestParam(required = false) Integer infantCount,
-                                 Model model,
-                                 RedirectAttributes redirectAttributes) {
+            @RequestParam(required = false) Long departureId,
+            @RequestParam(required = false) Integer adultCount,
+            @RequestParam(required = false) Integer childCount,
+            @RequestParam(required = false) Integer infantCount,
+            Model model,
+            RedirectAttributes redirectAttributes) {
         Tour tour = tourService.getTourDetailForClient(tourId);
         if (tour == null) {
             redirectAttributes.addFlashAttribute("errorMessage", "Tour không tồn tại");
@@ -334,9 +337,9 @@ public class UserController {
 
     @PostMapping("/booking/create")
     public String bookingCreatePost(@Valid @ModelAttribute("bookingRequest") BookingCreateRequest request,
-                                     BindingResult bindingResult,
-                                     Model model,
-                                     RedirectAttributes redirectAttributes) {
+            BindingResult bindingResult,
+            Model model,
+            RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             // Reload tour + departures for re-rendering form
             Tour tour = tourService.getTourDetailForClient(request.getTourId());
@@ -367,8 +370,8 @@ public class UserController {
 
     @GetMapping("/booking/edit")
     public String bookingEdit(@RequestParam Long id,
-                               Model model,
-                               RedirectAttributes redirectAttributes) {
+            Model model,
+            RedirectAttributes redirectAttributes) {
         Long userId = SecurityUtils.getCurrentUserId();
         Booking booking = bookingService.getBookingById(id);
 
@@ -391,12 +394,12 @@ public class UserController {
 
     @PostMapping("/booking/edit")
     public String bookingEditPost(@RequestParam Long id,
-                                   @RequestParam Long departureId,
-                                   @RequestParam int adultCount,
-                                   @RequestParam int childCount,
-                                   @RequestParam int infantCount,
-                                   @RequestParam(required = false) String specialRequests,
-                                   RedirectAttributes redirectAttributes) {
+            @RequestParam Long departureId,
+            @RequestParam int adultCount,
+            @RequestParam int childCount,
+            @RequestParam int infantCount,
+            @RequestParam(required = false) String specialRequests,
+            RedirectAttributes redirectAttributes) {
         try {
             Long userId = SecurityUtils.getCurrentUserId();
             bookingService.updateBooking(id, userId, departureId, adultCount, childCount, infantCount, specialRequests);
@@ -410,8 +413,8 @@ public class UserController {
 
     @GetMapping("/booking/cancel")
     public String bookingCancel(@RequestParam Long id,
-                                 Model model,
-                                 RedirectAttributes redirectAttributes) {
+            Model model,
+            RedirectAttributes redirectAttributes) {
         Long userId = SecurityUtils.getCurrentUserId();
         Booking booking = bookingService.getBookingById(id);
 
@@ -432,8 +435,8 @@ public class UserController {
 
     @PostMapping("/booking/cancel")
     public String bookingCancelPost(@RequestParam Long id,
-                                     @RequestParam(required = false) String reason,
-                                     RedirectAttributes redirectAttributes) {
+            @RequestParam(required = false) String reason,
+            RedirectAttributes redirectAttributes) {
         try {
             Long userId = SecurityUtils.getCurrentUserId();
             bookingService.cancelBooking(id, userId, reason);
@@ -452,8 +455,8 @@ public class UserController {
 
     @GetMapping("/booking/history")
     public String bookingHistory(@RequestParam(required = false) String status,
-                                  @RequestParam(defaultValue = "0") int page,
-                                  Model model) {
+            @RequestParam(defaultValue = "0") int page,
+            Model model) {
         Long userId = SecurityUtils.getCurrentUserId();
         Pageable pageable = PageRequest.of(page, 10, Sort.by("createdAt").descending());
         Page<Booking> bookingPage = bookingService.getBookingHistory(userId, status, pageable);
@@ -467,8 +470,8 @@ public class UserController {
 
     @GetMapping("/payment")
     public String payment(@RequestParam Long bookingId,
-                           Model model,
-                           RedirectAttributes redirectAttributes) {
+            Model model,
+            RedirectAttributes redirectAttributes) {
         Long userId = SecurityUtils.getCurrentUserId();
         Booking booking = bookingService.getBookingById(bookingId);
 
@@ -496,12 +499,13 @@ public class UserController {
 
     @PostMapping("/payment")
     public String paymentProcess(@RequestParam Long bookingId,
-                                  @RequestParam String paymentMethod,
-                                  @RequestParam(required = false) String note,
-                                  RedirectAttributes redirectAttributes) {
+            @RequestParam String paymentMethod,
+            @RequestParam(required = false) String note,
+            RedirectAttributes redirectAttributes) {
         try {
             Long userId = SecurityUtils.getCurrentUserId();
-            com.spring.project.entity.Payment payment = paymentService.processPayment(bookingId, userId, paymentMethod, note);
+            com.spring.project.entity.Payment payment = paymentService.processPayment(bookingId, userId, paymentMethod,
+                    note);
             redirectAttributes.addFlashAttribute("successMessage",
                     "Thanh toán thành công! Mã giao dịch: " + payment.getPaymentCode());
             return "redirect:/booking/history";
@@ -514,8 +518,37 @@ public class UserController {
     // ==================== REVIEW ====================
 
     @GetMapping("/review/create")
-    public String reviewCreate() {
+    public String reviewCreate(@RequestParam Long bookingId,
+            Model model,
+            RedirectAttributes redirectAttributes) {
+        Long userId = SecurityUtils.getCurrentUserId();
+
+        if (!reviewService.canReview(bookingId, userId)) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Không thể đánh giá: đơn chưa hoàn thành, không thuộc bạn, hoặc đã đánh giá rồi");
+            return "redirect:/booking/history";
+        }
+
+        Booking booking = bookingService.getBookingById(bookingId);
+        model.addAttribute("booking", booking);
         return "client/pages/reviewcreate";
+    }
+
+    @PostMapping("/review/create")
+    public String reviewCreatePost(@RequestParam Long bookingId,
+            @RequestParam int rating,
+            @RequestParam(required = false) String title,
+            @RequestParam String content,
+            RedirectAttributes redirectAttributes) {
+        try {
+            Long userId = SecurityUtils.getCurrentUserId();
+            reviewService.createReview(bookingId, userId, rating, title, content);
+            redirectAttributes.addFlashAttribute("successMessage", "Cảm ơn bạn đã đánh giá! ⭐");
+            return "redirect:/booking/history";
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/review/create?bookingId=" + bookingId;
+        }
     }
 
     // ==================== STATIC PAGES ====================
