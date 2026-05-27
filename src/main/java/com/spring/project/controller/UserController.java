@@ -16,10 +16,12 @@ import com.spring.project.repository.DestinationRepository;
 import com.spring.project.security.SecurityUtils;
 import com.spring.project.service.AuthService;
 import com.spring.project.service.BookingService;
+import com.spring.project.service.EmailService;
 import com.spring.project.service.PaymentService;
 import com.spring.project.service.ReviewService;
 import com.spring.project.service.TourService;
 import com.spring.project.service.UserService;
+import com.spring.project.repository.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -51,26 +53,32 @@ public class UserController {
     private final ReviewRepository reviewRepository;
     private final PaymentService paymentService;
     private final ReviewService reviewService;
+    private final EmailService emailService;
+    private final UserRepository userRepository;
 
     public UserController(AuthService authService, UserService userService,
             TourService tourService,
             BookingService bookingService,
             PaymentService paymentService,
             ReviewService reviewService,
+            EmailService emailService,
             TourCategoryRepository tourCategoryRepository,
             DestinationRepository destinationRepository,
             TourDepartureRepository tourDepartureRepository,
-            ReviewRepository reviewRepository) {
+            ReviewRepository reviewRepository,
+            UserRepository userRepository) {
         this.authService = authService;
         this.userService = userService;
         this.tourService = tourService;
         this.bookingService = bookingService;
         this.paymentService = paymentService;
         this.reviewService = reviewService;
+        this.emailService = emailService;
         this.tourCategoryRepository = tourCategoryRepository;
         this.destinationRepository = destinationRepository;
         this.tourDepartureRepository = tourDepartureRepository;
         this.reviewRepository = reviewRepository;
+        this.userRepository = userRepository;
     }
 
     // ==================== TRANG CHỦ ====================
@@ -134,6 +142,7 @@ public class UserController {
     public String register(@Valid @ModelAttribute("registerRequest") RegisterRequest request,
             BindingResult bindingResult,
             Model model,
+            HttpSession session,
             RedirectAttributes redirectAttributes) {
 
         // Nếu có lỗi validation (annotation trên DTO)
@@ -141,17 +150,109 @@ public class UserController {
             return "client/pages/register";
         }
 
-        try {
-            authService.register(request);
-            redirectAttributes.addFlashAttribute("successMessage",
-                    "Đăng ký thành công! Vui lòng đăng nhập.");
-            return "redirect:/login";
-
-        } catch (IllegalArgumentException e) {
-            // Lỗi nghiệp vụ (email trùng, phone trùng, password không khớp)
-            model.addAttribute("errorMessage", e.getMessage());
+        // Kiểm tra trùng email/phone trước khi gửi OTP
+        if (userRepository.existsByEmail(request.getEmail())) {
+            model.addAttribute("errorMessage", "Email này đã được sử dụng");
             return "client/pages/register";
         }
+        if (request.getPhone() != null && !request.getPhone().isBlank()) {
+            if (userRepository.existsByPhone(request.getPhone())) {
+                model.addAttribute("errorMessage", "Số điện thoại này đã được sử dụng");
+                return "client/pages/register";
+            }
+        }
+        if (!request.getPassword().equals(request.getConfirmPassword())) {
+            model.addAttribute("errorMessage", "Mật khẩu xác nhận không khớp");
+            return "client/pages/register";
+        }
+
+        // Sinh OTP 6 chữ số, lưu vào session
+        String otp = String.format("%06d", new java.util.Random().nextInt(1000000));
+        session.setAttribute("pendingRegister", request);
+        session.setAttribute("registerOtp", otp);
+        session.setAttribute("registerOtpExpiry", System.currentTimeMillis() + 5 * 60 * 1000); // 5 phút
+
+        // Gửi OTP qua email
+        emailService.sendVerificationOtp(request.getEmail(), otp);
+
+        return "redirect:/register/verify";
+    }
+
+    @GetMapping("/register/verify")
+    public String registerVerify(HttpSession session, Model model) {
+        RegisterRequest pending = (RegisterRequest) session.getAttribute("pendingRegister");
+        if (pending == null) {
+            return "redirect:/register";
+        }
+        // Che email: ngu***@gmail.com
+        String email = pending.getEmail();
+        String maskedEmail = maskEmail(email);
+        model.addAttribute("maskedEmail", maskedEmail);
+        return "client/pages/registerverify";
+    }
+
+    @PostMapping("/register/verify")
+    public String registerVerifyPost(@RequestParam String otp,
+            HttpSession session,
+            Model model,
+            RedirectAttributes redirectAttributes) {
+        RegisterRequest pending = (RegisterRequest) session.getAttribute("pendingRegister");
+        String savedOtp = (String) session.getAttribute("registerOtp");
+        Long expiry = (Long) session.getAttribute("registerOtpExpiry");
+
+        if (pending == null || savedOtp == null || expiry == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Phiên đăng ký đã hết hạn. Vui lòng đăng ký lại.");
+            return "redirect:/register";
+        }
+
+        // Kiểm tra hết hạn
+        if (System.currentTimeMillis() > expiry) {
+            model.addAttribute("maskedEmail", maskEmail(pending.getEmail()));
+            model.addAttribute("errorMessage", "Mã xác thực đã hết hạn. Vui lòng nhấn Gửi lại mã.");
+            return "client/pages/registerverify";
+        }
+
+        // Kiểm tra OTP
+        if (!savedOtp.equals(otp.trim())) {
+            model.addAttribute("maskedEmail", maskEmail(pending.getEmail()));
+            model.addAttribute("errorMessage", "Mã xác thực không chính xác.");
+            return "client/pages/registerverify";
+        }
+
+        // OTP đúng -> lưu user vào DB
+        try {
+            authService.register(pending);
+            // Xóa session tạm
+            session.removeAttribute("pendingRegister");
+            session.removeAttribute("registerOtp");
+            session.removeAttribute("registerOtpExpiry");
+
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Xác thực thành công! Đăng ký hoàn tất. Vui lòng đăng nhập.");
+            return "redirect:/login";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("maskedEmail", maskEmail(pending.getEmail()));
+            model.addAttribute("errorMessage", e.getMessage());
+            return "client/pages/registerverify";
+        }
+    }
+
+    @PostMapping("/register/resend-otp")
+    public String resendOtp(HttpSession session, RedirectAttributes redirectAttributes) {
+        RegisterRequest pending = (RegisterRequest) session.getAttribute("pendingRegister");
+        if (pending == null) {
+            return "redirect:/register";
+        }
+
+        // Sinh OTP mới
+        String newOtp = String.format("%06d", new java.util.Random().nextInt(1000000));
+        session.setAttribute("registerOtp", newOtp);
+        session.setAttribute("registerOtpExpiry", System.currentTimeMillis() + 5 * 60 * 1000);
+
+        emailService.sendVerificationOtp(pending.getEmail(), newOtp);
+
+        redirectAttributes.addFlashAttribute("successMessage", "Đã gửi lại mã xác thực. Vui lòng kiểm tra email.");
+        return "redirect:/register/verify";
     }
 
     @GetMapping("/forgot-password")
@@ -163,11 +264,18 @@ public class UserController {
     @PostMapping("/forgot-password")
     public String forgotPasswordPost(@RequestParam String email,
             Model model,
+            HttpSession session,
             RedirectAttributes redirectAttributes) {
         try {
-            userService.resetPassword(email.trim(), "123456");
+            String newPassword = generateRandomPassword();
+            userService.resetPassword(email.trim(), newPassword);
+            emailService.sendNewPassword(email.trim(), newPassword);
+
+            // Đánh dấu email vừa reset để SuccessHandler chuyển hướng đổi mật khẩu
+            session.setAttribute("justResetPasswordEmail", email.trim());
+
             redirectAttributes.addFlashAttribute("successMessage",
-                    "Đặt lại mật khẩu thành công! Mật khẩu tạm thời của bạn là: 123456. Vui lòng đăng nhập và đổi mật khẩu trong trang cá nhân.");
+                    "Mật khẩu mới đã được gửi tới email của bạn. Vui lòng kiểm tra hộp thư.");
             return "redirect:/login";
         } catch (IllegalArgumentException e) {
             model.addAttribute("errorMessage", e.getMessage());
@@ -176,11 +284,35 @@ public class UserController {
         }
     }
 
+    // ==================== HELPER METHODS ====================
+
+    /** Sinh mật khẩu ngẫu nhiên 8 ký tự (chữ hoa, chữ thường, số) */
+    private String generateRandomPassword() {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        java.security.SecureRandom random = new java.security.SecureRandom();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 8; i++) {
+            sb.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        return sb.toString();
+    }
+
+    /** Che email: nguyen@gmail.com → ngu***@gmail.com */
+    private String maskEmail(String email) {
+        int atIndex = email.indexOf('@');
+        if (atIndex <= 3) {
+            return email.charAt(0) + "***" + email.substring(atIndex);
+        }
+        return email.substring(0, 3) + "***" + email.substring(atIndex);
+    }
+
     // ==================== PROFILE ====================
 
     @GetMapping("/profile")
     public String profile(@RequestParam(required = false) String success,
             @RequestParam(required = false) String passwordChanged,
+            @RequestParam(required = false) String forceChange,
+            HttpSession session,
             Model model) {
         Long userId = SecurityUtils.getCurrentUserId();
         User user = userService.getUserById(userId);
@@ -188,6 +320,12 @@ public class UserController {
 
         model.addAttribute("user", user);
         model.addAttribute("hasLocalProvider", hasLocalProvider);
+
+        // Kiểm tra cờ session: vừa reset mật khẩu → ép đổi mật khẩu mới
+        String justReset = (String) session.getAttribute("justResetPasswordEmail");
+        if (justReset != null && justReset.equalsIgnoreCase(user.getEmail())) {
+            model.addAttribute("forceChange", true);
+        }
 
         // Thêm DTO rỗng nếu chưa có trong model (lần đầu vào trang)
         if (!model.containsAttribute("updateProfileRequest")) {
@@ -243,8 +381,36 @@ public class UserController {
     @PostMapping("/profile/change-password")
     public String changePassword(@Valid @ModelAttribute("changePasswordRequest") ChangePasswordRequest request,
             BindingResult bindingResult,
+            HttpSession session,
             RedirectAttributes redirectAttributes) {
 
+        // Kiểm tra cờ session: vừa reset mật khẩu → bypass kiểm tra mật khẩu cũ
+        String justReset = (String) session.getAttribute("justResetPasswordEmail");
+        Long userId = SecurityUtils.getCurrentUserId();
+        User currentUser = userService.getUserById(userId);
+
+        if (justReset != null && justReset.equalsIgnoreCase(currentUser.getEmail())) {
+            // Chỉ validate mật khẩu mới
+            if (bindingResult.hasFieldErrors("newPassword") || bindingResult.hasFieldErrors("confirmNewPassword")) {
+                redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.changePasswordRequest",
+                        bindingResult);
+                redirectAttributes.addFlashAttribute("changePasswordRequest", request);
+                redirectAttributes.addFlashAttribute("passwordError", "Vui lòng kiểm tra lại thông tin");
+                return "redirect:/profile?forceChange=true";
+            }
+            if (!request.getNewPassword().equals(request.getConfirmNewPassword())) {
+                redirectAttributes.addFlashAttribute("passwordError", "Mật khẩu xác nhận không khớp");
+                redirectAttributes.addFlashAttribute("changePasswordRequest", request);
+                return "redirect:/profile?forceChange=true";
+            }
+
+            // Cập nhật trực tiếp không cần kiểm tra mật khẩu cũ
+            userService.resetPassword(currentUser.getEmail(), request.getNewPassword());
+            session.removeAttribute("justResetPasswordEmail");
+            return "redirect:/profile?passwordChanged=true";
+        }
+
+        // Luồng bình thường: đổi mật khẩu có kiểm tra mật khẩu cũ
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.changePasswordRequest",
                     bindingResult);
@@ -254,7 +420,6 @@ public class UserController {
         }
 
         try {
-            Long userId = SecurityUtils.getCurrentUserId();
             userService.changePassword(userId, request);
             return "redirect:/profile?passwordChanged=true";
         } catch (IllegalArgumentException e) {

@@ -106,6 +106,12 @@
                 <div th:if="${hasLocalProvider}" class="card border-0 shadow-sm rounded-4 p-4 mt-4">
                     <h5 class="fw-bold mb-3">🔒 Đổi mật khẩu</h5>
 
+                    <!-- Thông báo ép đổi mật khẩu sau khi reset -->
+                    <div th:if="${forceChange}" class="alert alert-warning" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        Bạn vừa đăng nhập bằng mật khẩu tạm thời. Vui lòng đặt mật khẩu mới để bảo vệ tài khoản.
+                    </div>
+
                     <!-- Lỗi password -->
                     <div th:if="${passwordError}" class="alert alert-danger" role="alert">
                         <i class="bi bi-exclamation-triangle-fill me-2"></i>
@@ -113,7 +119,11 @@
                     </div>
 
                     <form th:action="@{/profile/change-password}" th:object="${changePasswordRequest}" method="post">
-                        <div class="mb-3">
+                        <!-- Mật khẩu hiện tại: ẩn khi forceChange, gửi giá trị bypass -->
+                        <div th:if="${forceChange}">
+                            <input type="hidden" name="currentPassword" value="bypass"/>
+                        </div>
+                        <div class="mb-3" th:if="${!forceChange}">
                             <label class="form-label fw-semibold">Mật khẩu hiện tại <span class="text-danger">*</span></label>
                             <input type="password" class="form-control" th:field="*{currentPassword}"
                                    th:classappend="${#fields.hasErrors('currentPassword')} ? 'is-invalid' : ''">

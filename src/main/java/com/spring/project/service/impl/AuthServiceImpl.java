@@ -73,7 +73,7 @@ public class AuthServiceImpl implements AuthService {
         authProvider.setUser(savedUser);
         authProvider.setProvider("LOCAL");
         authProvider.setPassword(passwordEncoder.encode(request.getPassword()));
-        authProvider.setEmailVerified(false);
+        authProvider.setEmailVerified(true);
         authProvider.setProviderEmail(request.getEmail());
         userAuthProviderRepository.save(authProvider);
     }

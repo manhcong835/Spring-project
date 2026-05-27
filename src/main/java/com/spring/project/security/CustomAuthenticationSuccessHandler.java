@@ -27,6 +27,13 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
         String loginSource = (String) request.getSession().getAttribute("loginSource");
 
+        // Nếu vừa reset mật khẩu → chuyển thẳng sang trang đổi mật khẩu mới
+        String justReset = (String) request.getSession().getAttribute("justResetPasswordEmail");
+        if (justReset != null && justReset.equalsIgnoreCase(authentication.getName())) {
+            response.sendRedirect("/profile?forceChange=true");
+            return;
+        }
+
         boolean isAdmin = false;
         for (GrantedAuthority authority : authentication.getAuthorities()) {
             if ("ROLE_ADMIN".equals(authority.getAuthority())) {

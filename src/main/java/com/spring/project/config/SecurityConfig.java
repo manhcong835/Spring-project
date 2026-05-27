@@ -52,7 +52,7 @@ public class SecurityConfig {
                 // Cho phép truy cập công khai
                 .requestMatchers(
                     "/", "/home", "/index",
-                    "/login", "/register",
+                    "/login", "/register", "/register/verify", "/register/resend-otp",
                     "/admin", "/admin/", "/admin/login",
                     "/forgot-password",
                     "/tours", "/tours/**",

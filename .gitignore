@@ -32,11 +32,10 @@ build/
 ### VS Code ###
 .vscode/
 
-/config/ConfigApplication.properties
+/config/
 
 usecase.txt
 database_sqlserver.sql
-OAuthGG.json
 guide*.md
 implementation_plan*
 src/main/resources/ssl/
