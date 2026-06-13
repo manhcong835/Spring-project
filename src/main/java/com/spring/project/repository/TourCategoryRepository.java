@@ -27,4 +27,17 @@ public interface TourCategoryRepository extends JpaRepository<TourCategory, Long
      * Kiểm tra tên danh mục đã tồn tại chưa
      */
     boolean existsByName(String name);
+
+    /**
+     * Đếm số tour đang dùng danh mục — kiểm tra trước khi xóa.
+     */
+    @org.springframework.data.jpa.repository.Query("SELECT COUNT(t) FROM Tour t WHERE t.category.id = :categoryId")
+    long countToursByCategoryId(@org.springframework.data.repository.query.Param("categoryId") Long categoryId);
+
+    /**
+     * Phân trang danh sách danh mục (Admin).
+     */
+    org.springframework.data.domain.Page<TourCategory> findByStatusOrderByIdDesc(String status, org.springframework.data.domain.Pageable pageable);
+
+    org.springframework.data.domain.Page<TourCategory> findAllByOrderByIdDesc(org.springframework.data.domain.Pageable pageable);
 }

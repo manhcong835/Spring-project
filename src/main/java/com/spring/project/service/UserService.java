@@ -36,4 +36,10 @@ public interface UserService {
      * Đặt lại mật khẩu tạm thời cho tài khoản LOCAL theo email.
      */
     void resetPassword(String email, String newPassword);
+
+    /**
+     * Kiểm tra cooldown forgot-password: throw IllegalArgumentException nếu
+     * email vừa request reset trong vòng 2 phút trước.
+     */
+    void assertCanResetPassword(String email);
 }

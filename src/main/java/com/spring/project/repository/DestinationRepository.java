@@ -31,4 +31,19 @@ public interface DestinationRepository extends JpaRepository<Destination, Long> 
     @Query("SELECT d FROM Destination d WHERE LOWER(d.name) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
            "OR LOWER(d.province) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<Destination> findByDestination(@Param("keyword") String keyword);
+
+    /**
+     * Đếm số tour đang dùng điểm đến — kiểm tra trước khi xóa.
+     */
+    @Query("SELECT COUNT(t) FROM Tour t WHERE t.destination.id = :destinationId")
+    long countToursByDestinationId(@Param("destinationId") Long destinationId);
+
+    /**
+     * Phân trang Admin.
+     */
+    org.springframework.data.domain.Page<Destination> findByStatusOrderByIdDesc(String status, org.springframework.data.domain.Pageable pageable);
+
+    org.springframework.data.domain.Page<Destination> findAllByOrderByIdDesc(org.springframework.data.domain.Pageable pageable);
+
+    boolean existsByNameAndCountry(String name, String country);
 }

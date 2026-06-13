@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,6 +59,13 @@ public class User extends BaseEntity {
     @Column(name = "status", nullable = false, length = 20)
     private String status = "ACTIVE";
 
+    /**
+     * Thời điểm gần nhất user yêu cầu reset mật khẩu (forgot-password).
+     * Dùng để chặn spam: cooldown 2 phút giữa các lần request.
+     */
+    @Column(name = "last_password_reset_at")
+    private LocalDateTime lastPasswordResetAt;
+
     // ===================== Relationships =====================
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -101,6 +109,9 @@ public class User extends BaseEntity {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public LocalDateTime getLastPasswordResetAt() { return lastPasswordResetAt; }
+    public void setLastPasswordResetAt(LocalDateTime lastPasswordResetAt) { this.lastPasswordResetAt = lastPasswordResetAt; }
 
     public List<UserAuthProvider> getAuthProviders() { return authProviders; }
     public void setAuthProviders(List<UserAuthProvider> authProviders) { this.authProviders = authProviders; }

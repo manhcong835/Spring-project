@@ -279,9 +279,10 @@ public class TourServiceImpl implements TourService {
     @Override
     public Page<Tour> searchToursForClient(String keyword, Long destinationId, Long categoryId,
                                             Integer minDuration, Integer maxDuration,
+                                            java.math.BigDecimal minPrice, java.math.BigDecimal maxPrice,
                                             Pageable pageable) {
         return tourRepository.searchToursForClient(
-                keyword, destinationId, categoryId, minDuration, maxDuration, null, null, pageable);
+                keyword, destinationId, categoryId, minDuration, maxDuration, minPrice, maxPrice, pageable);
     }
 
     // ==================== UC 3 — Xem chi tiết tour ====================

@@ -54,6 +54,9 @@ public class AdminController {
     private final com.spring.project.service.BookingService bookingService;
     private final com.spring.project.service.PromotionService promotionService;
     private final com.spring.project.service.CustomerService customerService;
+    private final com.spring.project.service.ReviewService reviewService;
+    private final com.spring.project.service.TourCategoryService tourCategoryService;
+    private final com.spring.project.service.DestinationService destinationService;
 
     public AdminController(UserService userService, AdminDashboardService adminDashboardService,
                            AuthService authService, StaffService staffService,
@@ -61,7 +64,10 @@ public class AdminController {
                            TourCategoryRepository tourCategoryRepository, DestinationRepository destinationRepository,
                            com.spring.project.service.BookingService bookingService,
                            com.spring.project.service.PromotionService promotionService,
-                           com.spring.project.service.CustomerService customerService) {
+                           com.spring.project.service.CustomerService customerService,
+                           com.spring.project.service.ReviewService reviewService,
+                           com.spring.project.service.TourCategoryService tourCategoryService,
+                           com.spring.project.service.DestinationService destinationService) {
         this.userService = userService;
         this.adminDashboardService = adminDashboardService;
         this.authService = authService;
@@ -73,6 +79,9 @@ public class AdminController {
         this.bookingService = bookingService;
         this.promotionService = promotionService;
         this.customerService = customerService;
+        this.reviewService = reviewService;
+        this.tourCategoryService = tourCategoryService;
+        this.destinationService = destinationService;
     }
 
     // ==================== AUTHENTICATION ====================
@@ -600,6 +609,276 @@ public class AdminController {
             redirectAttributes.addFlashAttribute("errorMessage", "Khuyến mãi không tồn tại.");
         }
         return "redirect:/admin/promotions";
+    }
+
+    // ==================== REVIEW MANAGEMENT ====================
+
+    @GetMapping("/reviews")
+    public String reviewList(@RequestParam(required = false) String status,
+                             @RequestParam(defaultValue = "0") int page,
+                             Model model) {
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("createdAt").descending());
+        Page<com.spring.project.entity.Review> reviewPage = reviewService.getReviewList(status, pageable);
+        model.addAttribute("reviewPage", reviewPage);
+        model.addAttribute("status", status);
+        return "admin/pages/reviewlist";
+    }
+
+    @PostMapping("/reviews/toggle")
+    public String reviewToggle(@RequestParam Long id,
+                               @RequestParam(required = false) String status,
+                               @RequestParam(defaultValue = "0") int page,
+                               RedirectAttributes redirectAttributes) {
+        try {
+            reviewService.toggleStatus(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Đã cập nhật trạng thái đánh giá.");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/admin/reviews?page=" + page + (status != null ? "&status=" + status : "");
+    }
+
+    @GetMapping("/reviews/delete")
+    public String reviewDelete(@RequestParam Long id, Model model,
+                                RedirectAttributes redirectAttributes) {
+        try {
+            model.addAttribute("review", reviewService.getReviewById(id));
+            return "admin/pages/reviewdelete";
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/admin/reviews";
+        }
+    }
+
+    @PostMapping("/reviews/delete")
+    public String reviewDeletePost(@RequestParam Long id,
+                                    RedirectAttributes redirectAttributes) {
+        try {
+            reviewService.deleteReview(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Xóa đánh giá thành công!");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/admin/reviews";
+    }
+
+    // ==================== CATEGORY MANAGEMENT ====================
+
+    @GetMapping("/categories")
+    public String categoryList(@RequestParam(required = false) String status,
+                               @RequestParam(defaultValue = "0") int page,
+                               Model model) {
+        Pageable pageable = PageRequest.of(page, 10);
+        Page<com.spring.project.entity.TourCategory> categoryPage = tourCategoryService.getCategoryList(status, pageable);
+        model.addAttribute("categoryPage", categoryPage);
+        model.addAttribute("status", status);
+        return "admin/pages/categorylist";
+    }
+
+    @GetMapping("/categories/create")
+    public String categoryCreate(Model model) {
+        if (!model.containsAttribute("categoryRequest")) {
+            model.addAttribute("categoryRequest", new com.spring.project.dto.TourCategoryRequest());
+        }
+        return "admin/pages/categorycreate";
+    }
+
+    @PostMapping("/categories/create")
+    public String categoryCreatePost(@Valid @ModelAttribute("categoryRequest") com.spring.project.dto.TourCategoryRequest request,
+                                      BindingResult bindingResult,
+                                      RedirectAttributes redirectAttributes,
+                                      Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("errorMessage", "Vui lòng kiểm tra lại thông tin");
+            return "admin/pages/categorycreate";
+        }
+        try {
+            tourCategoryService.createCategory(request);
+            redirectAttributes.addFlashAttribute("successMessage", "Tạo danh mục thành công!");
+            return "redirect:/admin/categories";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            return "admin/pages/categorycreate";
+        }
+    }
+
+    @GetMapping("/categories/update")
+    public String categoryUpdate(@RequestParam Long id, Model model,
+                                  RedirectAttributes redirectAttributes) {
+        try {
+            com.spring.project.entity.TourCategory category = tourCategoryService.getCategoryById(id);
+            model.addAttribute("category", category);
+            if (!model.containsAttribute("categoryRequest")) {
+                com.spring.project.dto.TourCategoryRequest req = new com.spring.project.dto.TourCategoryRequest();
+                req.setName(category.getName());
+                req.setDescription(category.getDescription());
+                req.setStatus(category.getStatus());
+                model.addAttribute("categoryRequest", req);
+            }
+            return "admin/pages/categoryupdate";
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/admin/categories";
+        }
+    }
+
+    @PostMapping("/categories/update")
+    public String categoryUpdatePost(@RequestParam Long id,
+                                      @Valid @ModelAttribute("categoryRequest") com.spring.project.dto.TourCategoryRequest request,
+                                      BindingResult bindingResult,
+                                      RedirectAttributes redirectAttributes,
+                                      Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("category", tourCategoryService.getCategoryById(id));
+            model.addAttribute("errorMessage", "Vui lòng kiểm tra lại thông tin");
+            return "admin/pages/categoryupdate";
+        }
+        try {
+            tourCategoryService.updateCategory(id, request);
+            redirectAttributes.addFlashAttribute("successMessage", "Cập nhật danh mục thành công!");
+            return "redirect:/admin/categories";
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/admin/categories/update?id=" + id;
+        }
+    }
+
+    @GetMapping("/categories/delete")
+    public String categoryDelete(@RequestParam Long id, Model model,
+                                  RedirectAttributes redirectAttributes) {
+        try {
+            com.spring.project.entity.TourCategory category = tourCategoryService.getCategoryById(id);
+            model.addAttribute("category", category);
+            model.addAttribute("tourCount", tourCategoryService.countTours(id));
+            return "admin/pages/categorydelete";
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/admin/categories";
+        }
+    }
+
+    @PostMapping("/categories/delete")
+    public String categoryDeletePost(@RequestParam Long id,
+                                      RedirectAttributes redirectAttributes) {
+        try {
+            tourCategoryService.deleteCategory(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Đã xử lý xóa danh mục.");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/admin/categories";
+    }
+
+    // ==================== DESTINATION MANAGEMENT ====================
+
+    @GetMapping("/destinations")
+    public String destinationList(@RequestParam(required = false) String status,
+                                  @RequestParam(defaultValue = "0") int page,
+                                  Model model) {
+        Pageable pageable = PageRequest.of(page, 10);
+        Page<com.spring.project.entity.Destination> destinationPage = destinationService.getDestinationList(status, pageable);
+        model.addAttribute("destinationPage", destinationPage);
+        model.addAttribute("status", status);
+        return "admin/pages/destinationlist";
+    }
+
+    @GetMapping("/destinations/create")
+    public String destinationCreate(Model model) {
+        if (!model.containsAttribute("destinationRequest")) {
+            com.spring.project.dto.DestinationRequest req = new com.spring.project.dto.DestinationRequest();
+            req.setCountry("Việt Nam");
+            model.addAttribute("destinationRequest", req);
+        }
+        return "admin/pages/destinationcreate";
+    }
+
+    @PostMapping("/destinations/create")
+    public String destinationCreatePost(@Valid @ModelAttribute("destinationRequest") com.spring.project.dto.DestinationRequest request,
+                                         BindingResult bindingResult,
+                                         RedirectAttributes redirectAttributes,
+                                         Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("errorMessage", "Vui lòng kiểm tra lại thông tin");
+            return "admin/pages/destinationcreate";
+        }
+        try {
+            destinationService.createDestination(request);
+            redirectAttributes.addFlashAttribute("successMessage", "Tạo điểm đến thành công!");
+            return "redirect:/admin/destinations";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            return "admin/pages/destinationcreate";
+        }
+    }
+
+    @GetMapping("/destinations/update")
+    public String destinationUpdate(@RequestParam Long id, Model model,
+                                     RedirectAttributes redirectAttributes) {
+        try {
+            com.spring.project.entity.Destination destination = destinationService.getDestinationById(id);
+            model.addAttribute("destination", destination);
+            if (!model.containsAttribute("destinationRequest")) {
+                com.spring.project.dto.DestinationRequest req = new com.spring.project.dto.DestinationRequest();
+                req.setName(destination.getName());
+                req.setProvince(destination.getProvince());
+                req.setCountry(destination.getCountry());
+                req.setDescription(destination.getDescription());
+                req.setImageUrl(destination.getImageUrl());
+                req.setStatus(destination.getStatus());
+                model.addAttribute("destinationRequest", req);
+            }
+            return "admin/pages/destinationupdate";
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/admin/destinations";
+        }
+    }
+
+    @PostMapping("/destinations/update")
+    public String destinationUpdatePost(@RequestParam Long id,
+                                         @Valid @ModelAttribute("destinationRequest") com.spring.project.dto.DestinationRequest request,
+                                         BindingResult bindingResult,
+                                         RedirectAttributes redirectAttributes,
+                                         Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("destination", destinationService.getDestinationById(id));
+            model.addAttribute("errorMessage", "Vui lòng kiểm tra lại thông tin");
+            return "admin/pages/destinationupdate";
+        }
+        try {
+            destinationService.updateDestination(id, request);
+            redirectAttributes.addFlashAttribute("successMessage", "Cập nhật điểm đến thành công!");
+            return "redirect:/admin/destinations";
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/admin/destinations/update?id=" + id;
+        }
+    }
+
+    @GetMapping("/destinations/delete")
+    public String destinationDelete(@RequestParam Long id, Model model,
+                                     RedirectAttributes redirectAttributes) {
+        try {
+            com.spring.project.entity.Destination destination = destinationService.getDestinationById(id);
+            model.addAttribute("destination", destination);
+            model.addAttribute("tourCount", destinationService.countTours(id));
+            return "admin/pages/destinationdelete";
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/admin/destinations";
+        }
+    }
+
+    @PostMapping("/destinations/delete")
+    public String destinationDeletePost(@RequestParam Long id,
+                                         RedirectAttributes redirectAttributes) {
+        try {
+            destinationService.deleteDestination(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Đã xử lý xóa điểm đến.");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/admin/destinations";
     }
 
     // ==================== CUSTOMER MANAGEMENT ====================

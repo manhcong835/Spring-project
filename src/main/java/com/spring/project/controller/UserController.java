@@ -91,12 +91,12 @@ public class UserController {
     public String home(Model model) {
         // Tour nổi bật (4 tour mới nhất)
         Pageable hotPageable = PageRequest.of(0, 4, Sort.by("id").descending());
-        Page<Tour> hotPage = tourService.searchToursForClient(null, null, null, null, null, hotPageable);
+        Page<Tour> hotPage = tourService.searchToursForClient(null, null, null, null, null, null, null, hotPageable);
         model.addAttribute("hotTours", hotPage.getContent());
 
         // Tour khuyến mãi (3 tour cũ nhất)
         Pageable promoPageable = PageRequest.of(0, 3, Sort.by("id").ascending());
-        Page<Tour> promoPage = tourService.searchToursForClient(null, null, null, null, null, promoPageable);
+        Page<Tour> promoPage = tourService.searchToursForClient(null, null, null, null, null, null, null, promoPageable);
         model.addAttribute("promoTours", promoPage.getContent());
 
         // Điểm đến phổ biến
@@ -267,6 +267,9 @@ public class UserController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
         try {
+            // Chặn spam: 1 email chỉ được request reset 2 phút/lần.
+            userService.assertCanResetPassword(email.trim());
+
             String newPassword = generateRandomPassword();
             userService.resetPassword(email.trim(), newPassword);
             emailService.sendNewPassword(email.trim(), newPassword);
@@ -437,17 +440,21 @@ public class UserController {
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) Integer minDuration,
             @RequestParam(required = false) Integer maxDuration,
+            @RequestParam(required = false) java.math.BigDecimal minPrice,
+            @RequestParam(required = false) java.math.BigDecimal maxPrice,
             @RequestParam(defaultValue = "0") int page,
             Model model) {
         Pageable pageable = PageRequest.of(page, 9, Sort.by("createdAt").descending());
         Page<Tour> tourPage = tourService.searchToursForClient(
-                keyword, destinationId, categoryId, minDuration, maxDuration, pageable);
+                keyword, destinationId, categoryId, minDuration, maxDuration, minPrice, maxPrice, pageable);
         model.addAttribute("tourPage", tourPage);
         model.addAttribute("keyword", keyword);
         model.addAttribute("destinationId", destinationId);
         model.addAttribute("categoryId", categoryId);
         model.addAttribute("minDuration", minDuration);
         model.addAttribute("maxDuration", maxDuration);
+        model.addAttribute("minPrice", minPrice);
+        model.addAttribute("maxPrice", maxPrice);
         model.addAttribute("categories", tourCategoryRepository.findAll());
         model.addAttribute("destinations", destinationRepository.findAll());
         return "client/pages/tourlist";

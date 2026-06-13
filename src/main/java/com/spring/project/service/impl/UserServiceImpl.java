@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * Implementation cho UserService.
@@ -111,5 +112,26 @@ public class UserServiceImpl implements UserService {
 
         authProvider.setPassword(passwordEncoder.encode(newPassword));
         userAuthProviderRepository.save(authProvider);
+
+        // Ghi nhận thời điểm reset để áp cooldown 2 phút.
+        user.setLastPasswordResetAt(LocalDateTime.now());
+        userRepository.save(user);
+    }
+
+    @Override
+    public void assertCanResetPassword(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Email không tồn tại trong hệ thống"));
+
+        LocalDateTime last = user.getLastPasswordResetAt();
+        if (last == null) return;
+
+        long secondsSince = java.time.Duration.between(last, LocalDateTime.now()).getSeconds();
+        long cooldownSeconds = 120;
+        if (secondsSince < cooldownSeconds) {
+            long wait = cooldownSeconds - secondsSince;
+            throw new IllegalArgumentException(
+                    "Bạn vừa yêu cầu đặt lại mật khẩu. Vui lòng thử lại sau " + wait + " giây.");
+        }
     }
 }

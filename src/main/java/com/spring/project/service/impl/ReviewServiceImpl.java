@@ -7,6 +7,8 @@ import com.spring.project.repository.BookingRepository;
 import com.spring.project.repository.ReviewRepository;
 import com.spring.project.repository.UserRepository;
 import com.spring.project.service.ReviewService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -75,5 +77,34 @@ public class ReviewServiceImpl implements ReviewService {
         review.setStatus("VISIBLE");
 
         return reviewRepository.save(review);
+    }
+
+    @Override
+    public Page<Review> getReviewList(String status, Pageable pageable) {
+        if (status == null || status.isBlank()) {
+            return reviewRepository.findAll(pageable);
+        }
+        return reviewRepository.findByStatus(status, pageable);
+    }
+
+    @Override
+    public Review getReviewById(Long id) {
+        return reviewRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Đánh giá không tồn tại"));
+    }
+
+    @Override
+    @Transactional
+    public void toggleStatus(Long id) {
+        Review review = getReviewById(id);
+        review.setStatus("VISIBLE".equals(review.getStatus()) ? "HIDDEN" : "VISIBLE");
+        reviewRepository.save(review);
+    }
+
+    @Override
+    @Transactional
+    public void deleteReview(Long id) {
+        Review review = getReviewById(id);
+        reviewRepository.delete(review);
     }
 }

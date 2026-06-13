@@ -139,8 +139,11 @@ public interface TourRepository extends JpaRepository<Tour, Long> {
            "AND (:categoryId IS NULL OR t.category.id = :categoryId) " +
            "AND (:minDuration IS NULL OR t.durationDays >= :minDuration) " +
            "AND (:maxDuration IS NULL OR t.durationDays <= :maxDuration) " +
-           "AND (:minPrice IS NULL OR :maxPrice IS NULL OR " +
-           "     EXISTS (SELECT dep2 FROM TourDeparture dep2 WHERE dep2.tour = t AND dep2.adultPrice BETWEEN :minPrice AND :maxPrice AND dep2.status = 'OPEN' AND dep2.availableSlots > 0))",
+           "AND (:minPrice IS NULL AND :maxPrice IS NULL OR " +
+           "     EXISTS (SELECT dep2 FROM TourDeparture dep2 WHERE dep2.tour = t " +
+           "             AND (:minPrice IS NULL OR dep2.adultPrice >= :minPrice) " +
+           "             AND (:maxPrice IS NULL OR dep2.adultPrice <= :maxPrice) " +
+           "             AND dep2.status = 'OPEN' AND dep2.availableSlots > 0))",
            countQuery = "SELECT COUNT(DISTINCT t) FROM Tour t WHERE t.status = 'ACTIVE' " +
            "AND (:keyword IS NULL OR :keyword = '' OR " +
            "     LOWER(t.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
@@ -148,7 +151,12 @@ public interface TourRepository extends JpaRepository<Tour, Long> {
            "AND (:destinationId IS NULL OR t.destination.id = :destinationId) " +
            "AND (:categoryId IS NULL OR t.category.id = :categoryId) " +
            "AND (:minDuration IS NULL OR t.durationDays >= :minDuration) " +
-           "AND (:maxDuration IS NULL OR t.durationDays <= :maxDuration)")
+           "AND (:maxDuration IS NULL OR t.durationDays <= :maxDuration) " +
+           "AND (:minPrice IS NULL AND :maxPrice IS NULL OR " +
+           "     EXISTS (SELECT dep2 FROM TourDeparture dep2 WHERE dep2.tour = t " +
+           "             AND (:minPrice IS NULL OR dep2.adultPrice >= :minPrice) " +
+           "             AND (:maxPrice IS NULL OR dep2.adultPrice <= :maxPrice) " +
+           "             AND dep2.status = 'OPEN' AND dep2.availableSlots > 0))")
     Page<Tour> searchToursForClient(
             @Param("keyword") String keyword,
             @Param("destinationId") Long destinationId,

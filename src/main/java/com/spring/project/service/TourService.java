@@ -31,6 +31,7 @@ public interface TourService {
     /** UC 2.1 + 2.2 — Tìm kiếm & lọc tour cho client (khách hàng) */
     Page<Tour> searchToursForClient(String keyword, Long destinationId, Long categoryId,
                                     Integer minDuration, Integer maxDuration,
+                                    BigDecimal minPrice, BigDecimal maxPrice,
                                     Pageable pageable);
 
     /** UC 3 — Lấy chi tiết tour cho client (eager load images, category, destination, itineraries) */

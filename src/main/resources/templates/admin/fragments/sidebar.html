@@ -50,6 +50,18 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/categories}">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                        Danh mục tour
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/destinations}">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a8 8 0 0 0-8 8c0 5.4 7 12 7 12s7-6.6 7-12a8 8 0 0 0-6-8z"/><circle cx="12" cy="10" r="3"/></svg>
+                        Điểm đến
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" th:href="@{/admin/bookings}">
                         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
                         Đơn đặt tour
@@ -71,6 +83,12 @@
                     <a class="nav-link" th:href="@{/admin/promotions}">
                         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
                         Khuyến mãi
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/admin/reviews}">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        Đánh giá
                     </a>
                 </li>
             </ul>
@@ -121,10 +139,13 @@
             <ul class="nav flex-column gap-1">
                 <li><a class="nav-link" th:href="@{/admin/dashboard}">📊 Dashboard</a></li>
                 <li><a class="nav-link" th:href="@{/admin/tours}">🗺️ Tour du lịch</a></li>
+                <li><a class="nav-link" th:href="@{/admin/categories}">🏷️ Danh mục tour</a></li>
+                <li><a class="nav-link" th:href="@{/admin/destinations}">📍 Điểm đến</a></li>
                 <li><a class="nav-link" th:href="@{/admin/bookings}">📋 Đơn đặt tour</a></li>
                 <li><a class="nav-link" th:href="@{/admin/customers}">👥 Khách hàng</a></li>
                 <li><a class="nav-link" th:href="@{/admin/staff}">👔 Nhân viên</a></li>
                 <li><a class="nav-link" th:href="@{/admin/promotions}">🎁 Khuyến mãi</a></li>
+                <li><a class="nav-link" th:href="@{/admin/reviews}">⭐ Đánh giá</a></li>
                 <li><hr style="border-color:var(--border-subtle)"></li>
                 <li><a class="nav-link" th:href="@{/admin/profile}">👤 Hồ sơ</a></li>
                 <li>

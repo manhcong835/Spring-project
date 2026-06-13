@@ -31,8 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
-
-/config/
+config/OAuthGG.json
 
 usecase.txt
 database_sqlserver.sql
@@ -47,3 +46,5 @@ PROMPT_OLD.txt
 seed_data.sql
 .agent/
 tourbookingdb_dump.sql
+docs/
+blue.exe

@@ -1,3 +1,8 @@
+-- =====================================================
+-- SCHEMA INIT - Tạo bảng (idempotent - chạy được nhiều lần)
+-- Spring Boot tự chạy file này khi khởi động.
+-- =====================================================
+
 CREATE DATABASE IF NOT EXISTS tourbookingdb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 USE tourbookingdb;
@@ -5,25 +10,16 @@ USE tourbookingdb;
 -- =========================
 -- 1. ROLES
 -- =========================
-CREATE TABLE roles (
+CREATE TABLE IF NOT EXISTS roles (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL UNIQUE,
     description VARCHAR(255)
 );
 
-INSERT IGNORE INTO
-    roles (name, description)
-VALUES (
-        'ADMIN',
-        'Quản trị viên hệ thống'
-    ),
-    ('STAFF', 'Nhân viên'),
-    ('CUSTOMER', 'Khách hàng');
-
 -- =========================
 -- 2. USERS
 -- =========================
-create TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     role_id BIGINT NOT NULL,
     full_name VARCHAR(100) NOT NULL,
@@ -40,12 +36,15 @@ create TABLE users (
     CONSTRAINT fk_users_role FOREIGN KEY (role_id) REFERENCES roles (id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
-CREATE TABLE user_auth_providers (
+-- =========================
+-- 3. USER AUTH PROVIDERS
+-- =========================
+CREATE TABLE IF NOT EXISTS user_auth_providers (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
-    provider VARCHAR(20) NOT NULL, -- LOCAL, GOOGLE
-    provider_user_id VARCHAR(255) NULL, -- với GOOGLE: lưu sub
-    password VARCHAR(255) NULL, -- với LOCAL: lưu mật khẩu băm
+    provider VARCHAR(20) NOT NULL,
+    provider_user_id VARCHAR(255) NULL,
+    password VARCHAR(255) NULL,
     email_verified BOOLEAN NOT NULL DEFAULT FALSE,
     provider_email VARCHAR(100) NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -56,9 +55,9 @@ CREATE TABLE user_auth_providers (
 );
 
 -- =========================
--- 3. TOUR CATEGORIES
+-- 4. TOUR CATEGORIES
 -- =========================
-CREATE TABLE tour_categories (
+CREATE TABLE IF NOT EXISTS tour_categories (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL UNIQUE,
     description VARCHAR(255),
@@ -66,9 +65,9 @@ CREATE TABLE tour_categories (
 );
 
 -- =========================
--- 4. DESTINATIONS
+-- 5. DESTINATIONS
 -- =========================
-CREATE TABLE destinations (
+CREATE TABLE IF NOT EXISTS destinations (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(150) NOT NULL,
     province VARCHAR(100),
@@ -79,9 +78,9 @@ CREATE TABLE destinations (
 );
 
 -- =========================
--- 5. TOURS
+-- 6. TOURS
 -- =========================
-CREATE TABLE tours (
+CREATE TABLE IF NOT EXISTS tours (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     category_id BIGINT NOT NULL,
     destination_id BIGINT NOT NULL,
@@ -106,9 +105,9 @@ CREATE TABLE tours (
 );
 
 -- =========================
--- 6. TOUR IMAGES
+-- 7. TOUR IMAGES
 -- =========================
-CREATE TABLE tour_images (
+CREATE TABLE IF NOT EXISTS tour_images (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     tour_id BIGINT NOT NULL,
     image_url VARCHAR(255) NOT NULL,
@@ -120,9 +119,9 @@ CREATE TABLE tour_images (
 );
 
 -- =========================
--- 7. TOUR ITINERARIES
+-- 8. TOUR ITINERARIES
 -- =========================
-CREATE TABLE tour_itineraries (
+CREATE TABLE IF NOT EXISTS tour_itineraries (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     tour_id BIGINT NOT NULL,
     day_number INT NOT NULL,
@@ -135,9 +134,9 @@ CREATE TABLE tour_itineraries (
 );
 
 -- =========================
--- 8. TOUR DEPARTURES
+-- 9. TOUR DEPARTURES
 -- =========================
-CREATE TABLE tour_departures (
+CREATE TABLE IF NOT EXISTS tour_departures (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     tour_id BIGINT NOT NULL,
     departure_date DATE NOT NULL,
@@ -157,9 +156,9 @@ CREATE TABLE tour_departures (
 );
 
 -- =========================
--- 9. PROMOTIONS
+-- 10. PROMOTIONS
 -- =========================
-CREATE TABLE promotions (
+CREATE TABLE IF NOT EXISTS promotions (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     code VARCHAR(50) NOT NULL UNIQUE,
     name VARCHAR(150) NOT NULL,
@@ -180,9 +179,9 @@ CREATE TABLE promotions (
 );
 
 -- =========================
--- 10. TOUR PROMOTIONS
+-- 11. TOUR PROMOTIONS
 -- =========================
-CREATE TABLE tour_promotions (
+CREATE TABLE IF NOT EXISTS tour_promotions (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     tour_id BIGINT NOT NULL,
     promotion_id BIGINT NOT NULL,
@@ -192,9 +191,9 @@ CREATE TABLE tour_promotions (
 );
 
 -- =========================
--- 11. BOOKINGS
+-- 12. BOOKINGS
 -- =========================
-CREATE TABLE bookings (
+CREATE TABLE IF NOT EXISTS bookings (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     booking_code VARCHAR(50) NOT NULL UNIQUE,
     user_id BIGINT NOT NULL,
@@ -230,9 +229,9 @@ CREATE TABLE bookings (
 );
 
 -- =========================
--- 12. BOOKING TRAVELERS
+-- 13. BOOKING TRAVELERS
 -- =========================
-CREATE TABLE booking_travelers (
+CREATE TABLE IF NOT EXISTS booking_travelers (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     booking_id BIGINT NOT NULL,
     full_name VARCHAR(100) NOT NULL,
@@ -246,9 +245,9 @@ CREATE TABLE booking_travelers (
 );
 
 -- =========================
--- 13. PAYMENTS
+-- 14. PAYMENTS
 -- =========================
-CREATE TABLE payments (
+CREATE TABLE IF NOT EXISTS payments (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     booking_id BIGINT NOT NULL,
     payment_code VARCHAR(50) NOT NULL UNIQUE,
@@ -265,9 +264,9 @@ CREATE TABLE payments (
 );
 
 -- =========================
--- 14. REVIEWS
+-- 15. REVIEWS
 -- =========================
-CREATE TABLE reviews (
+CREATE TABLE IF NOT EXISTS reviews (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     booking_id BIGINT NOT NULL,
     user_id BIGINT NOT NULL,
@@ -284,3 +283,11 @@ CREATE TABLE reviews (
     CONSTRAINT fk_reviews_tour FOREIGN KEY (tour_id) REFERENCES tours (id) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT chk_reviews_rating CHECK (rating BETWEEN 1 AND 5)
 );
+
+-- =========================
+-- SEED: Roles mặc định
+-- =========================
+INSERT IGNORE INTO roles (name, description) VALUES
+    ('ADMIN', 'Quản trị viên hệ thống'),
+    ('STAFF', 'Nhân viên'),
+    ('CUSTOMER', 'Khách hàng');
