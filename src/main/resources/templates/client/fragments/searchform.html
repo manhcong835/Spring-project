@@ -1,47 +1,71 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <div th:fragment="searchform" class="search-glass">
-    <form class="row g-3 align-items-end">
+    <form th:action="@{/tours}" method="GET" class="row g-3 align-items-end" id="homeSearchForm">
         <div class="col-md-3">
             <label class="form-label fw-semibold small" style="color:var(--color-text-muted);">📍 Điểm đến</label>
-            <select class="form-select">
-                <option selected>Tất cả điểm đến</option>
-                <option>Đà Nẵng – Hội An</option>
-                <option>Phú Quốc</option>
-                <option>Hạ Long</option>
-                <option>Sapa – Lào Cai</option>
-                <option>Nha Trang</option>
-                <option>Huế</option>
-                <option>Đà Lạt</option>
+            <select name="destinationId" class="form-select">
+                <option value="">Tất cả điểm đến</option>
+                <option th:each="d : ${destinations}"
+                        th:value="${d.id}"
+                        th:text="${d.name}"></option>
             </select>
         </div>
         <div class="col-md-3">
-            <label class="form-label fw-semibold small" style="color:var(--color-text-muted);">📅 Ngày khởi hành</label>
-            <input type="date" class="form-control">
-        </div>
-        <div class="col-md-2">
             <label class="form-label fw-semibold small" style="color:var(--color-text-muted);">⏱️ Thời gian</label>
-            <select class="form-select">
-                <option selected>Tất cả</option>
-                <option>1-2 ngày</option>
-                <option>3-4 ngày</option>
-                <option>5-7 ngày</option>
-                <option>Trên 7 ngày</option>
+            <select class="form-select" id="homeDuration">
+                <option value="" selected>Tất cả</option>
+                <option value="1-2">1-2 ngày</option>
+                <option value="3-4">3-4 ngày</option>
+                <option value="5-7">5-7 ngày</option>
+                <option value="8+">Trên 7 ngày</option>
             </select>
+            <input type="hidden" name="minDuration" id="homeMinDuration">
+            <input type="hidden" name="maxDuration" id="homeMaxDuration">
         </div>
-        <div class="col-md-2">
+        <div class="col-md-3">
             <label class="form-label fw-semibold small" style="color:var(--color-text-muted);">💰 Ngân sách</label>
-            <select class="form-select">
-                <option selected>Tất cả</option>
-                <option>Dưới 3 triệu</option>
-                <option>3 - 5 triệu</option>
-                <option>5 - 10 triệu</option>
-                <option>Trên 10 triệu</option>
+            <select class="form-select" id="homeBudget">
+                <option value="" selected>Tất cả</option>
+                <option value="0-3000000">Dưới 3 triệu</option>
+                <option value="3000000-7000000">3 - 7 triệu</option>
+                <option value="7000000-15000000">7 - 15 triệu</option>
+                <option value="15000000-">Trên 15 triệu</option>
             </select>
+            <input type="hidden" name="minPrice" id="homeMinPrice">
+            <input type="hidden" name="maxPrice" id="homeMaxPrice">
         </div>
-        <div class="col-md-2">
+        <div class="col-md-3">
             <button type="submit" class="btn btn-search-tour w-100">🔍 Tìm tour</button>
         </div>
     </form>
 </div>
+<script th:inline="javascript">
+    (function () {
+        var form = document.getElementById('homeSearchForm');
+        if (!form) return;
+        form.addEventListener('submit', function () {
+            var dur = document.getElementById('homeDuration').value;
+            var minD = document.getElementById('homeMinDuration');
+            var maxD = document.getElementById('homeMaxDuration');
+            if (dur === '1-2') { minD.value = 1; maxD.value = 2; }
+            else if (dur === '3-4') { minD.value = 3; maxD.value = 4; }
+            else if (dur === '5-7') { minD.value = 5; maxD.value = 7; }
+            else if (dur === '8+') { minD.value = 8; maxD.value = ''; }
+            else { minD.disabled = true; maxD.disabled = true; }
+
+            var bud = document.getElementById('homeBudget').value;
+            var minP = document.getElementById('homeMinPrice');
+            var maxP = document.getElementById('homeMaxPrice');
+            if (bud) {
+                var parts = bud.split('-');
+                minP.value = parts[0] || '';
+                maxP.value = parts[1] || '';
+            } else {
+                minP.disabled = true;
+                maxP.disabled = true;
+            }
+        });
+    })();
+</script>
 </html>
