@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="vi">
 <head th:replace="~{admin/fragments/head :: head('Dashboard', '/css/admin/dashboard.css')}"></head>
 <body>
 <div th:replace="~{admin/fragments/sidebar :: sidebar}"></div>
@@ -59,7 +59,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xl-3 col-md-6">
+            <div class="col-xl-3 col-md-6" sec:authorize="hasRole('ADMIN')">
                 <div class="card stat-card shadow-sm">
                     <div class="card-body d-flex align-items-center gap-3">
                         <div class="stat-icon bg-danger-subtle text-danger">&#128176;</div>
@@ -76,7 +76,7 @@
         </div>
 
         <div class="row g-4 mb-4">
-            <div class="col-lg-8">
+            <div class="col-lg-8" sec:authorize="hasRole('ADMIN')">
                 <div class="card admin-card h-100">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h6 class="fw-bold mb-0">Bi&#7875;u &#273;&#7891; doanh thu 6 th&#225;ng</h6>
@@ -101,7 +101,7 @@
                 </div>
             </div>
 
-            <div class="col-lg-4">
+            <div th:class="${#authorization.expression('hasRole(''ADMIN'')')} ? 'col-lg-4' : 'col-lg-12'">
                 <div class="card admin-card h-100">
                     <div class="card-header">
                         <h6 class="fw-bold mb-0">Ho&#7841;t &#273;&#7897;ng g&#7847;n &#273;&#226;y</h6>

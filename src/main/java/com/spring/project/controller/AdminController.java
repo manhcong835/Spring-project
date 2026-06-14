@@ -1073,7 +1073,7 @@ public class AdminController {
     // ==================== HELPER ====================
 
     /**
-     * Kiểm tra user đã đăng nhập và có role ADMIN hay không.
+     * Kiểm tra user đã đăng nhập và có quyền vào khu vực /admin (ADMIN hoặc STAFF).
      */
     private boolean isAdmin(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()
@@ -1082,6 +1082,6 @@ public class AdminController {
         }
         return authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .anyMatch("ROLE_ADMIN"::equals);
+                .anyMatch(a -> "ROLE_ADMIN".equals(a) || "ROLE_STAFF".equals(a));
     }
 }

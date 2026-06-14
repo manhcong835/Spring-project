@@ -61,8 +61,17 @@ public class SecurityConfig {
                     "/error/**"
                 ).permitAll()
 
-                // Chỉ ADMIN được vào /admin/**
-                .requestMatchers("/admin/**").hasRole("ADMIN")
+                // Chỉ ADMIN: tài chính, nhân sự, marketing, thao tác khách hàng
+                .requestMatchers(
+                    "/admin/revenue/**",
+                    "/admin/staff/**",
+                    "/admin/promotions/**",
+                    "/admin/customers/create",
+                    "/admin/customers/status"
+                ).hasRole("ADMIN")
+
+                // ADMIN + STAFF: dashboard, tour, danh mục, điểm đến, đơn đặt, đánh giá, hồ sơ
+                .requestMatchers("/admin/**").hasAnyRole("ADMIN", "STAFF")
 
                 // Các URL còn lại yêu cầu đăng nhập
                 .anyRequest().authenticated()

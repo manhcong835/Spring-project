@@ -34,15 +34,16 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             return;
         }
 
-        boolean isAdmin = false;
+        boolean canAccessAdmin = false;
         for (GrantedAuthority authority : authentication.getAuthorities()) {
-            if ("ROLE_ADMIN".equals(authority.getAuthority())) {
-                isAdmin = true;
+            String a = authority.getAuthority();
+            if ("ROLE_ADMIN".equals(a) || "ROLE_STAFF".equals(a)) {
+                canAccessAdmin = true;
                 break;
             }
         }
 
-        if (isAdmin && "admin".equals(loginSource)) {
+        if (canAccessAdmin && "admin".equals(loginSource)) {
             response.sendRedirect("/admin/dashboard");
         } else {
             response.sendRedirect("/");

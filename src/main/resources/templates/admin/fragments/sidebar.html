@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <div th:fragment="sidebar">
     <!-- Desktop sidebar -->
     <div class="admin-sidebar d-none d-lg-block">
@@ -40,7 +40,7 @@
                         Dashboard
                     </a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" sec:authorize="hasRole('ADMIN')">
                     <a class="nav-link" th:href="@{/admin/revenue}">
                         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
                         Thống kê doanh thu
@@ -79,13 +79,13 @@
                         Khách hàng
                     </a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" sec:authorize="hasRole('ADMIN')">
                     <a class="nav-link" th:href="@{/admin/staff}">
                         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
                         Nhân viên
                     </a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" sec:authorize="hasRole('ADMIN')">
                     <a class="nav-link" th:href="@{/admin/promotions}">
                         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
                         Khuyến mãi
@@ -144,14 +144,14 @@
 
             <ul class="nav flex-column gap-1">
                 <li><a class="nav-link" th:href="@{/admin/dashboard}">📊 Dashboard</a></li>
-                <li><a class="nav-link" th:href="@{/admin/revenue}">📈 Thống kê doanh thu</a></li>
+                <li sec:authorize="hasRole('ADMIN')"><a class="nav-link" th:href="@{/admin/revenue}">📈 Thống kê doanh thu</a></li>
                 <li><a class="nav-link" th:href="@{/admin/tours}">🗺️ Tour du lịch</a></li>
                 <li><a class="nav-link" th:href="@{/admin/categories}">🏷️ Danh mục tour</a></li>
                 <li><a class="nav-link" th:href="@{/admin/destinations}">📍 Điểm đến</a></li>
                 <li><a class="nav-link" th:href="@{/admin/bookings}">📋 Đơn đặt tour</a></li>
                 <li><a class="nav-link" th:href="@{/admin/customers}">👥 Khách hàng</a></li>
-                <li><a class="nav-link" th:href="@{/admin/staff}">👔 Nhân viên</a></li>
-                <li><a class="nav-link" th:href="@{/admin/promotions}">🎁 Khuyến mãi</a></li>
+                <li sec:authorize="hasRole('ADMIN')"><a class="nav-link" th:href="@{/admin/staff}">👔 Nhân viên</a></li>
+                <li sec:authorize="hasRole('ADMIN')"><a class="nav-link" th:href="@{/admin/promotions}">🎁 Khuyến mãi</a></li>
                 <li><a class="nav-link" th:href="@{/admin/reviews}">⭐ Đánh giá</a></li>
                 <li><hr style="border-color:var(--border-subtle)"></li>
                 <li><a class="nav-link" th:href="@{/admin/profile}">👤 Hồ sơ</a></li>
