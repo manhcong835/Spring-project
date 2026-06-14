@@ -326,9 +326,8 @@ public class UserController {
 
         // Kiểm tra cờ session: vừa reset mật khẩu → ép đổi mật khẩu mới
         String justReset = (String) session.getAttribute("justResetPasswordEmail");
-        if (justReset != null && justReset.equalsIgnoreCase(user.getEmail())) {
-            model.addAttribute("forceChange", true);
-        }
+        boolean forceChangeFlag = justReset != null && justReset.equalsIgnoreCase(user.getEmail());
+        model.addAttribute("forceChange", forceChangeFlag);
 
         // Thêm DTO rỗng nếu chưa có trong model (lần đầu vào trang)
         if (!model.containsAttribute("updateProfileRequest")) {

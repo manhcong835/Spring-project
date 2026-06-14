@@ -46,4 +46,14 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     @Query("SELECT p FROM Payment p JOIN FETCH p.booking b " +
            "WHERE p.status = 'SUCCESS' ORDER BY p.createdAt DESC")
     List<Payment> findRecentSuccessfulPayments(Pageable pageable);
+
+    @Query("SELECT p FROM Payment p " +
+           "JOIN FETCH p.booking b " +
+           "JOIN FETCH b.tourDeparture td " +
+           "JOIN FETCH td.tour t " +
+           "WHERE p.status = 'SUCCESS' " +
+           "AND p.paidAt >= :start AND p.paidAt < :end " +
+           "ORDER BY p.paidAt ASC")
+    List<Payment> findSuccessfulPaymentsBetween(@Param("start") LocalDateTime start,
+                                                @Param("end") LocalDateTime end);
 }

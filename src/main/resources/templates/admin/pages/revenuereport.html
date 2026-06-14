@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head th:replace="~{admin/fragments/head :: head('Thong ke doanh thu', '/css/admin/dashboard.css')}"></head>
+<body>
+<div th:replace="~{admin/fragments/sidebar :: sidebar}"></div>
+<div class="admin-main">
+    <div th:replace="~{admin/fragments/header :: header}"></div>
+    <main class="flex-grow-1 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 class="fw-bold mb-1">Th&#7889;ng k&#234; doanh thu</h4>
+                <p class="text-muted mb-0 small">D&#7921;a tr&#234;n giao d&#7883;ch thanh to&#225;n th&#224;nh c&#244;ng (SUCCESS)</p>
+            </div>
+            <div class="d-flex align-items-center gap-2 no-print">
+                <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">
+                    <span th:text="${report.fromText}">01/01/2026</span> &mdash; <span th:text="${report.toText}">31/01/2026</span>
+                </span>
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="window.print()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px">
+                        <polyline points="6 9 6 2 18 2 18 9"/>
+                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                        <rect x="6" y="14" width="12" height="8"/>
+                    </svg>
+                    In b&#225;o c&#225;o
+                </button>
+            </div>
+        </div>
+
+        <!-- Tieu de cho ban in (chi hien khi in) -->
+        <div class="print-only mb-4">
+            <h3 class="fw-bold mb-1">B&#225;o c&#225;o doanh thu</h3>
+            <p class="mb-0 text-muted small">
+                T&#7915; <span th:text="${report.fromText}">01/01/2026</span>
+                &#273;&#7871;n <span th:text="${report.toText}">31/01/2026</span>
+                &middot; Nh&#243;m theo
+                <span th:text="${report.groupBy == 'month' ? 'thang' : (report.groupBy == 'week' ? 'tuan' : 'ngay')}">ngay</span>
+            </p>
+        </div>
+
+        <!-- Filter form -->
+        <div class="card admin-card mb-4 no-print">
+            <div class="card-body">
+                <form method="get" th:action="@{/admin/revenue}" class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label small text-muted">T&#7915; ng&#224;y</label>
+                        <input type="date" name="from" class="form-control" th:value="${report.fromValue}">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small text-muted">&#272;&#7871;n ng&#224;y</label>
+                        <input type="date" name="to" class="form-control" th:value="${report.toValue}">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small text-muted">Nh&#243;m theo</label>
+                        <select name="groupBy" class="form-select">
+                            <option value="day" th:selected="${report.groupBy == 'day'}">Theo ng&#224;y</option>
+                            <option value="week" th:selected="${report.groupBy == 'week'}">Theo tu&#7847;n</option>
+                            <option value="month" th:selected="${report.groupBy == 'month'}">Theo th&#225;ng</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary w-100">L&#7885;c</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Summary cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="card stat-card shadow-sm">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <div class="stat-icon bg-danger-subtle text-danger">&#128176;</div>
+                        <div>
+                            <div class="text-muted small">T&#7893;ng doanh thu</div>
+                            <div class="fs-3 fw-bold" th:text="${report.totalText}">0 VND</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card stat-card shadow-sm">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <div class="stat-icon bg-success-subtle text-success">&#128203;</div>
+                        <div>
+                            <div class="text-muted small">S&#7889; giao d&#7883;ch th&#224;nh c&#244;ng</div>
+                            <div class="fs-3 fw-bold" th:text="${report.transactionCount}">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline chart -->
+        <div class="card admin-card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="fw-bold mb-0">Bi&#7875;u &#273;&#7891; doanh thu</h6>
+                <span class="text-muted small" th:text="${report.groupBy == 'month' ? 'Nhom theo thang' : (report.groupBy == 'week' ? 'Nhom theo tuan' : 'Nhom theo ngay')}">Nhom theo ngay</span>
+            </div>
+            <div class="card-body">
+                <div class="revenue-chart" th:if="${!report.timeline.isEmpty()}">
+                    <div class="revenue-column" th:each="point : ${report.timeline}">
+                        <div class="revenue-value" th:text="${point.amountText}">0 VND</div>
+                        <div class="revenue-bar-track">
+                            <div class="revenue-bar"
+                                 th:classappend="${point.barHeightPercent == 0} ? 'revenue-bar-empty' : ''"
+                                 th:style="|height:${point.barHeightPercent}%|"></div>
+                        </div>
+                        <div class="revenue-label" th:text="${point.label}">01/01</div>
+                    </div>
+                </div>
+                <div class="text-muted text-center py-5" th:if="${report.timeline.isEmpty()}">
+                    Kh&#244;ng c&#243; doanh thu trong kho&#7843;ng th&#7901;i gian n&#224;y.
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Top tour -->
+            <div class="col-lg-7">
+                <div class="card admin-card h-100">
+                    <div class="card-header">
+                        <h6 class="fw-bold mb-0">Top tour theo doanh thu</h6>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-admin table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th style="width:40px">#</th>
+                                        <th>Tour</th>
+                                        <th class="text-center">S&#7889; giao d&#7883;ch</th>
+                                        <th class="text-end">Doanh thu</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:if="${report.topTours.isEmpty()}">
+                                        <td colspan="4" class="text-center text-muted py-4">Kh&#244;ng c&#243; d&#7919; li&#7879;u.</td>
+                                    </tr>
+                                    <tr th:each="tour, iter : ${report.topTours}">
+                                        <td th:text="${iter.index + 1}">1</td>
+                                        <td th:text="${tour.tourName}">Tour name</td>
+                                        <td class="text-center" th:text="${tour.transactionCount}">0</td>
+                                        <td class="text-end fw-bold" th:text="${tour.amountText}">0 VND</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- By payment method -->
+            <div class="col-lg-5">
+                <div class="card admin-card h-100">
+                    <div class="card-header">
+                        <h6 class="fw-bold mb-0">Theo ph&#432;&#417;ng th&#7913;c thanh to&#225;n</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-muted text-center py-4" th:if="${report.byMethod.isEmpty()}">
+                            Kh&#244;ng c&#243; d&#7919; li&#7879;u.
+                        </div>
+                        <div th:each="m : ${report.byMethod}" class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-semibold" th:text="${m.methodLabel}">Tien mat</span>
+                                <span class="text-muted small" th:text="${m.amountText}">0 VND</span>
+                            </div>
+                            <div class="progress" style="height:8px">
+                                <div class="progress-bar bg-primary"
+                                     th:style="|width:${m.percentOfTotal}%|"
+                                     th:attr="aria-valuenow=${m.percentOfTotal}"
+                                     aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <div class="text-muted small mt-1">
+                                <span th:text="${m.transactionCount}">0</span> giao d&#7883;ch &middot;
+                                <span th:text="${m.percentOfTotal} + '%'">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <div th:replace="~{admin/fragments/footer :: footer}"></div>
+</div>
+
+<style>
+    .print-only { display: none; }
+    @media print {
+        @page { size: A4; margin: 12mm; }
+
+        /* Ep dark theme variables sang light */
+        :root {
+            --surface-base: #fff !important;
+            --surface-raised: #fff !important;
+            --surface-overlay: #f0f0f0 !important;
+            --surface-hover: #f5f5f5 !important;
+            --surface-active: #f5f5f5 !important;
+            --surface-sidebar: #fff !important;
+            --border-subtle: #ddd !important;
+            --border-default: #ccc !important;
+            --border-accent: #0d6efd !important;
+            --text-primary: #000 !important;
+            --text-secondary: #333 !important;
+            --text-muted: #555 !important;
+            --text-accent: #0a7c4a !important;
+            --accent-gradient: #0d6efd !important;
+            --shadow-sm: none !important;
+            --shadow-md: none !important;
+            --shadow-lg: none !important;
+        }
+
+        html, body, .admin-main, main { background: #fff !important; color: #000 !important; }
+
+        .admin-sidebar, .admin-header, .admin-footer,
+        .offcanvas, .no-print { display: none !important; }
+        .admin-main { margin-left: 0 !important; width: 100% !important; }
+        main { padding: 0 !important; }
+        .print-only { display: block !important; }
+
+        .card, .admin-card, .stat-card {
+            background: #fff !important;
+            border: 1px solid #ccc !important;
+            box-shadow: none !important;
+            break-inside: avoid;
+            color: #000 !important;
+        }
+        .card-header { background: #fafafa !important; color: #000 !important; border-bottom: 1px solid #ddd !important; }
+        .table, .table thead th, .table tbody td { color: #000 !important; background: #fff !important; border-color: #ddd !important; }
+        h3, h4, h6, .fw-bold { color: #000 !important; }
+        .text-muted, .text-muted * { color: #555 !important; }
+        .badge { background: #eef !important; color: #003 !important; border: 1px solid #cce; }
+
+        /* Bieu do: ep chieu cao + mau solid (gradient bi strip) */
+        .revenue-chart { min-height: 0 !important; height: 180px !important; gap: 8px !important; break-inside: avoid; page-break-inside: avoid; }
+        .revenue-column { grid-template-rows: 28px 130px 20px !important; min-width: 0 !important; }
+        .revenue-bar-track {
+            height: 130px !important;
+            background: #eee !important;
+            border: 1px solid #ddd !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        .revenue-bar {
+            background: #0d6efd !important;
+            min-height: 4px;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        .revenue-bar::after { display: none !important; }
+        .revenue-bar-empty { background: transparent !important; }
+        .revenue-value, .revenue-label { color: #000 !important; font-size: 9pt !important; }
+
+        /* Method breakdown progress bar */
+        .progress {
+            background: #eee !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        .progress-bar {
+            background: #0d6efd !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        /* Stat icon emoji circle */
+        .stat-icon {
+            background: #f0f0f0 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        a[href]:after { content: ""; }
+    }
+</style>
+</body>
+</html>

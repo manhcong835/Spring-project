@@ -57,6 +57,7 @@ public class AdminController {
     private final com.spring.project.service.ReviewService reviewService;
     private final com.spring.project.service.TourCategoryService tourCategoryService;
     private final com.spring.project.service.DestinationService destinationService;
+    private final com.spring.project.service.RevenueReportService revenueReportService;
 
     public AdminController(UserService userService, AdminDashboardService adminDashboardService,
                            AuthService authService, StaffService staffService,
@@ -67,7 +68,8 @@ public class AdminController {
                            com.spring.project.service.CustomerService customerService,
                            com.spring.project.service.ReviewService reviewService,
                            com.spring.project.service.TourCategoryService tourCategoryService,
-                           com.spring.project.service.DestinationService destinationService) {
+                           com.spring.project.service.DestinationService destinationService,
+                           com.spring.project.service.RevenueReportService revenueReportService) {
         this.userService = userService;
         this.adminDashboardService = adminDashboardService;
         this.authService = authService;
@@ -82,6 +84,7 @@ public class AdminController {
         this.reviewService = reviewService;
         this.tourCategoryService = tourCategoryService;
         this.destinationService = destinationService;
+        this.revenueReportService = revenueReportService;
     }
 
     // ==================== AUTHENTICATION ====================
@@ -122,6 +125,30 @@ public class AdminController {
     public String dashboard(Model model) {
         model.addAttribute("dashboard", adminDashboardService.getDashboard());
         return "admin/pages/dashboard";
+    }
+
+    // ==================== REVENUE REPORT ====================
+
+    @GetMapping("/revenue")
+    public String revenue(@RequestParam(required = false) String from,
+                          @RequestParam(required = false) String to,
+                          @RequestParam(defaultValue = "day") String groupBy,
+                          Model model) {
+        java.time.LocalDate fromDate = parseDateOrNull(from);
+        java.time.LocalDate toDate = parseDateOrNull(to);
+        if (fromDate == null) fromDate = java.time.LocalDate.now().withDayOfMonth(1);
+        if (toDate == null) toDate = java.time.LocalDate.now();
+        model.addAttribute("report", revenueReportService.getReport(fromDate, toDate, groupBy));
+        return "admin/pages/revenuereport";
+    }
+
+    private java.time.LocalDate parseDateOrNull(String value) {
+        if (value == null || value.isBlank()) return null;
+        try {
+            return java.time.LocalDate.parse(value);
+        } catch (java.time.format.DateTimeParseException e) {
+            return null;
+        }
     }
 
     // ==================== STAFF MANAGEMENT ====================
