@@ -130,11 +130,24 @@
                        th:if="${!bookingPage.first}">← Trước</a>
                     <span class="page-link" th:if="${bookingPage.first}">← Trước</span>
                 </li>
-                <th:block th:each="i : ${#numbers.sequence(0, bookingPage.totalPages - 1)}">
-                    <li class="page-item" th:classappend="${i == bookingPage.number} ? 'active'">
-                        <a class="page-link"
-                           th:href="@{/booking/history(status=${status},page=${i})}"
-                           th:text="${i + 1}">1</a>
+                <th:block th:with="cur=${bookingPage.number},
+                                   last=${bookingPage.totalPages - 1},
+                                   winStart=${T(java.lang.Math).max(0, cur - 2)},
+                                   winEnd=${T(java.lang.Math).min(last, cur + 2)}">
+                    <li class="page-item" th:if="${winStart > 0}">
+                        <a class="page-link" th:href="@{/booking/history(status=${status},page=0)}">1</a>
+                    </li>
+                    <li class="page-item disabled" th:if="${winStart > 1}"><span class="page-link">…</span></li>
+                    <th:block th:each="i : ${#numbers.sequence(winStart, winEnd)}">
+                        <li class="page-item" th:classappend="${i == cur} ? 'active'">
+                            <a class="page-link"
+                               th:href="@{/booking/history(status=${status},page=${i})}"
+                               th:text="${i + 1}">1</a>
+                        </li>
+                    </th:block>
+                    <li class="page-item disabled" th:if="${winEnd < last - 1}"><span class="page-link">…</span></li>
+                    <li class="page-item" th:if="${winEnd < last}">
+                        <a class="page-link" th:href="@{/booking/history(status=${status},page=${last})}" th:text="${last + 1}">N</a>
                     </li>
                 </th:block>
                 <li class="page-item" th:classappend="${bookingPage.last} ? 'disabled'">

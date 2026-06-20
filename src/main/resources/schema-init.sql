@@ -1,3 +1,4 @@
+-- Active: 1779420881625@@127.0.0.1@3306@mysql
 -- =====================================================
 -- SCHEMA INIT - Tạo bảng (idempotent - chạy được nhiều lần)
 -- Spring Boot tự chạy file này khi khởi động.
@@ -287,7 +288,11 @@ CREATE TABLE IF NOT EXISTS reviews (
 -- =========================
 -- SEED: Roles mặc định
 -- =========================
-INSERT IGNORE INTO roles (name, description) VALUES
-    ('ADMIN', 'Quản trị viên hệ thống'),
+INSERT IGNORE INTO
+    roles (name, description)
+VALUES (
+        'ADMIN',
+        'Quản trị viên hệ thống'
+    ),
     ('STAFF', 'Nhân viên'),
     ('CUSTOMER', 'Khách hàng');

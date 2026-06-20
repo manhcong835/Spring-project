@@ -109,16 +109,29 @@
                       th:text="'Hiển thị ' + (${tourPage.number * tourPage.size + 1}) + '-' + (${tourPage.number * tourPage.size + tourPage.numberOfElements}) + ' của ' + ${tourPage.totalElements} + ' kết quả'">
                 </span>
                 <ul class="pagination pagination-sm mb-0">
-                    <li class="page-item" th:classappend="${tourPage.first} ? 'disabled'">
-                        <a class="page-link" th:href="@{/admin/tours(keyword=${keyword}, status=${status}, page=${tourPage.number - 1})}">←</a>
-                    </li>
-                    <li th:each="i : ${#numbers.sequence(0, tourPage.totalPages - 1)}"
-                        class="page-item" th:classappend="${i == tourPage.number} ? 'active'">
-                        <a class="page-link" th:href="@{/admin/tours(keyword=${keyword}, status=${status}, page=${i})}" th:text="${i + 1}">1</a>
-                    </li>
-                    <li class="page-item" th:classappend="${tourPage.last} ? 'disabled'">
-                        <a class="page-link" th:href="@{/admin/tours(keyword=${keyword}, status=${status}, page=${tourPage.number + 1})}">→</a>
-                    </li>
+                    <th:block th:with="cur=${tourPage.number},
+                                       last=${tourPage.totalPages - 1},
+                                       winStart=${T(java.lang.Math).max(0, cur - 2)},
+                                       winEnd=${T(java.lang.Math).min(last, cur + 2)}">
+                        <li class="page-item" th:classappend="${tourPage.first} ? 'disabled'">
+                            <a class="page-link" th:href="@{/admin/tours(keyword=${keyword}, status=${status}, page=${cur - 1})}">←</a>
+                        </li>
+                        <li class="page-item" th:if="${winStart > 0}">
+                            <a class="page-link" th:href="@{/admin/tours(keyword=${keyword}, status=${status}, page=0)}">1</a>
+                        </li>
+                        <li class="page-item disabled" th:if="${winStart > 1}"><span class="page-link">…</span></li>
+                        <li th:each="i : ${#numbers.sequence(winStart, winEnd)}"
+                            class="page-item" th:classappend="${i == cur} ? 'active'">
+                            <a class="page-link" th:href="@{/admin/tours(keyword=${keyword}, status=${status}, page=${i})}" th:text="${i + 1}">1</a>
+                        </li>
+                        <li class="page-item disabled" th:if="${winEnd < last - 1}"><span class="page-link">…</span></li>
+                        <li class="page-item" th:if="${winEnd < last}">
+                            <a class="page-link" th:href="@{/admin/tours(keyword=${keyword}, status=${status}, page=${last})}" th:text="${last + 1}">N</a>
+                        </li>
+                        <li class="page-item" th:classappend="${tourPage.last} ? 'disabled'">
+                            <a class="page-link" th:href="@{/admin/tours(keyword=${keyword}, status=${status}, page=${cur + 1})}">→</a>
+                        </li>
+                    </th:block>
                 </ul>
             </div>
         </nav>

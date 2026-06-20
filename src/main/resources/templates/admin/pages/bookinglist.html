@@ -104,16 +104,36 @@
                 <span class="text-muted small"
                       th:text="'Hiển thị ' + (${bookingPage.number * bookingPage.size + 1}) + '-' + (${bookingPage.number * bookingPage.size + bookingPage.numberOfElements}) + ' của ' + ${bookingPage.totalElements} + ' kết quả'">
                 </span>
-                <ul class="pagination pagination-sm mb-0">
+                <ul class="pagination pagination-sm mb-0"
+                    th:with="cur=${bookingPage.number},
+                             last=${bookingPage.totalPages - 1},
+                             winStart=${T(java.lang.Math).max(0, cur - 2)},
+                             winEnd=${T(java.lang.Math).min(last, cur + 2)}">
                     <li class="page-item" th:classappend="${bookingPage.first} ? 'disabled'">
-                        <a class="page-link" th:href="@{/admin/bookings(keyword=${keyword}, status=${status}, page=${bookingPage.number - 1})}">←</a>
+                        <a class="page-link" th:href="@{/admin/bookings(keyword=${keyword}, status=${status}, page=${cur - 1})}">←</a>
                     </li>
-                    <li th:each="i : ${#numbers.sequence(0, bookingPage.totalPages - 1)}"
-                        class="page-item" th:classappend="${i == bookingPage.number} ? 'active'">
+
+                    <li class="page-item" th:if="${winStart > 0}">
+                        <a class="page-link" th:href="@{/admin/bookings(keyword=${keyword}, status=${status}, page=0)}">1</a>
+                    </li>
+                    <li class="page-item disabled" th:if="${winStart > 1}">
+                        <span class="page-link">…</span>
+                    </li>
+
+                    <li th:each="i : ${#numbers.sequence(winStart, winEnd)}"
+                        class="page-item" th:classappend="${i == cur} ? 'active'">
                         <a class="page-link" th:href="@{/admin/bookings(keyword=${keyword}, status=${status}, page=${i})}" th:text="${i + 1}">1</a>
                     </li>
+
+                    <li class="page-item disabled" th:if="${winEnd < last - 1}">
+                        <span class="page-link">…</span>
+                    </li>
+                    <li class="page-item" th:if="${winEnd < last}">
+                        <a class="page-link" th:href="@{/admin/bookings(keyword=${keyword}, status=${status}, page=${last})}" th:text="${last + 1}">N</a>
+                    </li>
+
                     <li class="page-item" th:classappend="${bookingPage.last} ? 'disabled'">
-                        <a class="page-link" th:href="@{/admin/bookings(keyword=${keyword}, status=${status}, page=${bookingPage.number + 1})}">→</a>
+                        <a class="page-link" th:href="@{/admin/bookings(keyword=${keyword}, status=${status}, page=${cur + 1})}">→</a>
                     </li>
                 </ul>
             </div>
