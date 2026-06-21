@@ -284,6 +284,85 @@ CREATE TABLE IF NOT EXISTS reviews (
     CONSTRAINT fk_reviews_tour FOREIGN KEY (tour_id) REFERENCES tours (id) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT chk_reviews_rating CHECK (rating BETWEEN 1 AND 5)
 );
+-- =====================================================================
+-- ADD INDEXES cho query thường dùng trên dataset 1M+ bookings
+-- Mỗi lệnh ALTER mất ~30-60s trên 1M rows. Tổng ~3-5 phút.
+-- =====================================================================
+
+USE tourbookingdb;
+
+-- ---------------------------------------------------------------------
+-- BOOKINGS - hot table
+-- ---------------------------------------------------------------------
+-- (1) Sort ORDER BY created_at DESC ở admin/bookings → cần index trên created_at
+-- (2) Filter WHERE booking_status = ? hoặc != 'DELETED' → cần index trên booking_status
+-- (3) Composite (booking_status, created_at) phục vụ filter+sort cùng lúc
+-- (4) booking_code đã UNIQUE rồi nên có index sẵn
+
+ALTER TABLE bookings
+ADD INDEX idx_bookings_created_at (created_at DESC);
+
+ALTER TABLE bookings
+ADD INDEX idx_bookings_status_created (
+    booking_status,
+    created_at DESC
+);
+
+ALTER TABLE bookings
+ADD INDEX idx_bookings_payment_status (payment_status);
+
+-- contact_name dùng cho search (LIKE '%kw%') — không tối ưu được bằng B-tree
+-- nhưng có FULLTEXT thì ích hơn. Bỏ qua để không tốn dung lượng.
+
+-- ---------------------------------------------------------------------
+-- BOOKING_TRAVELERS
+-- ---------------------------------------------------------------------
+-- booking_id đã có FK index sẵn (MySQL auto-create cho FK). Không cần thêm.
+
+-- ---------------------------------------------------------------------
+-- PAYMENTS
+-- ---------------------------------------------------------------------
+ALTER TABLE payments ADD INDEX idx_payments_paid_at (paid_at);
+
+ALTER TABLE payments ADD INDEX idx_payments_status (status);
+
+-- ---------------------------------------------------------------------
+-- REVIEWS
+-- ---------------------------------------------------------------------
+ALTER TABLE reviews
+ADD INDEX idx_reviews_tour_rating (tour_id, rating);
+
+ALTER TABLE reviews
+ADD INDEX idx_reviews_created_at (created_at DESC);
+
+-- ---------------------------------------------------------------------
+-- USERS
+-- ---------------------------------------------------------------------
+-- email và phone đã UNIQUE → đã có index
+-- full_name search → thêm prefix index nếu cần
+ALTER TABLE users ADD INDEX idx_users_status (status);
+
+-- ---------------------------------------------------------------------
+-- TOUR_DEPARTURES
+-- ---------------------------------------------------------------------
+ALTER TABLE tour_departures
+ADD INDEX idx_departures_date (departure_date);
+
+ALTER TABLE tour_departures ADD INDEX idx_departures_status (status);
+
+-- =====================================================================
+-- Sau khi chạy xong, refresh statistics
+-- =====================================================================
+ANALYZE TABLE bookings,
+booking_travelers,
+payments,
+reviews,
+users,
+tour_departures;
+
+-- Kiểm tra xem index đã được dùng chưa:
+-- EXPLAIN SELECT * FROM bookings WHERE booking_status != 'DELETED' ORDER BY created_at DESC LIMIT 80, 10;
+-- Mong đợi: type=index (không phải ALL), Extra không có "Using filesort".
 
 -- =========================
 -- SEED: Roles mặc định
